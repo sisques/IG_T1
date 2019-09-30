@@ -5,7 +5,7 @@
 #include <punto_direccion.h>
 
 	void mulAux(const double m[4][4], double& x, double& y, double& z, double& w){
-		int a, b, c, d;
+		double a, b, c, d;
 		a = m[0][0]*x + m[0][1]*y + m[0][2]*z + m[0][3]*w;
 		b = m[1][0]*x + m[1][1]*y + m[1][2]*z + m[1][3]*w;
 		c = m[2][0]*x + m[2][1]*y + m[2][2]*z + m[2][3]*w;
@@ -45,6 +45,24 @@
 		return m * d;
 	}
 	
+	point detrans(const point p, const double x, const double y, const double z){
+		double m[4][4] = { {1, 0, 0, -x},
+						   {0, 1, 0, -y},
+						   {0, 0, 1, -z},
+						   {0, 0, 0, 1}
+						};
+		return m * p;
+	}
+	
+	dir detrans(const dir d, const double x, const double y, const double z){
+		double m[4][4] = { {1, 0, 0, -x},
+						   {0, 1, 0, -y},
+						   {0, 0, 1, -z},
+						   {0, 0, 0, 1}
+						};
+		return m * d;
+	}
+	
 	point scale(const point p, const double x, const double y, const double z){
 		double m[4][4] = { {x, 0, 0, 0},
 						   {0, y, 0, 0},
@@ -58,6 +76,24 @@
 		double m[4][4] = { {x, 0, 0, 0},
 						   {0, y, 0, 0},
 						   {0, 0, z, 0},
+						   {0, 0, 0, 1}
+						};
+		return m * d;
+	}
+	
+	point descale(const point p, const double x, const double y, const double z){
+		double m[4][4] = { {1/x, 0, 0, 0},
+						   {0, 1/y, 0, 0},
+						   {0, 0, 1/z, 0},
+						   {0, 0, 0, 1}
+						};
+		return m * p;
+	}
+	
+	dir descale(const dir d, const double x, const double y, const double z){
+		double m[4][4] = { {1/x, 0, 0, 0},
+						   {0, 1/y, 0, 0},
+						   {0, 0, 1/z, 0},
 						   {0, 0, 0, 1}
 						};
 		return m * d;
