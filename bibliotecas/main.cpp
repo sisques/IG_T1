@@ -1,72 +1,151 @@
 #include "punto_direccion.h"
+#include "esfera.h"
+#include "plano.h"
 #include <iostream>
+#include "math.h"
 using namespace std;
 
 
 int main(){
-	point p = newPoint(0,1.0,1.0);
-	point q = newPoint(0,2.0,3.0);
-	point r = newPoint(0,3.0,2.0);
-	cout << "puntos" << endl;
-	cout << p.x << " " << p.y << " " << p.z << endl; 
-	cout << q.x << " " << q.y << " " << q.z << endl; 
-	cout << r.x << " " << r.y << " " << r.z << endl; 
-
-	dir d1 = newDir(0,1.0,4.0);
-	dir d2 = q - p;
-	dir d3 = d1 + d2; 
-	dir d4 = (r-q) - d3;
-
-	dir d5 = 3.1*d1;
-	dir d6 = 3.1/d5;
+	double x, y, z;
+	double incl1, incl2;
+	double azim1, azim2;
+	double r1, r2;
+	bool ok;
+	point centro1, centro2;
+	point ciudad1, ciudad2;
+	dir eje1, eje2;
 	
-	cout << "direcciones" << endl;
-	cout << d1.x << " " << d1.y << " " << d1.z << endl; 
-	cout << d2.x << " " << d2.y << " " << d2.z << endl; 
-	cout << d3.x << " " << d3.y << " " << d3.z << endl;
-	cout << d4.x << " " << d4.y << " " << d4.z << endl;
-	cout << d5.x << " " << d5.y << " " << d5.z << endl;
-	cout << d6.x << " " << d6.y << " " << d6.z << endl;
+	//----------PLANETA 1----------//
+
+	// Primero se le solicita al usuario las coordenadas en UCS del centro, eje 
+	// y cuidad de referencia del planeta 1
+	cout << "Introduce las coordenadas del centro del planeta 1 en UCS" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	centro1 = newPoint(x,y,z);
+
+	cout << "Introduce la direccion del eje del planeta 1 en UCS" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	eje1 = newDir(x,y,z);
+
+	cout << "Introduce las coordenadas de la ciudad de referencia del planeta 1 en UCS" << endl;
+	cout << "Las coordenadas de la ciudad de referencia se usarán para definir el 0-meridiano" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	ciudad1 = newPoint(x,y,z);
 
 
-	cout << "modulo de d5" << endl; 
-	cout << mod(d5) << endl;
+	// Ahora se comprueba si el radio definido por el eje y por la distancia de la
+	// cuidad de referencia es el mismo ( maximo error de 10 a la - 6)
+	r1 = mod(eje1)/2;
+	r2 = dist(centro1, ciudad1);
 
-	point s = p + d1;
+	ok = abs(r1-r2) <= 0.000001 ? true : false ;
 
-	cout << "punto s" << endl;
-	cout << s.x << " " << s.y << " " << s.z << endl; 
+	if (ok) {
+		cout << "Los valores introducidos son correctos." << endl;
+	} else {
+		cout << "Valores incorrectos, se va a detener la ejecución." << endl;
+		exit(0);
+	}
 
 
-	cout << "calculo de producto escalar" << endl;
+	// Acto seguido se pasará a solicitar al usuario la inclinación y azimut que definen la estacion
+	// planetaria del planeta 1
+	cout << "Introduce la inclinación de la estación planetaria del planeta 1, rango (0,pi)" << endl;
+	cout << "La inclinación es el angulo de la estación respecto al eje del planeta" << endl;
+	cout << "Inclinación: " ;cin >> incl1;
 
-	dir a = newDir(0,1.0,1.0);
-	dir b = newDir (0,5.0,0);
-
-	cout << a.x << " " << a.y << " " << a.z << endl; 
-	cout << b.x << " " << b.y << " " << b.z << endl;
-
-	double escalar = dot(a,b);
-	double angulo = angle(a,b);
+	if (!(incl1 > 0 && incl1 < M_PI)) {
+		cout << "La inclinación introducida no es valida, se va a detener la ejecución." << endl;
+		exit(1);
+	}
 	
-	cout << escalar << endl;
-	cout << angulo  << endl;
+	cout << "Introduce el azimut de la estación planetaria del planeta 1, rango (-pi, pi]" << endl;
+	cout << "El azimut es el angulo de la estación espacial respecto del 0-meridiano" << endl;
+	cout << "Azimut: " ;cin >> azim1;
+
+	if (!(azim1 > -M_PI && azim1 <= M_PI)) {
+		cout << "El azimut introducida no es valida, se va a detener la ejecución." << endl;
+		exit(1);
+	}
 
 
-	cout << "calculo de producto vectorial" << endl;
-;
+	// Finalmente se calculara la posición de la estación en el sistema de coordenadas del planeta
+	//TODO
 
-	cout << a.x << " " << a.y << " " << a.z << endl; 
-	cout << b.x << " " << b.y << " " << b.z << endl;
 
-	dir vectorial = cross(a,b);
-	
-	cout << vectorial.x << " " << vectorial.y << " " << vectorial.z << endl;
-	double angulo_ab = angle(a,b);
-	double angulo_bvect = angle(b,vectorial);
-	double angulo_vecta = angle(vectorial,a);
-	cout << angulo_ab << endl; 
-	cout << angulo_bvect << endl; 
-	cout << angulo_vecta << endl; 
+	//----------PLANETA 2----------//
 
+
+	// Luego se le solicita al usuario las coordenadas en UCS del centro, eje 
+	// y cuidad de referencia del planeta 2
+	cout << "Introduce las coordenadas del centro del planeta 2 en UCS" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	centro2 = newPoint(x,y,z);
+
+	cout << "Introduce la direccion del eje del planeta 2 en UCS" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	eje2 = newDir(x,y,z);
+
+	cout << "Introduce las coordenadas de la ciudad de referencia del planeta 2 en UCS" << endl;
+	cout << "Las coordenadas de la ciudad de referencia se usarán para definir el 0-meridiano" << endl;
+	cout << "x: " ;cin >> x;
+	cout << "y: " ;cin >> y;
+	cout << "z: " ;cin >> z;
+	ciudad2 = newPoint(x,y,z);
+
+
+	// Ahora se comprueba si el radio definido por el eje y por la distancia de la
+	// cuidad de referencia es el mismo ( maximo error de 10 a la - 6)
+	r1 = mod(eje2)/2;
+	r2 = dist(centro2, ciudad2);
+
+	ok = abs(r1-r2) <= 0.000001 ? true : false ;
+
+	if (ok) {
+		cout << "Los valores introducidos son correctos." << endl;
+	} else {
+		cout << "Valores incorrectos, se va a detener la ejecución." << endl;
+		exit(0);
+	}
+
+
+	// Acto seguido se pasará a solicitar al usuario la inclinación y azimut que definen la estacion
+	// planetaria del planeta 2
+	cout << "Introduce la inclinación de la estación planetaria del planeta 2, rango (0,pi)" << endl;
+	cout << "La inclinación es el angulo de la estación respecto al eje del planeta" << endl;
+	cout << "Inclinación: " ;cin >> incl1;
+
+	if (!(incl2 > 0 && incl2 < M_PI)) {
+		cout << "La inclinación introducida no es valida, se va a detener la ejecución." << endl;
+		exit(1);
+	}
+
+	cout << "Introduce el azimut de la estación planetaria del planeta 2, rango (-pi, pi]" << endl;
+	cout << "El azimut es el angulo de la estación espacial respecto del 0-meridiano" << endl;
+	cout << "Azimut: " ;cin >> azim2;
+
+	if (!(azim2 > -M_PI && azim2 <= M_PI)) {
+		cout << "El azimut introducido no es valido, se va a detener la ejecución." << endl;
+		exit(1);
+	}
+
+	// Finalmente se calculara la posición de la estación en el sistema de coordenadas del planeta
+	//TODO
+
+
+	//----------CÁLCULO DE LA CONEXIÓN----------//
 }
+
+
+

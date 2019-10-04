@@ -50,6 +50,15 @@ struct dir {
 		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);     
 	}   
 
+	point normalize(point p){
+		if(p.w == 1){
+			return p;
+		}
+		else {
+			return newPoint(p.x/p.w, p.y/p.w, p.z/p.w);
+		}
+	}
+
 	dir operator +(dir p, dir q)         {     
 		return newDir(p.x + q.x, p.y + q.y, p.z + q.z);     
 	}   
@@ -68,6 +77,10 @@ struct dir {
 
 	double mod(dir d){
 		return sqrt( pow(d.x,2) + pow(d.y,2) + pow(d.z,2) );
+	}
+
+	double dist(point p, point q) {
+		return mod(q-p);
 	}
 	
 	double dot(dir d, dir e) {
