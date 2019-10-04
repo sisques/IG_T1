@@ -3,6 +3,9 @@
 
 #include <math.h>
 #include <punto_direccion.h>
+#include <iostream>
+
+using namespace std;
 
 	void mulAux(const double m[4][4], double& x, double& y, double& z, double& w){
 		double a, b, c, d;
@@ -169,13 +172,13 @@
 		return q;
 	}
 	
-	point basec(const dir u, const dir v, const dir w, const point o, const point d){
+	point basec(const dir u, const dir v, const dir w, const point o, const point p){
 		double m[4][4] = { {u.x, v.x, w.x, o.x},
 						   {u.y, v.y, w.y, o.y},
 						   {u.z, v.z, w.z, o.z},
 						   {0,	 0,	  0,   1}
 						};
-		return m * d;
+		return m * p;
 	}
 	
 	dir basec(const dir u, const dir v, const dir w, const point o, const dir d){
@@ -185,6 +188,110 @@
 						   {0,	 0,	  0,   1}
 						};
 		return m * d;
+	}
+	
+	point desbasec(const dir u, const dir v, const dir w, const point o, const point p){
+		double m[4][4] = { {u.x, v.x, w.x, o.x},
+						   {u.y, v.y, w.y, o.y},
+						   {u.z, v.z, w.z, o.z},
+						   {0,	 0,	  0,   1}
+						};
+		double aux[4][4];
+		inver(m,aux);
+		return aux * p;
+	}
+	
+	dir desbasec(const dir u, const dir v, const dir w, const point o, const dir d){
+		double m[4][4] = { {u.x, v.x, w.x, o.x},
+						   {u.y, v.y, w.y, o.y},
+						   {u.z, v.z, w.z, o.z},
+						   {0,	 0,	  0,   1}
+						};
+		double aux[4][4];
+		inver(m,aux);
+		return aux * d;
+	}
+	
+	double det3x3(const double m[3][3]){
+		return m[0][0]*m[1][1]*m[2][2] + m[0][1]*m[1][2]*m[2][0] + m[1][0]*m[2][1]*m[0][2]
+			   - m[0][2]*m[1][1]*m[2][0] - m[1][2]*m[2][1]*m[0][0] - m[1][0]*m[0][1]*m[2][2];
+	}
+	
+	double det4x4(const double m[4][4]){
+		double det = 0.0;
+		if(m[0][0] != 0){
+			double aux[3][3] = { {m[1][1], m[1][2], m[1][3]},
+						{m[2][1], m[2][2], m[2][3]},
+						{m[3][1], m[3][2], m[3][3]}
+						};
+			det += m[0][0]*det3x3(aux);
+		}
+		if(m[1][0] != 0){
+			double aux[3][3] = { {m[0][1], m[0][2], m[0][3]},
+						{m[2][1], m[2][2], m[2][3]},
+						{m[3][1], m[3][2], m[3][3]}
+						};
+			det -= m[1][0]*det3x3(aux);
+		}
+		if(m[2][0] != 0){
+			double aux[3][3] = { {m[0][1], m[0][2], m[0][3]},
+						{m[1][1], m[1][2], m[1][3]},
+						{m[3][1], m[3][2], m[3][3]}
+						};
+			det += m[2][0]*det3x3(aux);
+		}
+		if(m[3][0] != 0){
+			double aux[3][3] = { {m[0][1], m[0][2], m[0][3]},
+						{m[1][1], m[1][2], m[1][3]},
+						{m[2][1], m[2][2], m[2][3]}
+						};
+			det -= m[3][0]*det3x3(aux);
+		}
+		
+		return det;
+	}
+	
+	void adj(const double m[4][4], double adj[4][4]){
+		for(int i = 0; i < 4; ++i){
+			for(int j = 0; j < 4; ++j){
+				double aux[3][3];
+				int h = 0, k = 0;
+				for(int x = 0; x < 4; ++x){
+					for(int y = 0; y < 4 && h <3 && k < 3; ++y){
+						if(y != j){
+							aux[h][k] = m[x][y];
+							++k;
+						}
+					}
+					if(x != i){++h;}
+					k = 0;
+				}
+				adj[i][j] = pow(-1.0, i+j)*det3x3(aux);
+			}
+		}
+	}
+	
+	void trasp(const double m[4][4], double adj[4][4]){
+		for(int i = 0; i < 4; ++i){
+			for(int j = 0; j < 4; ++j){
+				adj[i][j] = m[j][i];
+			}
+		}
+	}
+	
+	void div(const double m[4][4], double x, double d[4][4]){
+		for(int i = 0; i < 4; ++i){
+			for(int j = 0; j < 4; ++j){
+				d[i][j] = m[i][j]/x;
+			}
+		}
+	}
+	
+	void inver(const double m[4][4], double inv[4][4]){
+		double aux[4][4], aux2[4][4];
+		adj(m,aux);
+		trasp(aux, aux2);
+		div(aux2, det4x4(m), inv);
 	}
 	
 	#endif
