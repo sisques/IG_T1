@@ -85,8 +85,8 @@ int main(){
 	//meridianRef1 = sphereParametric(centro2,r1, 0, 0);
 	ejeY1  = 2 / eje1;
 	if(ejeY1.y < 0){ejeY1  = -1 * eje1;}
-	ejeZ1 = cross(ejeY1, (ciudad1 - centro1));
-	ejeX1 = cross(ejeY1, ejeZ1);
+	ejeX1 = cross(ejeY1, (ciudad1 - centro1));
+	ejeZ1 = cross(ejeY1, ejeX1);
 	//ejeX1 = meridianRef1 - centro1;
 	//ejeZ1 = cross(ejeX1, ejeY1);
 	estacion1 = desbasec(ejeX1,ejeY1,ejeZ1,centro1, estacion1);
@@ -156,8 +156,8 @@ int main(){
 	//meridianRef2 = sphereParametric(centro2,r1, 0, 0);
 	ejeY2  = 2 / eje2;
 	if(ejeY2.y < 0){ejeY2  = -1 * eje2;}
-	ejeZ2 = cross(ejeY2, (ciudad2 - centro2));
-	ejeX2 = cross(ejeY2, ejeZ2);
+	ejeX2 = cross(ejeY2, (ciudad2 - centro2));
+	ejeZ2 = cross(ejeY2, ejeX2);
 	///ejeX2 = meridianRef2 - centro2;
 	//ejeZ2 = cross(ejeX2, ejeY2);
 	estacion2 = desbasec(ejeX2,ejeY2,ejeZ2,centro2, estacion2);
