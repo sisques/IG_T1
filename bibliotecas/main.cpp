@@ -14,10 +14,8 @@ int main(){
 	double azim1, azim2;
 	double r1, r2;
 	bool ok;
-	point centro1, centro2;
-	point ciudad1, ciudad2;
-	point estacion1, estacion2;
-	point meridianRef1, meridianRef2;
+	point cero = newPoint(0,0,0);
+	point centro1, centro2, ciudad1, ciudad2, estacion1, estacion2, norte1, norte2;
 	dir ejeX1, ejeY1, ejeZ1, ejeX2, ejeY2, ejeZ2;
 	dir eje1, eje2;
 	
@@ -50,7 +48,7 @@ int main(){
 	r1 = mod(eje1)/2;
 	r2 = dist(centro1, ciudad1);
 
-	ok = abs(r1-r2) <= 1;//0.000001 ? true : false ;
+	ok = abs(r1-r2) <= 0.000001 ? true : false ;
 
 	if (ok) {
 		cout << endl << "Los valores introducidos son correctos." << endl;
@@ -81,15 +79,13 @@ int main(){
 	}
 
 	//Cálculo de la estación 1
-	estacion1 = sphereParametric(centro1,r1, incl1, azim1);
-	//meridianRef1 = sphereParametric(centro2,r1, 0, 0);
+	estacion1 = sphereParametric(cero,r1, incl1, azim1);
+	norte1 = centro1 + 2 / eje1;
 	ejeY1  = 2 / eje1;
 	if(ejeY1.y < 0){ejeY1  = -1 * eje1;}
-	ejeX1 = cross(ejeY1, (ciudad1 - centro1));
+	ejeX1 = cross((ciudad1 - centro1), ejeY1);
 	ejeZ1 = cross(ejeY1, ejeX1);
-	//ejeX1 = meridianRef1 - centro1;
-	//ejeZ1 = cross(ejeX1, ejeY1);
-	estacion1 = desbasec(ejeX1,ejeY1,ejeZ1,centro1, estacion1);
+	estacion1 = basec(ejeX1,ejeY1,ejeZ1,centro1, estacion1);
 
 	//----------PLANETA RECEPTOR----------//
 
@@ -121,7 +117,7 @@ int main(){
 	r1 = mod(eje2)/2;
 	r2 = dist(centro2, ciudad2);
 
-	ok = abs(r1-r2) <= 1;//0.000001 ? true : false ;
+	ok = abs(r1-r2) <= 0.000001 ? true : false ;
 
 	if (ok) {
 		cout << endl << "Los valores introducidos son correctos." << endl;
@@ -152,21 +148,30 @@ int main(){
 	}
 
 	//Cálculo de la estación 2
-	estacion2 = sphereParametric(centro2,r1, incl2, azim2);
-	//meridianRef2 = sphereParametric(centro2,r1, 0, 0);
+	estacion2 = sphereParametric(cero,r1, incl2, azim2);
+	norte2 = centro2 + 2 / eje2;
 	ejeY2  = 2 / eje2;
 	if(ejeY2.y < 0){ejeY2  = -1 * eje2;}
-	ejeX2 = cross(ejeY2, (ciudad2 - centro2));
+	ejeX2 = cross((ciudad2 - centro2), ejeY2);
 	ejeZ2 = cross(ejeY2, ejeX2);
-	///ejeX2 = meridianRef2 - centro2;
-	//ejeZ2 = cross(ejeX2, ejeY2);
-	estacion2 = desbasec(ejeX2,ejeY2,ejeZ2,centro2, estacion2);
+	estacion2 = basec(ejeX2,ejeY2,ejeZ2,centro2, estacion2);
 
 
 	//----------CÁLCULO DE LA CONEXIÓN----------//
 	dir conex = estacion2 - estacion1;
-	dir d1 = basec(ejeX1, ejeY1, ejeZ1, centro1, conex);
-	dir d2 = -1 * basec(ejeX2, ejeY2, ejeZ2, centro2, conex);
+	
+	ejeY1 = estacion1 - centro1;
+	ejeZ1 = norte1 - estacion1;
+	ejeX1 = cross(ejeY1, ejeZ1);
+	ejeZ1 = cross(ejeX1, ejeY1);
+	
+	ejeY2 = estacion2 - centro2;
+	ejeZ2 = norte2 - estacion2;
+	ejeX2 = cross(ejeY2, ejeZ2);
+	ejeZ2 = cross(ejeX2, ejeY2);
+	
+	dir d1 = desbasec(ejeX1, ejeY1, ejeZ1, estacion1, conex);
+	dir d2 = -1 * desbasec(ejeX2, ejeY2, ejeZ2, estacion2, conex);
 	
 	cout << endl << "La estación emisora lanzará en la dirección x: " << d1.x << " y: " << d1.y << " z: " << d1.z << endl;
 	if(d1.y < 0){cout << "Problema en la dirección de emisión. ALERTA" << endl;}

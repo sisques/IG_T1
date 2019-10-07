@@ -20,11 +20,15 @@
     *   inclination = posicion del punto en el eje vertical de la esfera, en radianes
     *   azimuth = posicion del punto en el eje horizontal de la esfera, en radianes
     */ 
-    point sphereParametric(point c, double r, double inclination, double azimuth){
-        point aux = newPoint(   r*sin(inclination)*sin(azimuth), 
-                                r*sin(inclination)*cos(azimuth),
-                                r*cos(inclination)              );
-        return c + aux;
+   point sphereParametric(point c, double r, double inclination, double azimuth){
+       return newPoint(   c.x + r*cos(inclination)*cos(azimuth),
+                                c.y + r*cos(inclination)*sin(azimuth),
+                                c.z + r*sin(inclination)              );
+       /*
+        * return newPoint(   c.x + r*sin(inclination)*sin(azimuth),
+                                c.y + r*sin(inclination)*cos(azimuth),
+                                c.z + r*cos(inclination)              );
+        */
     }
 
 #endif
