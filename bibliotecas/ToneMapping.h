@@ -7,30 +7,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "../bibliotecas/enum.h"
 
 
 using namespace std;
 
 
-	int reinhardt(const double Lw, const double alpha, const double avg, const double max, const double cr){
-	    double realValue = Lw*max/cr;
-	    double l = (alpha/avg)*realValue;
+	int reinhardt(const double Lw, const double alpha, const long double avg, const double max, const double cr){
+	    long double realValue = Lw*max/cr;
+	    long double l = (alpha/avg)*realValue;
 	    int writeValue = l*cr/max;
 	    return (writeValue)/*/(1+writeValue)*/;
 	}
 
 	double media(const double Lw, const double delta, const double max, const double cr){
-	    double realValue = Lw*max/cr;
-	    return log10(delta + realValue);
+	    long double realValue = Lw*max/cr;
+	    return log(delta + realValue);
 	}
 
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
-    bool applyToneMapping(const string fileIn, tipo algoritmo) {
-	    double N = 0, avgR = 0, avgG = 0, avgB = 0;
-	    double alpha = 0.18, delta = 0.05;
-		double MAX = 0, width = 0, height = 0, cr = 0;
+    bool applyToneMapping(const string fileIn, const double alpha, const double delta) {
+	    long double avgR = 0, avgG = 0, avgB = 0;
+		double MAX = 0, width = 0, height = 0, cr = 0, N = 0;
 
 
 
