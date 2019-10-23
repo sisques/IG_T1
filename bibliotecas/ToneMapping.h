@@ -12,25 +12,21 @@
 using namespace std;
 
 
-	int reinhardt(const double Lw, const double alpha, const long double avg, const double max, const double cr){
-	    long double realValue = Lw*max/cr;
-	    long double l = (alpha/avg)*realValue;
-	    int writeValue = l*cr/max;
-	    return (writeValue)/*/(1+writeValue)*/;
+	double reinhardt(const double Lw, const double lmax,const double alpha, const long double avg){
+	    long double l = (alpha/avg)*Lw;
+	    return (l	*	(1+	l
+							/(pow(lmax,2))))
+					/(1+l);
 	}
 
-	double media(const double Lw, const double delta, const double max, const double cr){
-	    long double realValue = Lw*max/cr;
-	    return log(delta + realValue);
+	double media(const double Lw, const double delta){
+		return log(delta + Lw);
 	}
-
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
     bool applyToneMapping(const string fileIn, const double alpha, const double delta) {
-	    long double avgR = 0, avgG = 0, avgB = 0;
-		double MAX = 0, width = 0, height = 0, cr = 0, N = 0;
-
-
+	    /*long */double avgLum = 0;
+		double MAX = 0, width = 0, height = 0, cr = 0, N = 0, lmax = 10000000;
 
         fstream flujoIn;
         flujoIn.open(fileIn.c_str(), ios::in);
@@ -55,27 +51,17 @@ using namespace std;
         for(int i = 0; i < height; ++i){
             for(int j = 0; j < width; ++j){
                 flujoIn >> a >> b >> c;
-                avgR = avgR + media(a, delta, MAX, cr);
-                avgG = avgG + media(b, delta, MAX, cr);
-                avgB = avgB + media(c, delta, MAX, cr);
+				a = a*MAX/cr;
+				b = b*MAX/cr;
+				c = c*MAX/cr;
+				/*long */double lum = (0.2126*a + 0.7152*b + 0.0722*c);
+				if(lum < lmax){lmax = lum;}
+                avgLum = avgLum + media(lum, delta);
             }
         }
-        avgR = exp(avgR/N) ;
-        avgG = exp(avgG/N);
-        avgB = exp(avgB/N);
-
+        avgLum = exp(avgLum/N);
 
         flujoIn.close();
-
-
-
-
-
-
-
-
-
-
 
         string fileOut = fileIn;
 		fileOut.erase(fileOut.end()-4,fileOut.end());
@@ -104,9 +90,17 @@ using namespace std;
 		for(int i = 0; i < height; ++i){
 			for(int j = 0; j < width; ++j){
 				flujoIn >> a >> b >> c;
-                x = reinhardt(a, alpha, avgR, MAX, cr);
-                y = reinhardt(b, alpha, avgG, MAX, cr);
-                z = reinhardt(c, alpha, avgB, MAX, cr);
+				a = a*MAX/cr;
+				b = b*MAX/cr;
+				c = c*MAX/cr;
+				/*long */double lum = (0.2126*a + 0.7152*b + 0.0722*c);
+				/*long */double newLum = reinhardt(lum, lmax, alpha, avgLum);
+                a = a * newLum;
+                b = b * newLum;
+                c = c * newLum;
+				x = a*/*(cr/MAX)*/		(255/MAX);
+				y = b*/*(cr/MAX)*/		(255/MAX);
+				z = c*/*(cr/MAX)*/		(255/MAX);
 				flujoOut << x << " " << y << " " << z;
 				if(j < width-1){
 					flujoOut << "    ";
