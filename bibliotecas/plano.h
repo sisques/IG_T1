@@ -4,6 +4,25 @@
 #include "punto_direccion.h"
 
 
+
+
+
+struct plane{
+public:
+    point o;
+    dir n;
+    int R, G, B;
+};
+
+plane newPlane(point _o, dir _n, int _R, int _G, int _B){
+    plane p;
+    p.o = _o;
+    p.n = _n;
+    p.R = _R;
+    p.G = _G;
+    p.B = _B;
+    return p;
+}
     /**
     *   p = punto que queremos comprobar si pertenece al plano
     *   n = vector normal al plano
@@ -11,9 +30,11 @@
     *   p pertenece al plano si y solo si (p-o) es perpendicular a n
     *   es decir (p-o)·n = 0
     */
-    bool planeImplicit(point p, point o, dir n) {
-        dir d = p - o;
-        return dot(d,n) == 0;
+
+   //poner un threshold
+    bool planeImplicit(point p, plane pl) {
+        dir d = p - pl.o;
+        return dot(d,pl.n) <= 0;
     }
 
     /**
