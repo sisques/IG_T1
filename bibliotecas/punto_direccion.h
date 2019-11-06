@@ -48,9 +48,13 @@ struct dir {
 
 	point operator +(point p, dir q)         {     
 		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);     
-	}   
+	}
 
-	point normalize(point p){
+    point operator -(point p, dir q)         {
+	    return newPoint(p.x - q.x, p.y - q.y, p.z - q.z);
+    }
+
+    point normalize(point p){
 		if(p.w == 1){
 			return p;
 		}
@@ -69,9 +73,13 @@ struct dir {
 
 	dir operator *( double q, dir p)         {     
 		return newDir(p.x*q, p.y*q, p.z*q);     
-	}   
+	}
 
-	dir operator /(double q, dir p)         {     
+dir operator *( dir p, double q)         {
+    return newDir(q*p.x, q*p.y, q*p.z);
+}
+
+dir operator /(dir p, double q)         {
 		return newDir(p.x/q, p.y/q, p.z/q);     
 	}   
 
