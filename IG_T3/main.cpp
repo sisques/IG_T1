@@ -1,7 +1,8 @@
-#include "../bibliotecas/punto_direccion.h"
-#include "../bibliotecas/camara.h"
-#include "../bibliotecas/figuras.h"
-#include "../bibliotecas/tranformations.h"
+#include "bibliotecas/punto_direccion.h"
+#include "bibliotecas/camara.h"
+#include "bibliotecas/figuras.h"
+#include "bibliotecas/tranformations.h"
+#include "bibliotecas/monteCarlo.h"
 
 
 #include <iostream>
@@ -13,9 +14,9 @@
 using namespace std;
 
 
-dir monteCarlo(camara c, double altura, double anchura, int numRayo, int rpp){
+dir MonteCarlo(camara c, double altura, double anchura, int numRayo, int rpp){
     point origen = c.o;
-    point final = newPoint(c.f.x, altura, anchura);
+    point final = newPoint(anchura, altura, c.f.z);
     return final - origen;
 
 }
@@ -26,7 +27,7 @@ void rtx( camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& 
     double delta = 0;
     double distMin = numeric_limits<double>::max();
     double distActual = 0;
-    bool colision = false;
+    bool colision;
     shared_ptr<figura> nearest;
 
 
@@ -38,73 +39,59 @@ void rtx( camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& 
             distActual = mod(c.o - p);
             if (distActual < distMin) {
                 nearest = f;
+                distMin = distActual;
             }
         }
     }
-
-
-
-    // Iterar todos los elementos de la escen y dibujar el mas cercano al origen de la camara.
-
-        R = nearest->getR();
-        G = nearest->getG();
-        B = nearest->getB();
-
+    R = nearest->getR();
+    G = nearest->getG();
+    B = nearest->getB();
 }
 
 
+
+
 list<shared_ptr<figura>> setUpScene(){
-    list<shared_ptr<figura>> elementos;
+    //string file = "/home/victor/4o/IG/IG_T1/models/test.ply";
+    list<shared_ptr<figura>> elementos/* = plyReader(file)*/;
 
 
-/*
- * NO FUNCIONA CORRECTAMENTE
- *
-    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(10,0,0), newDir(1,0,0), 255,0,0));
-    shared_ptr<figura> arriba = make_shared<plano>(plano(newPoint(0,10,0), newDir(0,1,0), 255,255,255));
-    shared_ptr<figura> abajo = make_shared<plano>(plano(newPoint(0,-10,0), newDir(0,1,0), 255,255,255));
-    shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(0,0,-10), newDir(0,0,1), 0,0,255));
-    shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0,0,-10), newDir(0,0,1), 0,0,255));
-    shared_ptr<figura> centro = make_shared<esfera>(esfera(newPoint(5.0,0.0,0.0), 2.0, 0,255, 0));
+    shared_ptr<figura> p1 = make_shared<esfera>(esfera(newPoint(-50,0,100), 25, 255,255, 255));
+    shared_ptr<figura> p2 = make_shared<esfera>(esfera(newPoint(50,0,100), 25, 255,255, 255));
+    shared_ptr<figura> p3 = make_shared<esfera>(esfera(newPoint(0,50,100), 25, 255,255, 255));
+    shared_ptr<figura> p4 = make_shared<esfera>(esfera(newPoint(0,-50,100), 25, 255,255, 255));
 
 
+    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,500), newDir(0,0,-1), 0,0,0));
+    elementos.push_back(p1);
+    elementos.push_back(p2);
+    elementos.push_back(p3);
+    elementos.push_back(p4);
     elementos.push_back(fondo);
-    elementos.push_back(arriba);
-    elementos.push_back(abajo);
-    elementos.push_back(izquierda);
-    elementos.push_back(derecha);
-    elementos.push_back(centro);
-*/
-
-    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(100,100,100), newDir(1,0,0), 0,0,0));
-    shared_ptr<figura> esfera1 = make_shared<esfera>(esfera(newPoint(30.0,50.0,0.0), 50.0, 255,0, 0));
-    //shared_ptr<figura> esfera2 = make_shared<esfera>(esfera(newPoint(5.0,0.0,5.0), 4.0, 0,255, 0));
-    //shared_ptr<figura> esfera3 = make_shared<esfera>(esfera(newPoint(5.0,0.0,5.0), 6.0, 0,0, 255));
-
-    elementos.push_back(fondo);
-    elementos.push_back(esfera1);
-    //elementos.push_back(esfera2);
-    //elementos.push_back(esfera3);
 
 
 
     return elementos;
 }
 
+
+
+
+
 int main(){
     /*
      * camara       x   y   z
      *      o   =   0   0   0
+     *      l   =   1   0   0
      *      u   =   0   1   0
-     *      l   =   0   0   1
-     *      f   =   1   0   0
+     *      f   =   0   0   1
      *
      *      aspect ratio        1:1
      */
 	point origenCamara = newPoint(0,0,0);
+    dir anchuraPlano = newDir(1,0,0);
     dir alturaPlano = newDir(0,1,0);
-    dir anchuraPlano = newDir(0,0,1);
-    dir distanciaPlano = newDir(1,0,0);
+    dir distanciaPlano = newDir(0,0,1);
 
 
 	camara c =  newCamara(origenCamara, alturaPlano, anchuraPlano, distanciaPlano);
@@ -129,7 +116,7 @@ int main(){
 
 
 
-    string ruta = "/home/victor/4o/IG/IG_T1/imagenes/";
+    string ruta = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\";
     fOut = fOut + ".ppm";
     fstream flujoOut;
     string fOutAux = ruta + fOut;
@@ -148,33 +135,14 @@ int main(){
 
     list<shared_ptr<figura>> e = setUpScene();
 
-
-    int _R, _G, _B;
-    double altura;
-    double anchura;
-    for (int i = h/2 ; i > -h/2; i--){
-        for (int j = -w/2; j < w/2; j++){
-            _R = 0;
-            _G = 0;
-            _B = 0;
-            anchura = j/(w/2);
-            altura = i/(h/2);
-            for (int k = 0; k < rpp; k++){
-                rayo = monteCarlo(c,altura,anchura,k, rpp);
-                rtx(c, e, rayo, R, G, B);
-                _R += R;
-                _G += G;
-                _B += B;
-            }
-            R = _R/rpp;
-            G = _G/rpp;
-            B = _B/rpp;
-
+	monteCarlo mc(c,h,w,10);
+    for (int i = 0; i < h; ++i){
+        for (int j = 0; j < w; j++){
+            mc.rtx(e,i,j,R,G,B);
             flujoOut << R << " " << G << " " << B;
-            if(j < w-1){
-                flujoOut << "    ";
-            }
-
+            flujoOut << "    ";
         }
     }
+	flujoOut.close();
 }
+
