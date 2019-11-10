@@ -1,8 +1,10 @@
-#include "bibliotecas/punto_direccion.h"
-#include "bibliotecas/camara.h"
-#include "bibliotecas/figuras.h"
-#include "bibliotecas/tranformations.h"
-#include "bibliotecas/monteCarlo.h"
+#include "../bibliotecas/ply_reader.h"
+
+
+#include "../bibliotecas/punto_direccion.h"
+#include "../bibliotecas/camara.h"
+#include "../bibliotecas/figuras.h"
+#include "../bibliotecas/tranformations.h"
 
 
 #include <iostream>
@@ -14,7 +16,7 @@
 using namespace std;
 
 
-dir MonteCarlo(camara c, double altura, double anchura, int numRayo, int rpp){
+dir monteCarlo(camara c, double altura, double anchura, int numRayo, int rpp){
     point origen = c.o;
     point final = newPoint(anchura, altura, c.f.z);
     return final - origen;
@@ -116,7 +118,7 @@ int main(){
 
 
 
-    string ruta = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\";
+    string ruta = "/home/victor/4o/IG/IG_T1/imagenes/";
     fOut = fOut + ".ppm";
     fstream flujoOut;
     string fOutAux = ruta + fOut;
@@ -135,14 +137,36 @@ int main(){
 
     list<shared_ptr<figura>> e = setUpScene();
 
-	monteCarlo mc(c,h,w,10);
-    for (int i = 0; i < h; ++i){
-        for (int j = 0; j < w; j++){
-            mc.rtx(e,i,j,R,G,B);
+
+    int _R, _G, _B;
+    double altura;
+    double anchura;
+    for (int i = h/2 ; i > -h/2; i--){
+        for (int j = -w/2; j < w/2; j++){
+            _R = 0;
+            _G = 0;
+            _B = 0;
+            anchura = j/(w/2);
+            altura = i/(h/2);
+
+            for (int k = 0; k < rpp; k++){
+                rayo = monteCarlo(c,altura,anchura,k, rpp);
+                rtx(c, e, rayo, R, G, B);
+                _R += R;
+                _G += G;
+                _B += B;
+            }
+            R = _R/rpp;
+            G = _G/rpp;
+            B = _B/rpp;
+
+
             flujoOut << R << " " << G << " " << B;
-            flujoOut << "    ";
+            if(j < w-1){
+                flujoOut << "    ";
+            }
+
         }
     }
-	flujoOut.close();
 }
 
