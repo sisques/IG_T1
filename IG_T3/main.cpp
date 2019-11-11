@@ -4,6 +4,7 @@
 #include "bibliotecas/tranformations.h"
 #include "bibliotecas/monteCarlo.h"
 #include "bibliotecas/ply_reader.h"
+#include "bibliotecas/perlinNoise.h"
 
 #include <iostream>
 #include <string>
@@ -24,21 +25,23 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
     string file = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\test.ply";
-    list<shared_ptr<figura>> elementos = plyReader(file,c, 1);
+    list<shared_ptr<figura>> elementos = plyReader(file,c, 5);
 
 
-    shared_ptr<figura> p1 = make_shared<esfera>(esfera(c, newPoint(-50,0,100), 25, 255,0, 0,1));
-    shared_ptr<figura> p2 = make_shared<esfera>(esfera(c, newPoint(50,0,100), 25, 0,255, 0,1));
-    shared_ptr<figura> p3 = make_shared<esfera>(esfera(c, newPoint(0,50,100), 25, 0,0, 255,3));
-    shared_ptr<figura> p4 = make_shared<esfera>(esfera(c, newPoint(0,-50,100), 25, 255,0, 255,3));
+    shared_ptr<figura> p1 = make_shared<esfera>(esfera(c, newPoint(-50,0,100), 25, 255,100, 100,5));
+    shared_ptr<figura> p2 = make_shared<esfera>(esfera(c, newPoint(50,0,100), 25, 100,255, 100,5));
+    shared_ptr<figura> p3 = make_shared<esfera>(esfera(c, newPoint(0,50,100), 25, 51,153, 255,5));
+    shared_ptr<figura> p4 = make_shared<esfera>(esfera(c, newPoint(0,-50,100), 25, 255,100, 255,5));
 
 
-    shared_ptr<figura> fondo = make_shared<plano>(plano(c, newPoint(0,0,500), newDir(0,0,-1), 0,0,0, 3));
+    shared_ptr<figura> fondo = make_shared<plano>(plano(c, newPoint(0,0,500), newDir(0,0,-1), 0,0, 0, 7));
+	shared_ptr<figura> fondo2 = make_shared<plano>(plano(c, newPoint(0,0,600), newDir(0,0,-1), 51,153, 150, 5));
     elementos.push_back(p1);
     elementos.push_back(p2);
     elementos.push_back(p3);
     elementos.push_back(p4);
     elementos.push_back(fondo);
+	elementos.push_back(fondo2);
 
 
 
@@ -50,6 +53,7 @@ void generateScene( monteCarlo mc, const list<shared_ptr<figura>> e,
 	int R,G,B;
 	fstream flujoOut;
 	flujoOut.open((fOut).c_str(), ios::out);
+	texture4 tex;
 	for (int i = hMin; i <= hMax; ++i){
         for (int j = 0; j < w; j++){
             mc.rtx(e,i,j,R,G,B);
@@ -96,18 +100,18 @@ int main(){
     rpp = 1;
     fOut = "test";
     string ruta = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\";
-   
+   int threads = 10;
 	list<shared_ptr<figura>> e = setUpScene();
-	thread th[10];
-	int hMin = 0, hMax = - 1 + h/10;
-	for(int i = 0; i < 10;++i){
-		monteCarlo mc(c,h,w,10);
+	thread th[threads];
+	int hMin = 0, hMax = - 1 + h/threads;
+	for(int i = 0; i < threads;++i){
+		monteCarlo mc(c,h,w,1);
 		if(i == 9){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w);
-		hMin += h/10;
-		hMax += h/10;
+		hMin += h/threads;
+		hMax += h/threads;
 	}
-	for(int i = 0; i < 10;++i){th[i].join();}
+	for(int i = 0; i < threads;++i){th[i].join();}
 	
 	fOut = fOut + ".ppm";
     fstream flujoOut;
