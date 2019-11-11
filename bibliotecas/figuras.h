@@ -5,16 +5,44 @@
 #include "punto_direccion.h"
 #include <iostream>
 #include <math.h>
+#include "textures.h"
+#include "camara.h"
 
 using namespace std;
 
 class figura{
-    int R, G, B;
+protected:
+    int R, G, B, text;
+	camara cam;
+	texture *texturizador;
 public:
-    figura(int _R, int _G, int _B){
+    figura(camara c, int _R, int _G, int _B){
         this -> R = _R;
         this -> G = _G;
         this -> B = _B;
+		this->text = 0;
+		this -> cam = c;
+		texturizador = new texture();
+    }
+	
+	figura(camara c, int _R, int _G, int _B, int t){
+		this -> R = _R;
+        this -> G = _G;
+        this -> B = _B;
+		this->text = t;
+		this->cam = c;
+		if(t == 0){
+			texturizador = new texture();
+		}
+		else if(t == 1){
+			texturizador = new texture1();
+		}
+		else if(t == 2){
+			texturizador = new texture2();
+		}
+		else if(t == 3){
+			texturizador = new texture3();
+		}
     }
 
     virtual bool implicit(point p) {
@@ -23,6 +51,34 @@ public:
     int getR(){ return this->R;}
     int getG(){ return this->G;}
     int getB(){ return this->B;}
+	
+	virtual int getR(point p){
+		if(this->text == 1){
+			return texturizador->getR(p,this->R);
+		}
+		else if(this->text == 3){
+			return texturizador->getR(this->cam.o, p,this->R);
+		}
+		return this->R;
+	}
+    virtual int getG(point p){
+		if(this->text == 1){
+			return texturizador->getG(p,this->G);
+		}
+		else if(this->text == 3){
+			return texturizador->getG(this->cam.o, p,this->G);
+		}
+		return this->G;
+	}
+    virtual int getB(point p){
+		if(this->text == 1){
+			return texturizador->getB(p,this->B);
+		}
+		else if(this->text == 3){
+			return texturizador->getB(this->cam.o, p,this->B);
+		}
+		return this->B;
+	}
 
     virtual bool intersection(dir rd, point ro, double &t, double &dist){
         return false;
@@ -36,7 +92,12 @@ private:
     point c;
     double r;
 public:
-    esfera(point _c, double _r, int _R, int _G, int _B): figura(_R, _G, _B){
+    esfera(camara c, point _c, double _r, int _R, int _G, int _B): figura(c, _R, _G, _B){
+        this -> c = _c;
+        this -> r = _r;
+    }
+	
+	esfera(camara c, point _c, double _r, int _R, int _G, int _B, int t): figura(c, _R, _G, _B, t){
         this -> c = _c;
         this -> r = _r;
     }
@@ -70,7 +131,6 @@ public:
             return false;
         }
     }
-
 };
 
 
@@ -79,10 +139,16 @@ private:
     point p;
     dir n;
 public:
-    plano(point _p, dir _n, int _R, int _G, int _B): figura(_R, _G, _B){
+    plano(camara c, point _p, dir _n, int _R, int _G, int _B): figura(c, _R, _G, _B){
         this -> p = _p;
         this -> n = _n;
     }
+	
+	plano(camara c, point _p, dir _n, int _R, int _G, int _B, int t): figura(c, _R, _G, _B, t){
+        this -> p = _p;
+        this -> n = _n;
+    }
+	
     bool implicit(point p) override  {
         dir d = p - this -> p;
         return dot(d, this -> n) <= 0;
@@ -112,24 +178,47 @@ public:
         }
 
     }
+	
+	int getR(point pp) override {
+		if(this->text == 2){
+			return texturizador->getR(this->p, pp,this->R);
+		}
+		return figura::getR(pp);
+	}
+    int getG(point pp) override {
+		if(this->text == 2){
+			return texturizador->getG(this->p, pp,this->G);
+		}
+		return figura::getG(pp);
+	}
+    int getB(point pp) override {
+		if(this->text == 2){
+			return texturizador->getB(this->p, pp,this->B);
+		}
+		return figura::getB(pp);
+	}
+	
 };
-
-
-
 
 class triangulo : public figura {
 private:
     point v0, v1, v2;
 public:
-    triangulo(point _v0, point _v1, point _v2, int _R, int _G, int _B): figura(_R, _G, _B){
+    triangulo(camara c, point _v0, point _v1, point _v2, int _R, int _G, int _B): figura(c, _R, _G, _B){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
     }
-    bool implicit(point p) override  {
-        dir d = p - this -> p;
-        return dot(d, this -> getNormal()) <= 0;
+	
+	triangulo(camara c, point _v0, point _v1, point _v2, int _R, int _G, int _B, int t): figura(c, _R, _G, _B,t){
+        this -> v0 = _v0;
+        this -> v1 = _v1;
+        this -> v2 = _v2;
     }
+   /* bool implicit(point p) override  {
+        dir d = p - this -> p;
+        return dot(d, this -> n) <= 0;
+    }*/
 
     dir getNormal(){
        dir arista1 = this->v1 - this->v0;

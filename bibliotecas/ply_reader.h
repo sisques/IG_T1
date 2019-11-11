@@ -15,7 +15,7 @@ using namespace std;
 
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
-    list<shared_ptr<figura>> plyReader(const string fileIn) {
+    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text) {
         list<shared_ptr<figura>> ouput;
 
         fstream flujoIn;
@@ -50,7 +50,7 @@ using namespace std;
             flujoIn >> x;
             flujoIn >> y;
             flujoIn >> z;
-            puntos[i] = newPoint(x,y,z);
+            puntos[i] = newPoint(x,y,z+4);
         }
 
         int R,G,B;
@@ -70,10 +70,10 @@ using namespace std;
          /*   flujoIn >> R;
             flujoIn >> G;
             flujoIn >> B;*/
-            R = 255;
-            G = 255;
-            B = 255;
-            shared_ptr<figura> tri = make_shared<triangulo>(triangulo(v0, v1, v2, R,G,B));
+            R = 100;
+            G = 0;
+            B = 0;
+            shared_ptr<figura> tri = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R,G,B, text));
             ouput.push_back(tri);
         }
 
