@@ -43,6 +43,18 @@ public:
 		else if(t == 3){
 			texturizador = new texture3();
 		}
+		else if(t == 4){
+			texturizador = new texture4();
+		}
+		else if(t == 5){
+			texturizador = new texture5();
+		}
+		else if(t == 6){
+			texturizador = new texture6();
+		}
+		else if(t == 7){
+			texturizador = new texture7();
+		}
     }
 
     virtual bool implicit(point p) {
@@ -53,7 +65,7 @@ public:
     int getB(){ return this->B;}
 	
 	virtual int getR(point p){
-		if(this->text == 1){
+		if(this->text == 1 || this->text == 4 || this->text == 5){
 			return texturizador->getR(p,this->R);
 		}
 		else if(this->text == 3){
@@ -62,16 +74,16 @@ public:
 		return this->R;
 	}
     virtual int getG(point p){
-		if(this->text == 1){
+		if(this->text == 1 || this->text == 4 || this->text == 5){
 			return texturizador->getG(p,this->G);
 		}
-		else if(this->text == 3){
+		else if(this->text == 3 ){
 			return texturizador->getG(this->cam.o, p,this->G);
 		}
 		return this->G;
 	}
     virtual int getB(point p){
-		if(this->text == 1){
+		if(this->text == 1 || this->text == 4 || this->text == 5){
 			return texturizador->getB(p,this->B);
 		}
 		else if(this->text == 3){
@@ -131,6 +143,26 @@ public:
             return false;
         }
     }
+	
+	int getR(point pp) override {
+		if(this->text == 2){
+			return texturizador->getR(this->c, pp,this->R);
+		}
+		return figura::getR(pp);
+	}
+    int getG(point pp) override {
+		if(this->text == 2){
+			return texturizador->getG(this->c, pp,this->G);
+		}
+		return figura::getG(pp);
+	}
+    int getB(point pp) override {
+		if(this->text == 2){
+			return texturizador->getB(this->c, pp,this->B);
+		}
+		return figura::getB(pp);
+	}
+	
 };
 
 
@@ -180,19 +212,19 @@ public:
     }
 	
 	int getR(point pp) override {
-		if(this->text == 2){
+		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getR(this->p, pp,this->R);
 		}
 		return figura::getR(pp);
 	}
     int getG(point pp) override {
-		if(this->text == 2){
+		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getG(this->p, pp,this->G);
 		}
 		return figura::getG(pp);
 	}
     int getB(point pp) override {
-		if(this->text == 2){
+		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getB(this->p, pp,this->B);
 		}
 		return figura::getB(pp);

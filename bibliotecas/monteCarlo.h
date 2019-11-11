@@ -16,7 +16,7 @@ private:
 	camara cam;
 	int height, wide, rays;
 	
-	void getRGB(camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& B, int x, int y){
+	void getRGB(camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& B){
 		double t = 0;
 		double delta = 0;
 		double distMin = numeric_limits<double>::max();
@@ -30,7 +30,7 @@ private:
 			if (colision) {
 				point p = c.o + rayo * (t - delta);
 				distActual = mod(c.o - p);
-				if (distActual < distMin) {
+				if (distActual < distMin && f->getR(p) != -1 && f->getG(p) != -1 && f->getB(p) != -1) {
 					nearest = f;
 					distMin = distActual;
 					colP = p;
@@ -60,8 +60,8 @@ public:
 		
 		double a3[rays], b3[rays];
 		for(int i = 0; i < rays;++i){
-			a3[i] = (double)rand() / (RAND_MAX+1);
-			b3[i] = (double)rand() / (RAND_MAX+1);
+			a3[i] = ((double)rand()-1) / (RAND_MAX);
+			b3[i] = ((double)rand()-1) / (RAND_MAX);
 		}
 		
 		double Xs[rays], Ys[rays];
@@ -73,7 +73,7 @@ public:
 		double Rt = 0.0, Gt = 0.0, Bt = 0.0;
 		for(int i = 0; i < rays; ++i){
 			dir rayo = newDir(Xs[i],Ys[i],1);
-			getRGB(cam, e, rayo, r, g, b, x, y);
+			getRGB(cam, e, rayo, r, g, b);
 			Rt += r; // /p(a3[i])*p(b3[i])
 			Gt += g; // /p(a3[i])*p(b3[i]) 
 			Bt += b; // /p(a3[i])*p(b3[i])

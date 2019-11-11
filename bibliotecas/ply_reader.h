@@ -50,7 +50,7 @@ using namespace std;
             flujoIn >> x;
             flujoIn >> y;
             flujoIn >> z;
-            puntos[i] = newPoint(x,y,z+4);
+            puntos[i] = newPoint(x,y,z+25);
         }
 
         int R,G,B;
