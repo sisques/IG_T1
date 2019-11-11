@@ -1,11 +1,9 @@
-#include "../bibliotecas/ply_reader.h"
-
-
-#include "../bibliotecas/punto_direccion.h"
-#include "../bibliotecas/camara.h"
-#include "../bibliotecas/figuras.h"
-#include "../bibliotecas/tranformations.h"
-
+#include "bibliotecas/punto_direccion.h"
+#include "bibliotecas/camara.h"
+#include "bibliotecas/figuras.h"
+#include "bibliotecas/tranformations.h"
+#include "bibliotecas/monteCarlo.h"
+#include "bibliotecas/ply_reader.h"
 
 #include <iostream>
 #include <string>
@@ -13,58 +11,29 @@
 #include <list>
 #include <memory>
 #include <limits>
+#include <thread>
+#include <chrono>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+#include <stdio.h>
+
 using namespace std;
 
-
-dir monteCarlo(camara c, double altura, double anchura, int numRayo, int rpp){
-    point origen = c.o;
-    point final = newPoint(anchura, altura, c.f.z);
-    return final - origen;
-
-}
-
-
-void rtx( camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& B){
-    double t = 0;
-    double delta = 0;
-    double distMin = numeric_limits<double>::max();
-    double distActual = 0;
-    bool colision;
-    shared_ptr<figura> nearest;
-
-
-    for( auto it = e.begin(); it != e.end(); ++it){
-        shared_ptr<figura> f = *it;
-        colision = f->intersection(rayo, c.o, t, delta);
-        if (colision) {
-            point p = c.o + rayo * (t - delta);
-            distActual = mod(c.o - p);
-            if (distActual < distMin) {
-                nearest = f;
-                distMin = distActual;
-            }
-        }
-    }
-    R = nearest->getR();
-    G = nearest->getG();
-    B = nearest->getB();
-}
-
-
-
+camara c;
 
 list<shared_ptr<figura>> setUpScene(){
-    //string file = "/home/victor/4o/IG/IG_T1/models/test.ply";
-    list<shared_ptr<figura>> elementos/* = plyReader(file)*/;
+    string file = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\test.ply";
+    list<shared_ptr<figura>> elementos = plyReader(file,c, 1);
 
 
-    shared_ptr<figura> p1 = make_shared<esfera>(esfera(newPoint(-50,0,100), 25, 255,255, 255));
-    shared_ptr<figura> p2 = make_shared<esfera>(esfera(newPoint(50,0,100), 25, 255,255, 255));
-    shared_ptr<figura> p3 = make_shared<esfera>(esfera(newPoint(0,50,100), 25, 255,255, 255));
-    shared_ptr<figura> p4 = make_shared<esfera>(esfera(newPoint(0,-50,100), 25, 255,255, 255));
+    shared_ptr<figura> p1 = make_shared<esfera>(esfera(c, newPoint(-50,0,100), 25, 255,0, 0,1));
+    shared_ptr<figura> p2 = make_shared<esfera>(esfera(c, newPoint(50,0,100), 25, 0,255, 0,1));
+    shared_ptr<figura> p3 = make_shared<esfera>(esfera(c, newPoint(0,50,100), 25, 0,0, 255,3));
+    shared_ptr<figura> p4 = make_shared<esfera>(esfera(c, newPoint(0,-50,100), 25, 255,0, 255,3));
 
 
-    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,500), newDir(0,0,-1), 0,0,0));
+    shared_ptr<figura> fondo = make_shared<plano>(plano(c, newPoint(0,0,500), newDir(0,0,-1), 0,0,0, 3));
     elementos.push_back(p1);
     elementos.push_back(p2);
     elementos.push_back(p3);
@@ -76,9 +45,20 @@ list<shared_ptr<figura>> setUpScene(){
     return elementos;
 }
 
-
-
-
+void generateScene( monteCarlo mc, const list<shared_ptr<figura>> e,
+					const string fOut, const int hMin, const int hMax, const int w){
+	int R,G,B;
+	fstream flujoOut;
+	flujoOut.open((fOut).c_str(), ios::out);
+	for (int i = hMin; i <= hMax; ++i){
+        for (int j = 0; j < w; j++){
+            mc.rtx(e,i,j,R,G,B);
+            flujoOut << R << " " << G << " " << B;
+            flujoOut << "	";
+        }
+    }
+	flujoOut.close();
+}
 
 int main(){
     /*
@@ -96,7 +76,7 @@ int main(){
     dir distanciaPlano = newDir(0,0,1);
 
 
-	camara c =  newCamara(origenCamara, alturaPlano, anchuraPlano, distanciaPlano);
+	c =  newCamara(origenCamara, alturaPlano, anchuraPlano, distanciaPlano);
     double rpp = 0, w = 0, h = 0;
     string fOut = "";
     /*cout << "Introduce la altura de la imagen deseada:" << endl;
@@ -115,11 +95,21 @@ int main(){
     w = 1024;
     rpp = 1;
     fOut = "test";
-
-
-
-    string ruta = "/home/victor/4o/IG/IG_T1/imagenes/";
-    fOut = fOut + ".ppm";
+    string ruta = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\";
+   
+	list<shared_ptr<figura>> e = setUpScene();
+	thread th[10];
+	int hMin = 0, hMax = - 1 + h/10;
+	for(int i = 0; i < 10;++i){
+		monteCarlo mc(c,h,w,10);
+		if(i == 9){hMax = h - 1;}
+		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w);
+		hMin += h/10;
+		hMax += h/10;
+	}
+	for(int i = 0; i < 10;++i){th[i].join();}
+	
+	fOut = fOut + ".ppm";
     fstream flujoOut;
     string fOutAux = ruta + fOut;
     flujoOut.open((fOutAux).c_str(), ios::out);
@@ -128,45 +118,19 @@ int main(){
                 <<  "# " << fOut << endl
                 << w << " " << h << endl
                 <<      "255"    << endl;
-
-
-    int R = 0, G = 0, B = 0;
-    dir rayo;
-
-
-
-    list<shared_ptr<figura>> e = setUpScene();
-
-
-    int _R, _G, _B;
-    double altura;
-    double anchura;
-    for (int i = h/2 ; i > -h/2; i--){
-        for (int j = -w/2; j < w/2; j++){
-            _R = 0;
-            _G = 0;
-            _B = 0;
-            anchura = j/(w/2);
-            altura = i/(h/2);
-
-            for (int k = 0; k < rpp; k++){
-                rayo = monteCarlo(c,altura,anchura,k, rpp);
-                rtx(c, e, rayo, R, G, B);
-                _R += R;
-                _G += G;
-                _B += B;
-            }
-            R = _R/rpp;
-            G = _G/rpp;
-            B = _B/rpp;
-
-
-            flujoOut << R << " " << G << " " << B;
-            if(j < w-1){
-                flujoOut << "    ";
-            }
-
-        }
-    }
+				
+	for(int i = 0; i < 10;++i){
+		string file = ruta+to_string(i);
+		fstream flujoAux;
+		flujoAux.open((file).c_str(), ios::in);
+		char c;
+		while(!flujoAux.eof()){
+			flujoAux >> std::noskipws >> c;
+			flujoOut << c;
+		}
+		flujoAux.close();
+		remove((file).c_str());
+	}
+	flujoOut.close();
 }
 
