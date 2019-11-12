@@ -5,6 +5,7 @@
 #include "bibliotecas/monteCarlo.h"
 #include "bibliotecas/ply_reader.h"
 #include "bibliotecas/perlinNoise.h"
+#include "bibliotecas/ppm_reader.h"
 
 #include <iostream>
 #include <string>
@@ -25,23 +26,32 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
     string file = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\test.ply";
-    list<shared_ptr<figura>> elementos = plyReader(file,c, 5);
+    list<shared_ptr<figura>> elementos = plyReader(file,c, 3);
 
 
     shared_ptr<figura> p1 = make_shared<esfera>(esfera(c, newPoint(-50,0,100), 25, 255,100, 100,5));
     shared_ptr<figura> p2 = make_shared<esfera>(esfera(c, newPoint(50,0,100), 25, 100,255, 100,5));
-    shared_ptr<figura> p3 = make_shared<esfera>(esfera(c, newPoint(0,50,100), 25, 51,153, 255,5));
-    shared_ptr<figura> p4 = make_shared<esfera>(esfera(c, newPoint(0,-50,100), 25, 255,100, 255,5));
+    shared_ptr<figura> p3 = make_shared<esfera>(esfera(c, newPoint(0,50,100), 25, 51,153, 255,4));
+    shared_ptr<figura> p4 = make_shared<esfera>(esfera(c, newPoint(0,-50,100), 25, 255,100, 255,4));
 
 
-    shared_ptr<figura> fondo = make_shared<plano>(plano(c, newPoint(0,0,500), newDir(0,0,-1), 0,0, 0, 7));
-	shared_ptr<figura> fondo2 = make_shared<plano>(plano(c, newPoint(0,0,600), newDir(0,0,-1), 51,153, 150, 5));
+    shared_ptr<figura> fondo = make_shared<plano>(plano(c, newPoint(0,0,401), newDir(0,0,-1), 0,0, 0, 8, "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\agua.ppm"));
+	shared_ptr<figura> fondo3 = make_shared<plano>(plano(c, newPoint(-250,0,500), newDir(1,0,0), 0,0, 0, 8, "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\arena.ppm"));
+	shared_ptr<figura> fondo4 = make_shared<plano>(plano(c, newPoint(250,0,500), newDir(-1,0,0), 0,0, 0, 8, "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\arena.ppm"));
+	shared_ptr<figura> fondo5 = make_shared<plano>(plano(c, newPoint(0,-250,500), newDir(0,1,0), 0,0, 0, 8, "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\arena.ppm"));
+	shared_ptr<figura> fondo6 = make_shared<plano>(plano(c, newPoint(0,250,500), newDir(0,-1,0), 0,0, 0, 8, "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\arena.ppm"));
+	shared_ptr<figura> fondo2 = make_shared<plano>(plano(c, newPoint(0,0,400), newDir(0,0,-1), 51,153, 250, 7));
     elementos.push_back(p1);
     elementos.push_back(p2);
     elementos.push_back(p3);
     elementos.push_back(p4);
     elementos.push_back(fondo);
 	elementos.push_back(fondo2);
+	elementos.push_back(fondo3);
+	elementos.push_back(fondo4);
+	elementos.push_back(fondo5);
+	elementos.push_back(fondo6);
+	
 
 
 
@@ -65,7 +75,7 @@ void generateScene( monteCarlo mc, const list<shared_ptr<figura>> e,
 }
 
 int main(){
-    /*
+	/*
      * camara       x   y   z
      *      o   =   0   0   0
      *      l   =   1   0   0
@@ -100,13 +110,13 @@ int main(){
     rpp = 1;
     fOut = "test";
     string ruta = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\";
-   int threads = 10;
+   int threads = 20;
 	list<shared_ptr<figura>> e = setUpScene();
 	thread th[threads];
 	int hMin = 0, hMax = - 1 + h/threads;
 	for(int i = 0; i < threads;++i){
-		monteCarlo mc(c,h,w,1);
-		if(i == 9){hMax = h - 1;}
+		monteCarlo mc(c,h,w,10);
+		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w);
 		hMin += h/threads;
 		hMax += h/threads;
@@ -123,7 +133,7 @@ int main(){
                 << w << " " << h << endl
                 <<      "255"    << endl;
 				
-	for(int i = 0; i < 10;++i){
+	for(int i = 0; i < threads;++i){
 		string file = ruta+to_string(i);
 		fstream flujoAux;
 		flujoAux.open((file).c_str(), ios::in);
