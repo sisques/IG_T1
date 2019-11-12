@@ -8,6 +8,7 @@
 #include <list>
 #include "figuras.h"
 #include "punto_direccion.h"
+#include "matrix.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ using namespace std;
 
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
-    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text) {
+    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text, const Matrix transformationMatrix) {
         list<shared_ptr<figura>> ouput;
 
         fstream flujoIn;
@@ -50,7 +51,8 @@ using namespace std;
             flujoIn >> x;
             flujoIn >> y;
             flujoIn >> z;
-            puntos[i] = newPoint(x,y,z+25);
+            point pto = newPoint(x,y,z);
+            puntos[i] = transformationMatrix * pto;
         }
 
         int R,G,B;
@@ -73,8 +75,9 @@ using namespace std;
             R = 100;
             G = 0;
             B = 0;
-            shared_ptr<figura> tri = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R,G,B, text));
-            ouput.push_back(tri);
+            shared_ptr<figura> fig;
+            fig = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R,G,B, text));
+            ouput.push_back(fig);
         }
 
 
