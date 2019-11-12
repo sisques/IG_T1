@@ -1,7 +1,7 @@
 #include "bibliotecas/punto_direccion.h"
 #include "bibliotecas/camara.h"
 #include "bibliotecas/figuras.h"
-#include "bibliotecas/tranformations.h"
+#include "/bibliotecas/matrix.h"
 #include "bibliotecas/monteCarlo.h"
 #include "bibliotecas/ply_reader.h"
 #include "bibliotecas/perlinNoise.h"
@@ -25,8 +25,9 @@ using namespace std;
 camara c;
 
 list<shared_ptr<figura>> setUpScene(){
+    Matrix m =  translate(0,0,0);
     string file = "C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\test.ply";
-    list<shared_ptr<figura>> elementos = plyReader(file,c, 3);
+    list<shared_ptr<figura>> elementos = plyReader(file,c, 3, m);
 
 
     shared_ptr<figura> p1 = make_shared<esfera>(esfera(c, newPoint(-50,0,100), 25, 255,100, 100,5));
