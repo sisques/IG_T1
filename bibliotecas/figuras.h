@@ -15,6 +15,7 @@ protected:
     int R, G, B, text;
 	camara cam;
 	texture *texturizador;
+	string im = "";
 public:
     figura(camara c, int _R, int _G, int _B){
         this -> R = _R;
@@ -31,10 +32,7 @@ public:
         this -> B = _B;
 		this->text = t;
 		this->cam = c;
-		if(t == 0){
-			texturizador = new texture();
-		}
-		else if(t == 1){
+		if(t == 1){
 			texturizador = new texture1();
 		}
 		else if(t == 2){
@@ -54,6 +52,23 @@ public:
 		}
 		else if(t == 7){
 			texturizador = new texture7();
+		}
+		else{
+			texturizador = new texture();
+		}
+    }
+	
+	figura(camara c, int _R, int _G, int _B, int t, string im, dir d){
+		this -> R = _R;
+        this -> G = _G;
+        this -> B = _B;
+		this->text = t;
+		this->cam = c;
+		if(t == 8){
+			texturizador = new texture8(im, d);
+		}
+		else {
+			texturizador = new texture();
 		}
     }
 
@@ -181,6 +196,11 @@ public:
         this -> n = _n;
     }
 	
+	plano(camara c, point _p, dir _n, int _R, int _G, int _B, int t, string _im): figura(c, _R, _G, _B, t, _im, _n){
+        this -> p = _p;
+        this -> n = _n;
+    }
+	
     bool implicit(point p) override  {
         dir d = p - this -> p;
         return dot(d, this -> n) <= 0;
@@ -215,17 +235,26 @@ public:
 		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getR(this->p, pp,this->R);
 		}
+		else if(this->text == 8){
+			return texturizador->getR(this->p, pp);
+		}
 		return figura::getR(pp);
 	}
     int getG(point pp) override {
 		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getG(this->p, pp,this->G);
 		}
+		else if(this->text == 8){
+			return texturizador->getG(this->p, pp);
+		}
 		return figura::getG(pp);
 	}
     int getB(point pp) override {
 		if(this->text == 2 || this->text == 6 || this->text == 7){
 			return texturizador->getB(this->p, pp,this->B);
+		}
+		else if(this->text == 8){
+			return texturizador->getB(this->p, pp);
 		}
 		return figura::getB(pp);
 	}
