@@ -6,6 +6,7 @@
 #include <math.h>
 #include "perlinNoise.h"
 #include "ppm_reader.h"
+#include "matrix.h"
 
 using namespace std;
 
@@ -230,7 +231,7 @@ public:
 };
 
 //Imagen plano
-class texture8 : public texture {
+/*class texture8 : public texture {
 private:
 	int **Rs;
 	int **Gs;
@@ -290,6 +291,7 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
+		if(Rs[y][x] == -1){return -1;}
 		return (Rs[y][x]*this->cr)/256;
 	}
     int getG(point c, point p) override {
@@ -306,6 +308,7 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
+		if(Gs[y][x] == -1){return -1;}
 		return (Gs[y][x]*this->cr)/256;
 	}
     int getB(point c, point p) override {
@@ -322,6 +325,102 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
+		if(Bs[y][x] == -1){return -1;}
+		return (Bs[y][x]*this->cr)/256;
+	}
+};*/
+
+class texture8 : public texture {
+private:
+	int **Rs;
+	int **Gs;
+	int **Bs;
+	int width, height;
+	dir n;
+	Matrix toPlain = null;
+	
+	void setMatrix(point c, point p){
+		dir x = c - p;
+		dir z = n;
+		dir y = dot(x,z);
+		x = dot(y,z);
+		toPlain = newBase(x, y, z, c);
+	}
+	
+public:
+	texture8(string im, dir _n):texture(){
+		n = _n;
+		list<int*> pixels = ppmReader(im);
+		width = pixels.front()[0]; 
+		height = pixels.front()[1];
+		pixels.pop_front();
+		
+		Rs = new int*[height];
+		for (int i = 0; i < height; ++i){Rs[i] = new int[width];}
+		Gs = new int*[height];
+		for (int i = 0; i < height; ++i){Gs[i] = new int[width];}
+		Bs = new int*[height];
+		for (int i = 0; i < height; ++i){Bs[i] = new int[width];}
+		
+		for(int i = 0; i < height; ++i){
+			for(int j = 0; j < width; ++j){
+				Rs[i][j] = pixels.front()[0]; 
+				Gs[i][j] = pixels.front()[1]; 
+				Bs[i][j] = pixels.front()[2];
+				pixels.pop_front();
+			}
+		}
+		
+	}
+	~texture8(){
+		for (int i = 0; i < height; ++i){
+			delete [] Rs[i];
+		}
+		delete [] Rs;
+		for (int i = 0; i < height; ++i){
+			delete [] Gs[i];
+		}
+		delete [] Gs;
+		for (int i = 0; i < height; ++i){
+			delete [] Bs[i];
+		}
+		delete [] Bs;
+	}
+	
+	int getR(point c, point p) override {
+		
+		if(toPlain == null){setMatrix(c,p);}
+		
+		int x = (toPlain*p).x%width;
+		int y = (toPlain*p).y%height;
+
+		if(x < 0){x = width + x;}
+		if(y < 0){y = height + y;}
+		if(Rs[y][x] == -1){return -1;}
+		return (Rs[y][x]*this->cr)/256;
+	}
+    int getG(point c, point p) override {
+		
+		if(toPlain == null){setMatrix(c,p);}
+		
+		int x = (toPlain*p).x%width;
+		int y = (toPlain*p).y%height;
+		
+		if(x < 0){x = width + x;}
+		if(y < 0){y = height + y;}
+		if(Gs[y][x] == -1){return -1;}
+		return (Gs[y][x]*this->cr)/256;
+	}
+    int getB(point c, point p) override {
+		
+		if(toPlain == null){setMatrix(c,p);}
+		
+		int x = (toPlain*p).x%width;
+		int y = (toPlain*p).y%height;
+		
+		if(x < 0){x = width + x;}
+		if(y < 0){y = height + y;}
+		if(Bs[y][x] == -1){return -1;}
 		return (Bs[y][x]*this->cr)/256;
 	}
 };
