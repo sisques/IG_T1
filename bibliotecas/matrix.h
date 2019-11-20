@@ -53,6 +53,18 @@ void mulAux(const Matrix& m, double& x, double& y, double& z, double& w){
     x = a; y = b; z = c; w = d;
 }
 
+// operador de suma
+Matrix operator+ (const Matrix& a, const Matrix& b)    {
+    Matrix res = Matrix();
+    for (int f = 0; f < 4; f++){
+        for (int c = 0; c < 4; c++){
+            res.p[f][c] = a.p[f][c] + b.p[f][c];
+        }
+    }
+    return res;
+}
+
+
 
 // operador de multiplicacion
 Matrix operator* (const Matrix& a, const Matrix& b)    {
@@ -67,6 +79,16 @@ Matrix operator* (const Matrix& a, const Matrix& b)    {
     return res;
 }
 
+// operador de division entre real
+Matrix operator/ (const Matrix& a, const double& b)    {
+    Matrix res = Matrix();
+    for (int f = 0; f < 4; f++){
+        for (int c = 0; c < 4; c++){
+            res.p[f][c] = res.p[f][c] / b;
+        }
+    }
+    return res;
+}
 
 
 // operador de multiplicacion por punto
@@ -84,6 +106,91 @@ dir operator* (const Matrix& m, const dir& p)    {
     mulAux(m, a, b, c, d);
     return newDir(a, b, c);
 }
+
+double det3x3(const double m[3][3]){
+    return  m[0][0]*m[1][1]*m[2][2] +
+            m[0][1]*m[1][2]*m[2][0] +
+            m[1][0]*m[2][1]*m[0][2] -
+            m[0][2]*m[1][1]*m[2][0] -
+            m[1][2]*m[2][1]*m[0][0] -
+            m[1][0]*m[0][1]*m[2][2];
+}
+
+double det(const Matrix& m){
+    double det = 0;
+    if(m.p[0][0] != 0){
+        double aux[3][3] = { {m.p[1][1], m.p[1][2], m.p[1][3]},
+                             {m.p[2][1], m.p[2][2], m.p[2][3]},
+                             {m.p[3][1], m.p[3][2], m.p[3][3]}
+        };
+        det += m.p[0][0]*det3x3(aux);
+    }
+    if(m.p[1][0] != 0){
+        double aux[3][3] = { {m.p[0][1], m.p[0][2], m.p[0][3]},
+                             {m.p[2][1], m.p[2][2], m.p[2][3]},
+                             {m.p[3][1], m.p[3][2], m.p[3][3]}
+        };
+        det -= m.p[1][0]*det3x3(aux);
+    }
+    if(m.p[2][0] != 0){
+        double aux[3][3] = { {m.p[0][1], m.p[0][2], m.p[0][3]},
+                             {m.p[1][1], m.p[1][2], m.p[1][3]},
+                             {m.p[3][1], m.p[3][2], m.p[3][3]}
+        };
+        det += m.p[2][0]*det3x3(aux);
+    }
+    if(m.p[3][0] != 0){
+        double aux[3][3] = { {m.p[0][1], m.p[0][2], m.p[0][3]},
+                             {m.p[1][1], m.p[1][2], m.p[1][3]},
+                             {m.p[2][1], m.p[2][2], m.p[2][3]}
+        };
+        det -= m.p[3][0]*det3x3(aux);
+    }
+
+    return det;
+}
+
+Matrix adj(const Matrix& a){
+    Matrix res = Matrix();
+    for(int f = 0; f < 4; f++){
+        for(int c = 0; f < 4; c++){
+            double aux[3][3];
+            int h = 0, k = 0;
+            for(int x = 0; x < 4; x++){
+                for(int y = 0; y < 4 && h <3 && k < 3; y++){
+                    if(y != c){
+                        aux[h][k] = a.p[x][y];
+                        k++;
+                    }
+                }
+                if(x != f){h++;}
+                k = 0;
+            }
+            res.p[f][c] = pow(-1.0, f+c)*det3x3(aux);
+        }
+    }
+    return res;
+}
+
+
+Matrix transp(const Matrix& a){
+    Matrix res = Matrix();
+    for(int f = 0; f < 4; f++){
+        for(int c = 0; c < 4; c++){
+            res.p[f][c] = a.p[c][f];
+        }
+    }
+    return res;
+}
+
+
+Matrix inverse(const Matrix& a){
+    Matrix adjM = adj(a);
+    Matrix trasnpM = transp(adjM);
+    double d = det(a);
+    return trasnpM / d;
+}
+
 
 Matrix scale(const double x_s, const double y_s, const double z_s){
     // x_s  0   0   0
@@ -164,6 +271,51 @@ Matrix rotateZ(const double i){
     res.p[1][0] = sin(i);
     return res;
 }
+
+
+
+
+
+Matrix originalBase(const dir u, const dir v, const dir w, const point o){
+    //u.x       v.x         w.x       o.x
+    //u.y       v.y         w.y       o.y
+    //u.z       v.z         w.z       o.z
+    //0         0           0         1
+
+    Matrix res = Matrix();
+    res.p[0][0] = u.x;
+    res.p[1][0] = u.y;
+    res.p[2][0] = u.z;
+
+
+    res.p[0][1] = v.x;
+    res.p[1][1] = v.y;
+    res.p[2][1] = v.z;
+
+
+    res.p[0][2] = w.x;
+    res.p[1][2] = w.y;
+    res.p[2][2] = w.z;
+
+
+    res.p[0][3] = o.x;
+    res.p[1][3] = o.y;
+    res.p[2][3] = o.z;
+
+
+    res.p[3][3] = 1;
+
+    return res;
+
+}
+
+
+Matrix newBase(const dir u, const dir v, const dir w, const point o){
+    Matrix res = originalBase(u,v,w,o);
+
+    return res;
+}
+
 
 
 #endif
