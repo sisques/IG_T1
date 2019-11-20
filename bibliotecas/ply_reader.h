@@ -8,6 +8,7 @@
 #include <list>
 #include "figuras.h"
 #include "punto_direccion.h"
+#include "matrix.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ using namespace std;
 
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
-    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text) {
+    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text, const Matrix trans[],int arrSize) {
         list<shared_ptr<figura>> ouput;
 
         fstream flujoIn;
@@ -30,6 +31,9 @@ using namespace std;
         int check;
         int a,b,c;
         point v0, v1, v2;
+        bool normal = false;
+        bool vertexColor = false;
+
 
         flujoIn >> currentWord;
         if (currentWord == "ply") {
@@ -42,18 +46,50 @@ using namespace std;
                     } else {
                         flujoIn >> faceN;
                     }
+                } else if (currentWord == "property"){
+                    flujoIn >> currentWord;
+                    flujoIn >> currentWord;
+                    if (currentWord == "nx"){
+                        normal = true;
+                    }else if (currentWord == "red"){
+                        vertexColor = true;
+                    }
+
                 }
             }
         }
+        int R,G,B, alpha;
         point puntos[vertexN];
-        for(int i =  0; i < vertexN; i++){
+        dir normals[vertexN];
+        int Red[vertexN];
+        int Green[vertexN];
+        int Blue[vertexN];
+        for(int i =  0; i < vertexN; i++) {
             flujoIn >> x;
             flujoIn >> y;
             flujoIn >> z;
-            puntos[i] = newPoint(x,y,z+25);
+            point pto = newPoint(x, y, z);
+            for (int j = 0; j < arrSize; j++){
+            pto = trans[j] * pto;
+            }
+            puntos[i] = pto;
+            if (normal){
+                flujoIn >> x;
+                flujoIn >> y;
+                flujoIn >> z;
+                dir d = newDir(x, y, z);
+                normals[i] = d;
+            } if (vertexColor){
+                flujoIn >> R;
+                flujoIn >> G;
+                flujoIn >> B;
+                Red[i] = R;
+                Green[i] = G;
+                Blue[i] = B;
+                flujoIn >> alpha;
+            }
         }
 
-        int R,G,B;
         for(int i =  0; i < faceN; i++) {
             flujoIn >> check;
             if (check != 3) {
@@ -66,15 +102,16 @@ using namespace std;
             v0 = puntos[a];
             v1 = puntos[b];
             v2 = puntos[c];
-
-         /*   flujoIn >> R;
-            flujoIn >> G;
-            flujoIn >> B;*/
-            R = 100;
-            G = 0;
-            B = 0;
-            shared_ptr<figura> tri = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R,G,B, text));
-            ouput.push_back(tri);
+            R = ( Red[a] + Red[b] + Red[c] )/ 3;
+            G = ( Green[a] + Green[b] + Green[c] )/ 3;
+            B = ( Blue[a] + Blue[b] + Blue[c] )/ 3;
+            shared_ptr<figura> fig;
+            if(normal) {
+                fig = make_shared<triangulo>(triangulo(cam, v0, v1, v2, normals[a], R, G, B, text));
+            } else {
+                fig = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R, G, B, text));
+            }
+            ouput.push_back(fig);
         }
 
 

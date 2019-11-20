@@ -311,7 +311,7 @@ Matrix originalBase(const dir u, const dir v, const dir w, const point o){
 
 
 Matrix newBase(const dir u, const dir v, const dir w, const point o){
-    Matrix res = originalBase(u,v,w,o);
+    Matrix res = inverse(originalBase(u,v,w,o));
 
     return res;
 }
