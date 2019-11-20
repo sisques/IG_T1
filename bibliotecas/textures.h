@@ -9,9 +9,16 @@
 
 using namespace std;
 
+enum textures { flatColor = 0 , psychedelic = 1, concentricCircles = 2,
+				distanceBased = 3, wood = 4, fuzzy = 5, waterPlain = 6,
+				circularTransparence = 7, imagePlain = 8}
+
 class texture{
+protected:
+	int cr = 256
 public:
     texture(){}
+	texture(int _cr){cr = _cr;}
 
 	virtual int getR(point p, int r){ return r;}
     virtual int getG(point p, int g){ return g;}
@@ -21,9 +28,9 @@ public:
     virtual int getG(point c, point p, int g){ return g;}
     virtual int getB(point c, point p, int b){ return b;}
 	
-	virtual int getR(point c, point p){ return 255;}
-    virtual int getG(point c, point p){ return 255;}
-    virtual int getB(point c, point p){ return 255;}
+	virtual int getR(point c, point p){ return cr-1;}
+    virtual int getG(point c, point p){ return cr-1;}
+    virtual int getB(point c, point p){ return cr-1;}
 };
 
 
@@ -31,20 +38,22 @@ public:
 class texture1 : public texture {
 public:
 	texture1():texture(){}
+	texture1(int _cr):texture(_cr){}
+	
 	int getR(point p, int r) override {
 		double c = sin(p.x)*sin(p.z);
-		int aux = (r*c+97);
-		return aux%256;
+		int aux = (r*c+(97*this->cr)/256);
+		return aux%this->cr;
 	}
     int getG(point p, int g) override {
 		double c = sin(p.x)*sin(p.z);
-		int aux = (g*c+34);
-		return aux%256;
+		int aux = (g*c+(34*this->cr)/256);
+		return aux%this->cr;
 	}
     int getB(point p, int b) override {
 		double c = sin(p.x)*sin(p.z);
-		int aux = (b*c+65);
-		return aux%256;
+		int aux = (b*c+(65*this->cr)/256);
+		return aux%this->cr;
 	}
 };
 
@@ -52,24 +61,26 @@ public:
 class texture2 : public texture {
 public:
 	texture2():texture(){}
+	texture2(int _cr):texture(_cr){}
+	
 	int getR(point c, point p, int r) override {
 		int d = dist(c,p);
 		if((d/10)%2 == 1){
-			return abs((r+85)%256);
+			return abs((r+(85*this->)/256)%this->cr);
 		}
 		return r;
 	}
     int getG(point c, point p, int g) override {
 		int d = dist(c,p);
 		if((d/10)%2 == 1){
-			return abs((g-53)%256);
+			return abs((g-(53*this->)/256)%this->cr);
 		}
 		return g;
 	}
     int getB(point c, point p, int b) override {
 		int d = dist(c,p);
 		if((d/10)%2 == 1){
-			return abs((b+85)%256);
+			return abs((b+(85*this->cr)/256)%this->cr);
 		}
 		return b;
 	}
@@ -79,27 +90,34 @@ public:
 class texture3 : public texture {
 public:
 	texture3():texture(){}
+	texture3(int _cr):texture(_cr){}
+	
 	int getR(point c, point p, int r) override {
-		int d = 5*dist(c,p);
-		return abs(r-d)%256;
+		int d = 5*dist(c,p)*(this->cr/256.0);
+		return abs(r-d)%this->cr;
 	}
     int getG(point c, point p, int g) override {
-		int d = 5*dist(c,p);
-		return abs(g-d)%256;
+		int d = 5*dist(c,p)*(this->cr/256.0);
+		return abs(g-d)%this->cr;
 	}
     int getB(point c, point p, int b) override {
-		int d = 5*dist(c,p);
-		return abs(b-d)%256;
+		int d = 5*dist(c,p)*(this->cr/256.0);
+		return abs(b-d)%this->cr;
 	}
 };
 
 //Madera
 class texture4 : public texture {
+private:
 	perlinNoise pn;
 public:
 	texture4():texture(){
 		pn = perlinNoise();
 	}
+	texture4(int _cr):texture(_cr){
+		pn = perlinNoise();
+	}
+	
 	int getR(point p, int r) override {
 		double n = 20 * pn.noise(p.x/10, p.y/10, p.z/10);
 		n = n - floor(n);
@@ -119,11 +137,16 @@ public:
 
 //Emborronao
 class texture5 : public texture {
+private:
 	perlinNoise pn;
 public:
 	texture5():texture(){
 		pn = perlinNoise();
 	}
+	texture5(int _cr):texture(_cr){
+		pn = perlinNoise();
+	}
+	
 	int getR(point p, int r) override {
 		double n = pn.noise(p.x/10, p.y/10, p.z/10);
 		return floor(r * n);
@@ -140,18 +163,23 @@ public:
 
 //Agua para plano
 class texture6 : public texture {
+private:
 	perlinNoise pn;
 public:
 	texture6():texture(){
 		pn = perlinNoise();
 	}
+	texture6(int _cr):texture(_cr){
+		pn = perlinNoise();
+	}
+	
 	int getR(point c, point p, int r) override {
 		double n = pn.noise(p.x/200, p.y/200, p.z/200);
 		n *= n - floor(n);
 		int d = dist(c,p);
 		if((d/200)%2 == 1){
-			if(r+50 > 255){return 255;}
-			return (r+50)*n;
+			if(r+(50*this->cr)/256 > this->cr-1){return this->cr-1;}
+			return (r+(50*this->cr)/256)*n;
 		}
 		return floor(r * n);
 	}
@@ -160,8 +188,8 @@ public:
 		n = n - floor(n);
 		int d = dist(c,p);
 		if((d/200)%2 == 1){
-			if(g+25 > 255){return 255;}
-			return (g+25)*n;
+			if(g+(25*this->cr)/256 > this->cr-1){return this->cr-1;}
+			return (g+(25*this->cr)/256)*n;
 		}
 		return floor(g * n);
 	}
@@ -174,11 +202,10 @@ public:
 
 //Transparencia circular
 class texture7 : public texture {
-	perlinNoise pn;
 public:
-	texture7():texture(){
-		pn = perlinNoise();
-	}
+	texture7():texture(){}
+	texture7(int _cr):texture(_cr){}
+	
 	int getR(point c, point p, int r) override {
 		int d = dist(c,p);
 		if((d/100)%2 == 1){
@@ -204,6 +231,7 @@ public:
 
 //Imagen plano
 class texture8 : public texture {
+private:
 	int **Rs;
 	int **Gs;
 	int **Bs;
@@ -262,7 +290,7 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
-		return Rs[y][x];
+		return (Rs[y][x]*this->cr)/256;
 	}
     int getG(point c, point p) override {
 		dir aux = c - p;
@@ -278,7 +306,7 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
-		return Gs[y][x];
+		return (Gs[y][x]*this->cr)/256;
 	}
     int getB(point c, point p) override {
 		dir aux = c - p;
@@ -294,7 +322,7 @@ public:
 		}
 		if(x < 0){x = width + x;}
 		if(y < 0){y = height + y;}
-		return Bs[y][x];
+		return (Bs[y][x]*this->cr)/256;
 	}
 };
 

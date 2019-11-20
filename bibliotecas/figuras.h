@@ -32,28 +32,28 @@ public:
         this -> B = _B;
 		this->text = t;
 		this->cam = c;
-		if(t == 1){
+		if(t == textures.psychedelic){
 			texturizador = new texture1();
 		}
-		else if(t == 2){
+		else if(t == textures.concentricCircles){
 			texturizador = new texture2();
 		}
-		else if(t == 3){
+		else if(t == textures.distanceBased){
 			texturizador = new texture3();
 		}
-		else if(t == 4){
+		else if(t == textures.wood){
 			texturizador = new texture4();
 		}
-		else if(t == 5){
+		else if(t == textures.fuzzy){
 			texturizador = new texture5();
 		}
-		else if(t == 6){
+		else if(t == textures.waterPlain){
 			texturizador = new texture6();
 		}
-		else if(t == 7){
+		else if(t == textures.circularTransparence){
 			texturizador = new texture7();
 		}
-		else{
+		else{//textures.flatColor
 			texturizador = new texture();
 		}
     }
@@ -64,7 +64,7 @@ public:
         this -> B = _B;
 		this->text = t;
 		this->cam = c;
-		if(t == 8){
+		if(t == textures.imagePlain){
 			texturizador = new texture8(im, d);
 		}
 		else {
@@ -80,28 +80,28 @@ public:
     int getB(){ return this->B;}
 	
 	virtual int getR(point p){
-		if(this->text == 1 || this->text == 4 || this->text == 5){
+		if(this->text == textures.psychedelic || this->text == textures.wood || this->text == textures.fuzzy){
 			return texturizador->getR(p,this->R);
 		}
-		else if(this->text == 3){
+		else if(this->text == textures.distanceBased){
 			return texturizador->getR(this->cam.o, p,this->R);
 		}
 		return this->R;
 	}
     virtual int getG(point p){
-		if(this->text == 1 || this->text == 4 || this->text == 5){
+		if(this->text == textures.psychedelic || this->text == textures.wood || this->text == textures.fuzzy){
 			return texturizador->getG(p,this->G);
 		}
-		else if(this->text == 3 ){
+		else if(this->text == textures.distanceBased){
 			return texturizador->getG(this->cam.o, p,this->G);
 		}
 		return this->G;
 	}
     virtual int getB(point p){
-		if(this->text == 1 || this->text == 4 || this->text == 5){
+		if(this->text == textures.psychedelic || this->text == textures.wood || this->text == textures.fuzzy){
 			return texturizador->getB(p,this->B);
 		}
-		else if(this->text == 3){
+		else if(this->text == textures.distanceBased){
 			return texturizador->getB(this->cam.o, p,this->B);
 		}
 		return this->B;
@@ -160,19 +160,19 @@ public:
     }
 	
 	int getR(point pp) override {
-		if(this->text == 2){
+		if(this->text == texture.concentricCircles){
 			return texturizador->getR(this->c, pp,this->R);
 		}
 		return figura::getR(pp);
 	}
     int getG(point pp) override {
-		if(this->text == 2){
+		if(this->text == texture.concentricCircles){
 			return texturizador->getG(this->c, pp,this->G);
 		}
 		return figura::getG(pp);
 	}
     int getB(point pp) override {
-		if(this->text == 2){
+		if(this->text == texture.concentricCircles){
 			return texturizador->getB(this->c, pp,this->B);
 		}
 		return figura::getB(pp);
@@ -232,28 +232,28 @@ public:
     }
 	
 	int getR(point pp) override {
-		if(this->text == 2 || this->text == 6 || this->text == 7){
+		if(this->text == textures.concentricCircles || this->text == texture.waterPlain || this->text == circularTransparence){
 			return texturizador->getR(this->p, pp,this->R);
 		}
-		else if(this->text == 8){
+		else if(this->text == textures.imagePlain){
 			return texturizador->getR(this->p, pp);
 		}
 		return figura::getR(pp);
 	}
     int getG(point pp) override {
-		if(this->text == 2 || this->text == 6 || this->text == 7){
+		if(this->text == textures.concentricCircles || this->text == texture.waterPlain || this->text == circularTransparence){
 			return texturizador->getG(this->p, pp,this->G);
 		}
-		else if(this->text == 8){
+		else if(this->text == textures.imagePlain){
 			return texturizador->getG(this->p, pp);
 		}
 		return figura::getG(pp);
 	}
     int getB(point pp) override {
-		if(this->text == 2 || this->text == 6 || this->text == 7){
+		if(this->text == textures.concentricCircles || this->text == texture.waterPlain || this->text == circularTransparence){
 			return texturizador->getB(this->p, pp,this->B);
 		}
-		else if(this->text == 8){
+		else if(this->text == textures.imagePlain){
 			return texturizador->getB(this->p, pp);
 		}
 		return figura::getB(pp);
