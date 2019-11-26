@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/victor/4o/IG/IG_T1/IG_T2/main.cpp
+iostream
+-
+../bibliotecas/ToneMapping.h
+/home/victor/4o/IG/IG_T1/bibliotecas/ToneMapping.h
+
+/home/victor/4o/IG/IG_T1/bibliotecas/ToneMapping.h
+iostream
+-
+string
+-
+fstream
+-
+stdio.h
+-
+string.h
+-
+math.h
+-
+

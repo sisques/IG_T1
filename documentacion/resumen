@@ -1,0 +1,57 @@
+una estacion se puede conectar a cualquier otra estacion del universo
+
+velocidad de 20*c
+
+
+Datos iniciales:
+    Direccion de salida de la estacion de lanzamiento (punto de vista de la estacion emisora)
+    Direccion de llegada de la estacion receptora (punto de vista de la estacion receptora)
+
+La conexion se mide en coordenadas de UCS y cada estacion trabaja en su propio sistema de coordenadas
+
+
+
+PLANETAS
+
+Un planeta se define por su centro, eje y su cuidad de referencia
+
+    El centro es un punto en el espacio UCS
+    el eje es una direccion del polo sur al polo norte, su modulo es 2*radio
+    la ciudad de referencia es la posicion en el espacion del planeta, de la ciudad desde la cual se calcula el azimo (longitud) medido en UCS. distancia del centro a la cuidad de referencia = radio
+
+AL preguntar por un planeta, el usuario introducira estos 3 vectores, el sistema chequeará que el radio definido por el eje y por la distancia de la cuidad de referencia es el mismo ( maximo error de 10 a la - 6)
+
+ESTACION PLANETARIA
+
+La posicion de una estacion planetaria se define por
+    inclinacion -> el angulio respecto al eje del planeta --> rango (0, pi)
+    azimo -> angulo alrededor del globo respecto al 0-meridiano (definido por la ciudad de referencia) --> rango (-pi, pi]
+
+Dada la inclinacion y el azimo, se puede calcular su posicion en el UCS, concretamente se puede obtener lo siguiente
+    POSICION de la estacion en UCS
+    NORMAL DE LA SUPERFICE del planeta en esa posicion (modulo = 1)
+    DIRECCION TANGENTE A LA LONGITUD direccion tangente a la superficie del planeta y perpendicular al eje del planeta -> sigue la variavion  positiva del azimo
+    DIRECCION TANGENTE A LA LATITUD direccion tangente a la superficie del planeta y perpendicular a la otra tangente -> sigue la variavion negativa de la inclinacion
+
+EL sistema de coordenadas de la estacion se define por la Direccion tangente a la longitud (vector i), Direccion tangente a la latitud (vector j) y la normal de la superficie (vector k). Estas tres direcciones son perpendiculares
+
+Al preguntar por una estacion planetaria, el usuario introducira el planeta, seguido de la inclinacion y su azimo -> el sistema calculara la posicion del a estacion en el sistema de coordenads correspondiente.
+
+
+
+CONEXIÓN INTERPLANETARIA
+
+Dadas dos estaciones, la conexion en el UCS es la direccion desde la posicion de la estavion de lanzamiento con la posicion de la estacion de recepcion
+
+para que el transporte funcione correctamente , cada estacion necesita la conexion en su sistema de coordenadas especifico.
+
+
+
+La catapulta cuantica requiere entre 1 y 2 segundos para alcanzar su velocidad maxima, al alcanzarla, el elemento transportado no puede colisionar con nada, pero antes de que esto pase puede haber colision.
+EL receptor requiere entre 1 y 2 seguindos para reducir la velocidad.
+
+ES DECIR, UNA ESTACION DE LANZAMIENTO NO PUEDE LANZAR HACIA EL MISMO PLANETA Y UNA DE RECEPCION NO PUEDE RECIBIR DEL MISMO PLANETA.
+TIPO PEDIRA ----> 2 estaciones, mostrara por pantalla la conexion entre ellas  desde sus 2 sistemas de coordenadas y el UCS. dara warning si hay colision
+
+EL PROTO
+
