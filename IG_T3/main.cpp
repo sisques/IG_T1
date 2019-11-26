@@ -93,7 +93,9 @@ int main(){
 	c =  newCamara(origenCamara, alturaPlano, anchuraPlano, distanciaPlano);
     double rpp = 0, w = 0, h = 0;
     string fOut = "";
+
     /*cout << "Introduce la altura de la imagen deseada:" << endl;
+     *
     cin >> h;
 
     cout << "Introduce la anchura de la imagen deseada:" << endl;
