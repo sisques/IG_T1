@@ -92,7 +92,7 @@ Matrix operator/ (const Matrix& a, const double& b)    {
     Matrix res = Matrix();
     for (int f = 0; f < 4; f++){
         for (int c = 0; c < 4; c++){
-            res.p[f][c] = res.p[f][c] / b;
+            res.p[f][c] = a.p[f][c] / b;
         }
     }
     return res;

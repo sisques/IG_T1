@@ -90,99 +90,97 @@ public:
 
 //Imagen
 class texture3 : public texture {
-private:
-	int **Rs;
-	int **Gs;
-	int **Bs;
-	int width, height;
-	dir n;
-	Matrix toPlane = Matrix().empty();
-
-
-	void setMatrix(point c, point p){
-		dir x = c - p;
-		dir z = n;
-		dir y = cross(x,z);
-		x = cross(y,z);
-		toPlane = newBase(x, y, z, c);
-	}
-
+    int **Rs;
+    int **Gs;
+    int **Bs;
+    int width, height;
+    dir n;
 public:
-	texture3(string im, dir _n):texture(){
-		n = _n;
-		list<int*> pixels = ppmReader(im);
-		width = pixels.front()[0];
-		height = pixels.front()[1];
-		pixels.pop_front();
+    texture3(string im, dir _n):texture(){
+        n = _n;
+        list<int*> pixels = ppmReader(im);
+        width = pixels.front()[0];
+        height = pixels.front()[1];
+        pixels.pop_front();
 
-		Rs = new int*[height];
-		for (int i = 0; i < height; ++i){Rs[i] = new int[width];}
-		Gs = new int*[height];
-		for (int i = 0; i < height; ++i){Gs[i] = new int[width];}
-		Bs = new int*[height];
-		for (int i = 0; i < height; ++i){Bs[i] = new int[width];}
+        Rs = new int*[height];
+        for (int i = 0; i < height; ++i){Rs[i] = new int[width];}
+        Gs = new int*[height];
+        for (int i = 0; i < height; ++i){Gs[i] = new int[width];}
+        Bs = new int*[height];
+        for (int i = 0; i < height; ++i){Bs[i] = new int[width];}
 
-		for(int i = 0; i < height; ++i){
-			for(int j = 0; j < width; ++j){
-				Rs[i][j] = pixels.front()[0];
-				Gs[i][j] = pixels.front()[1];
-				Bs[i][j] = pixels.front()[2];
-				pixels.pop_front();
-			}
-		}
+        for(int i = 0; i < height; ++i){
+            for(int j = 0; j < width; ++j){
+                Rs[i][j] = pixels.front()[0];
+                Gs[i][j] = pixels.front()[1];
+                Bs[i][j] = pixels.front()[2];
+                pixels.pop_front();
+            }
+        }
 
-	}
-	~texture3(){
-		for (int i = 0; i < height; ++i){
-			delete [] Rs[i];
-		}
-		delete [] Rs;
-		for (int i = 0; i < height; ++i){
-			delete [] Gs[i];
-		}
-		delete [] Gs;
-		for (int i = 0; i < height; ++i){
-			delete [] Bs[i];
-		}
-		delete [] Bs;
-	}
-
-	int getR(point c, point p) override {
-
-		if(toPlane.isEmpty()){setMatrix(c,p);}
-
-		int x = (int)(toPlane*p).x % width;
-		int y = (int)(toPlane*p).y % height;
-
-		if(x < 0){x = width + x;}
-		if(y < 0){y = height + y;}
-		if(Rs[y][x] == -1){return -1;}
-		return (Rs[y][x]*this->cr)/256;
-	}
+    }
+    ~texture3(){
+        for (int i = 0; i < height; ++i){
+            delete [] Rs[i];
+        }
+        delete [] Rs;
+        for (int i = 0; i < height; ++i){
+            delete [] Gs[i];
+        }
+        delete [] Gs;
+        for (int i = 0; i < height; ++i){
+            delete [] Bs[i];
+        }
+        delete [] Bs;
+    }
+    int getR(point c, point p) override {
+        dir aux = c - p;
+        int x = (int)aux.x%width;
+        int y = (int)aux.y%height;
+        if(n.x == 0 && n.z == 0){
+            x = (int)aux.x%width;
+            y = (int)aux.z%height;
+        }
+        else if(n.y == 0 && n.z == 0){
+            x = (int)aux.z%width;
+            y = (int)aux.y%height;
+        }
+        if(x < 0){x = width + x;}
+        if(y < 0){y = height + y;}
+        return Rs[y][x];
+    }
     int getG(point c, point p) override {
-
-		if(toPlane.isEmpty()){setMatrix(c,p);}
-
-		int x = (int)(toPlane*p).x % width;
-		int y = (int)(toPlane*p).y % height;
-
-		if(x < 0){x = width + x;}
-		if(y < 0){y = height + y;}
-		if(Gs[y][x] == -1){return -1;}
-		return (Gs[y][x]*this->cr)/256;
-	}
+        dir aux = c - p;
+        int x = (int)aux.x%width;
+        int y = (int)aux.y%height;
+        if(n.x == 0 && n.z == 0){
+            x = (int)aux.x%width;
+            y = (int)aux.z%height;
+        }
+        else if(n.y == 0 && n.z == 0){
+            x = (int)aux.z%width;
+            y = (int)aux.y%height;
+        }
+        if(x < 0){x = width + x;}
+        if(y < 0){y = height + y;}
+        return Gs[y][x];
+    }
     int getB(point c, point p) override {
-
-		if(toPlane.isEmpty()){setMatrix(c,p);}
-
-		int x = (int)(toPlane*p).x % width;
-		int y = (int)(toPlane*p).y % height;
-
-		if(x < 0){x = width + x;}
-		if(y < 0){y = height + y;}
-		if(Bs[y][x] == -1){return -1;}
-		return (Bs[y][x]*this->cr)/256;
-	}
+        dir aux = c - p;
+        int x = (int)aux.x%width;
+        int y = (int)aux.y%height;
+        if(n.x == 0 && n.z == 0){
+            x = (int)aux.x%width;
+            y = (int)aux.z%height;
+        }
+        else if(n.y == 0 && n.z == 0){
+            x = (int)aux.z%width;
+            y = (int)aux.y%height;
+        }
+        if(x < 0){x = width + x;}
+        if(y < 0){y = height + y;}
+        return Bs[y][x];
+    }
 };
-
 #endif
