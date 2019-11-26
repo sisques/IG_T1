@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=c++11 -pthread -O3 -DNDEBUG   CMakeFiles/IG_T3.dir/main.cpp.o  -o IG_T3 

@@ -1,3 +1,0 @@
-/home/victor/4o/IG/IG_T1/IG_T3/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/victor/4o/IG/IG_T1/IG_T3/cmake-build-release/CMakeFiles/IG_T3.dir
-/home/victor/4o/IG/IG_T1/IG_T3/cmake-build-release/CMakeFiles/edit_cache.dir
