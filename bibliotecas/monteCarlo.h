@@ -7,6 +7,7 @@
 #include <list>
 #include <memory>
 #include <limits>
+#include "path_tracer.h"
 
 using namespace std;
 
@@ -15,32 +16,7 @@ class monteCarlo
 private:
 	camara cam;
 	int height, wide, rays;
-	
-	void getRGB(camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& B){
-		double t = 0;
-		double delta = 0;
-		double distMin = numeric_limits<double>::max();
-		double distActual = 0;
-		bool colision;
-		shared_ptr<figura> nearest;
-		point colP;
-		for( auto it = e.begin(); it != e.end(); ++it){
-			shared_ptr<figura> f = *it;
-			colision = f->intersection(rayo, c.o, t, delta);
-			if (colision) {
-				point p = c.o + rayo * (t - delta);
-				distActual = mod(c.o - p);
-				if (distActual < distMin && f->getR(p) != -1 && f->getG(p) != -1 && f->getB(p) != -1) {
-					nearest = f;
-					distMin = distActual;
-					colP = p;
-				}
-			}
-		}
-		R = nearest->getR(colP);
-		G = nearest->getG(colP);
-		B = nearest->getB(colP);
-	}
+	pathTracer pT;
 	
 	double cFunc(const double v, const double min, const double max){
 		return (max-min)*v + min;
@@ -73,7 +49,7 @@ public:
 		double Rt = 0.0, Gt = 0.0, Bt = 0.0;
 		for(int i = 0; i < rays; ++i){
 			dir rayo = newDir(Xs[i],Ys[i],1);
-			getRGB(cam, e, rayo, r, g, b);
+			pT.getRGB(cam, e, rayo, r, g, b);
 			Rt += r; // /p(a3[i])*p(b3[i])
 			Gt += g; // /p(a3[i])*p(b3[i]) 
 			Bt += b; // /p(a3[i])*p(b3[i])

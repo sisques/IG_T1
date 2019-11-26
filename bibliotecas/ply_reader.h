@@ -9,6 +9,8 @@
 #include "figuras.h"
 #include "punto_direccion.h"
 #include "matrix.h"
+#include "materialProperties.h"
+#include "textures.h"
 
 using namespace std;
 
@@ -16,8 +18,8 @@ using namespace std;
 
 
 	//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
-    list<shared_ptr<figura>> plyReader(const string fileIn,camara cam, int text, const Matrix trans[],int arrSize) {
-        list<shared_ptr<figura>> ouput;
+    list<shared_ptr<figura>> plyReader(const string fileIn,materialProperties mp, const Matrix trans[],int arrSize) {
+        list<shared_ptr<figura>> output;
 
         fstream flujoIn;
         flujoIn.open(fileIn.c_str(), ios::in);
@@ -102,21 +104,28 @@ using namespace std;
             v0 = puntos[a];
             v1 = puntos[b];
             v2 = puntos[c];
-            R = ( Red[a] + Red[b] + Red[c] )/ 3;
-            G = ( Green[a] + Green[b] + Green[c] )/ 3;
-            B = ( Blue[a] + Blue[b] + Blue[c] )/ 3;
+            if (vertexColor) {
+                R = (Red[a] + Red[b] + Red[c]) / 3;
+                G = (Green[a] + Green[b] + Green[c]) / 3;
+                B = (Blue[a] + Blue[b] + Blue[c]) / 3;
+            } else{
+                R = 0;
+                G = 0;
+                B = 0;
+            }
+            mp.setRGB(R,G,B);
             shared_ptr<figura> fig;
             if(normal) {
-                fig = make_shared<triangulo>(triangulo(cam, v0, v1, v2, normals[a], R, G, B, text));
+                fig = make_shared<triangulo>(triangulo(v0, v1, v2, normals[a],mp));
             } else {
-                fig = make_shared<triangulo>(triangulo(cam, v0, v1, v2, R, G, B, text));
+                fig = make_shared<triangulo>(triangulo(v0, v1, v2,mp));
             }
-            ouput.push_back(fig);
+            output.push_back(fig);
         }
 
 
         flujoIn.close();
-        return ouput;
+        return output;
     }
 
 #endif
