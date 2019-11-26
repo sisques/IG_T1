@@ -6,32 +6,26 @@
 
 #IncludeRegexTransform: 
 
-/home/victor/4o/IG/IG_T1/IG_T3/main.cpp
+/home/victor/gitRepos/IG_T1/IG_T3/main.cpp
 ../bibliotecas/punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 ../bibliotecas/camara.h
-/home/victor/4o/IG/IG_T1/bibliotecas/camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 ../bibliotecas/figuras.h
-/home/victor/4o/IG/IG_T1/bibliotecas/figuras.h
+/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
 ../bibliotecas/matrix.h
-/home/victor/4o/IG/IG_T1/bibliotecas/matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
 ../bibliotecas/monteCarlo.h
-/home/victor/4o/IG/IG_T1/bibliotecas/monteCarlo.h
+/home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h
 ../bibliotecas/ply_reader.h
-/home/victor/4o/IG/IG_T1/bibliotecas/ply_reader.h
-../bibliotecas/perlinNoise.h
-/home/victor/4o/IG/IG_T1/bibliotecas/perlinNoise.h
+/home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
 iostream
 -
 string
 -
-fstream
--
 list
 -
 memory
--
-limits
 -
 thread
 -
@@ -41,32 +35,30 @@ stdlib.h
 -
 time.h
 -
-unistd.h
--
 stdio.h
 -
 iomanip
 -
 
-/home/victor/4o/IG/IG_T1/bibliotecas/camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/figuras.h
+/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 iostream
 -
 math.h
 -
 textures.h
-/home/victor/4o/IG/IG_T1/bibliotecas/textures.h
+/home/victor/gitRepos/IG_T1/bibliotecas/textures.h
 camara.h
-/home/victor/4o/IG/IG_T1/bibliotecas/camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 materialProperties.h
-/home/victor/4o/IG/IG_T1/bibliotecas/materialProperties.h
+/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/materialProperties.h
+/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 iostream
 -
 math.h
@@ -74,11 +66,11 @@ math.h
 list
 -
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 camara.h
-/home/victor/4o/IG/IG_T1/bibliotecas/camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
 cstdlib
 -
 cstdio
@@ -86,15 +78,15 @@ cstdio
 math.h
 -
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/monteCarlo.h
+/home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h
 iostream
 -
 math.h
 -
 camara.h
-/home/victor/4o/IG/IG_T1/bibliotecas/camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 list
 -
 memory
@@ -102,7 +94,7 @@ memory
 limits
 -
 
-/home/victor/4o/IG/IG_T1/bibliotecas/perlinNoise.h
+/home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h
 cmath
 -
 random
@@ -118,7 +110,7 @@ stdlib.h
 time.h
 -
 
-/home/victor/4o/IG/IG_T1/bibliotecas/ply_reader.h
+/home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
 iostream
 -
 string
@@ -130,17 +122,17 @@ memory
 list
 -
 figuras.h
-/home/victor/4o/IG/IG_T1/bibliotecas/figuras.h
+/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 matrix.h
-/home/victor/4o/IG/IG_T1/bibliotecas/matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
 materialProperties.h
-/home/victor/4o/IG/IG_T1/bibliotecas/materialProperties.h
+/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 textures.h
-/home/victor/4o/IG/IG_T1/bibliotecas/textures.h
+/home/victor/gitRepos/IG_T1/bibliotecas/textures.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/ppm_reader.h
+/home/victor/gitRepos/IG_T1/bibliotecas/ppm_reader.h
 iostream
 -
 string
@@ -152,27 +144,27 @@ memory
 list
 -
 figuras.h
-/home/victor/4o/IG/IG_T1/bibliotecas/figuras.h
+/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 cmath
 -
 
-/home/victor/4o/IG/IG_T1/bibliotecas/textures.h
+/home/victor/gitRepos/IG_T1/bibliotecas/textures.h
 punto_direccion.h
-/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 iostream
 -
 math.h
 -
 perlinNoise.h
-/home/victor/4o/IG/IG_T1/bibliotecas/perlinNoise.h
+/home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h
 ppm_reader.h
-/home/victor/4o/IG/IG_T1/bibliotecas/ppm_reader.h
+/home/victor/gitRepos/IG_T1/bibliotecas/ppm_reader.h
 list
 -
 matrix.h
-/home/victor/4o/IG/IG_T1/bibliotecas/matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
 

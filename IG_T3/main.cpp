@@ -4,19 +4,16 @@
 #include "../bibliotecas/matrix.h"
 #include "../bibliotecas/monteCarlo.h"
 #include "../bibliotecas/ply_reader.h"
-#include "../bibliotecas/perlinNoise.h"
+
 
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <list>
 #include <memory>
-#include <limits>
 #include <thread>
 #include <chrono>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <iomanip>
 
@@ -26,16 +23,18 @@ camara c;
 
 
 list<shared_ptr<figura>> setUpScene(){
+
+    double brdfValues[] = {0.0,0.0,0.0};
+
+
+
     string file = "/home/victor/4o/IG/IG_T1/models/human.ply";
     int matrixSize = 3;
-    double brdfValues[] = {0.0,0.0,0.0};
-    Matrix m[matrixSize] ={rotateX(-M_PI/2), rotateY(M_PI/4 + M_PI/2), translate(0,-0.3,0.5)};
-    materialProperties mp = materialProperties(false, brdfValues);
-    list<shared_ptr<figura>> elementos; //= plyReader(file,&mp, m, matrixSize);
-
+    //Matrix m[matrixSize] ={rotateX(-M_PI/2), rotateY(M_PI/4 + M_PI/2), translate(0,-0.3,0.5)};
+    //list<shared_ptr<figura>> elementos = plyReader(file,&mp, m, matrixSize);
+    list<shared_ptr<figura>> elementos;
 
 //cornell box
-    //list<shared_ptr<figura>> elementos;
 
 
     //fondo, suelo y techo -> gris
@@ -43,21 +42,55 @@ list<shared_ptr<figura>> setUpScene(){
     //pared derecha -> verde
     //esfera 1 -> phong material
     //esfera 2 -> mezcla de especular perfecta y refracion perfecta
-    mp.setRGB(255,0,0);
-    string ruta = "/home/victor/4o/IG/IG_T1/textures/marto.ppm";
-    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,10000), newDir(0,-1,-1), IMAGE,ruta ,&mp));
+    materialProperties mp = materialProperties(false, brdfValues);
 
+    mp.setRGB(120, 120, 120);
+    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), &mp));
+    shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),&mp));
+    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),&mp));
+
+    mp.setRGB(255, 0, 0);
+    shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),&mp));
+
+    mp.setRGB(0, 255, 0);
+    shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),&mp));
+
+    materialProperties phong = materialProperties(false,0,0,255, brdfValues);
+    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.5), 0.25, &phong);
+
+
+
+    double brdfValues2[] = {0.0,1.0,0.0};
+    materialProperties especular_refracion = materialProperties(false,0,255,255, brdfValues2);
+    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.2,-0.2,0.5), 0.2, &especular_refracion);
+
+
+    materialProperties light = materialProperties(true,255,255,255, brdfValues);
+    point p1 = newPoint(-0.25,0.5,0.25);
+    point p2 = newPoint(0.25,0.5,0.25);
+    point p3 = newPoint(-0.25,0.5,0.75);
+    point p4 = newPoint(0.25,0.5,0.75);
+    shared_ptr<figura> lght_src_1 = make_shared<triangulo>(triangulo(p1,p2,p3,&light));
+    shared_ptr<figura> lght_src_2 = make_shared<triangulo>(triangulo(p2,p3,p4,&light));
+
+
+    elementos.push_back(lght_src_1);
+    elementos.push_back(lght_src_2);
     elementos.push_back(fondo);
-
-
+    elementos.push_back(suelo);
+    elementos.push_back(techo);
+    elementos.push_back(izquierda);
+    elementos.push_back(derecha);
+    elementos.push_back(esferaPhong);
+    elementos.push_back(esferaEspecularRefracion);
 
     return elementos;
 }
 
 int lineasCompletadas = 0;
 
-void generateScene( monteCarlo mc, const list<shared_ptr<figura>> e,
-					const string fOut, const int hMin, const int hMax, const int w, const int h){
+void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
+					const string &fOut, const int hMin, const int hMax, const int w, const int h){
 	int R,G,B;
 	fstream flujoOut;
 	flujoOut.open((fOut).c_str(), ios::out);
@@ -116,7 +149,7 @@ int main(){
         exit(5);
     }
     fOut = "test";
-    string ruta = "/home/victor/4o/IG/IG_T1/imagenes/";
+    string ruta = "/home/victor/gitRepos/IG_T1/imagenes/";
 
 	list<shared_ptr<figura>> e = setUpScene();
 	thread th[threads];

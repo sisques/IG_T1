@@ -8,33 +8,33 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/victor/4o/IG/IG_T1/cmake-build-debug"/>
+				<Option working_dir="/home/victor/gitRepos/IG_T1/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/victor/4o/IG/IG_T1/cmake-build-debug"/>
+				<Option working_dir="/home/victor/gitRepos/IG_T1/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="IG_T1">
-				<Option output="/home/victor/4o/IG/IG_T1/cmake-build-debug/IG_T1" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/victor/4o/IG/IG_T1/cmake-build-debug"/>
+				<Option output="/home/victor/gitRepos/IG_T1/cmake-build-debug/IG_T1" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/victor/gitRepos/IG_T1/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/victor/4o/IG/IG_T1/bibliotecas"/>
+					<Add directory="/home/victor/gitRepos/IG_T1/bibliotecas"/>
 					<Add directory="/usr/include/c++/6"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
 					<Add directory="/usr/include/c++/6/backward"/>
@@ -45,20 +45,20 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 IG_T1"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 IG_T1"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="IG_T1/fast">
-				<Option output="/home/victor/4o/IG/IG_T1/cmake-build-debug/IG_T1" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/victor/4o/IG/IG_T1/cmake-build-debug"/>
+				<Option output="/home/victor/gitRepos/IG_T1/cmake-build-debug/IG_T1" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/victor/gitRepos/IG_T1/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/victor/4o/IG/IG_T1/bibliotecas"/>
+					<Add directory="/home/victor/gitRepos/IG_T1/bibliotecas"/>
 					<Add directory="/usr/include/c++/6"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
 					<Add directory="/usr/include/c++/6/backward"/>
@@ -69,60 +69,60 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 IG_T1/fast"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 IG_T1/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/victor/4o/IG/IG_T1/cmake-build-debug"/>
+				<Option working_dir="/home/victor/gitRepos/IG_T1/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/victor/4o/IG/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/victor/gitRepos/IG_T1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/victor/4o/IG/IG_T1/IG_T3/main.cpp">
+		<Unit filename="/home/victor/gitRepos/IG_T1/IG_T3/main.cpp">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/ToneMapping.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/ToneMapping.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/camara.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/camara.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/figuras.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/materialProperties.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/matrix.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/monteCarlo.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/perlinNoise.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/ply_reader.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/ppm_reader.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/ppm_reader.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/punto_direccion.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/bibliotecas/textures.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/textures.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/4o/IG/IG_T1/CMakeLists.txt">
+		<Unit filename="/home/victor/gitRepos/IG_T1/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

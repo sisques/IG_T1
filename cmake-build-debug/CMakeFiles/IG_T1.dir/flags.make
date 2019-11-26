@@ -6,5 +6,5 @@ CXX_FLAGS =  -std=c++11 -pthread -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/victor/4o/IG/IG_T1/bibliotecas 
+CXX_INCLUDES = -I/home/victor/gitRepos/IG_T1/bibliotecas 
 

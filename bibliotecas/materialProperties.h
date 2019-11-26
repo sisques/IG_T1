@@ -36,6 +36,8 @@ public:
         this -> brdfValues = _brdfValues;
     }
 
+
+
     void setRGB(int _R,int _G,int _B){
         this -> R = _R;
         this -> G = _G;
@@ -49,11 +51,6 @@ public:
     bool isLightSource(){
         return this->light_source;
     }
-
-    list<dir> nextRay(dir inputRay){}
-
-
-
 
 };
 
