@@ -17,23 +17,23 @@ protected:
     texture_enum text;
     texture *texturizador;
     string im = "";
-    materialProperties *mp;
+    materialProperties mp;
 public:
-    figura(materialProperties *_mp){
+    figura(materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp->getR();
-        this -> G = mp->getG();
-        this -> B = mp->getB();
+        this -> R = mp.getR();
+        this -> G = mp.getG();
+        this -> B = mp.getB();
         this->text = NO_TEXTURE;
         texturizador = new texture();
 
     }
 
-    figura(texture_enum t, materialProperties *_mp){
+    figura(texture_enum t, materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp->getR();
-        this -> G = mp->getG();
-        this -> B = mp->getB();
+        this -> R = mp.getR();
+        this -> G = mp.getG();
+        this -> B = mp.getB();
         this->text = t;
         if(t == WOOD){
             texturizador = new texture1();
@@ -47,11 +47,11 @@ public:
         }
     }
 
-    figura(texture_enum t, string im, dir d, materialProperties *_mp){
+    figura(texture_enum t, string im, dir d, materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp->getR();
-        this -> G = mp->getG();
-        this -> B = mp->getB();
+        this -> R = mp.getR();
+        this -> G = mp.getG();
+        this -> B = mp.getB();
         this->text = t;
         if(t == IMAGE){
             texturizador = new texture3(im, d);
@@ -59,6 +59,18 @@ public:
         else {
             texturizador = new texture();
         }
+    }
+
+    event_enum evento(){
+        return mp.evento();
+    }
+
+    bool isPhong(){
+        return mp.isPhong();
+    }
+
+    bool isLight(){
+        return mp.isLightSource();
     }
 
     virtual bool implicit(point p) {
@@ -99,12 +111,12 @@ private:
     point c;
     double r;
 public:
-    esfera(point _c, double _r,  materialProperties *_mp): figura(_mp){
+    esfera(point _c, double _r,  materialProperties _mp): figura(_mp){
         this -> c = _c;
         this -> r = _r;
     }
 
-	esfera(point _c, double _r, texture_enum t,  materialProperties *_mp): figura(t,_mp){
+    esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> c = _c;
         this -> r = _r;
     }
@@ -138,17 +150,17 @@ public:
             return false;
         }
     }
-	
-	int getR(point pp) override {
-		return figura::getR(pp);
-	}
+
+    int getR(point pp) override {
+        return figura::getR(pp);
+    }
     int getG(point pp) override {
-		return figura::getG(pp);
-	}
+        return figura::getG(pp);
+    }
     int getB(point pp) override {
-		return figura::getB(pp);
-	}
-	
+        return figura::getB(pp);
+    }
+
 };
 
 class plano : public figura {
@@ -156,21 +168,21 @@ private:
     point p;
     dir n;
 public:
-    plano( point _p, dir _n, materialProperties *_mp): figura(_mp){
-        this -> p = _p;
-        this -> n = _n;
-    }
-	
-	plano( point _p, dir _n,texture_enum t, materialProperties *_mp): figura( t,_mp){
+    plano( point _p, dir _n, materialProperties _mp): figura(_mp){
         this -> p = _p;
         this -> n = _n;
     }
 
-	plano( point _p, dir _n, texture_enum t, string _im,  materialProperties *_mp): figura(t, _im, _n, _mp){
+    plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
         this -> p = _p;
         this -> n = _n;
     }
-	
+
+    plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
+        this -> p = _p;
+        this -> n = _n;
+    }
+
     bool implicit(point p) override  {
         dir d = p - this -> p;
         return dot(d, this -> n) <= 0;
@@ -200,26 +212,26 @@ public:
         }
 
     }
-	
-	int getR(point pp) override {
-		if(this->text == IMAGE){
-			return texturizador->getR(this->p, pp);
-		}
-		return figura::getR(pp);
-	}
+
+    int getR(point pp) override {
+        if(this->text == IMAGE){
+            return texturizador->getR(this->p, pp);
+        }
+        return figura::getR(pp);
+    }
     int getG(point pp) override {
         if(this->text == IMAGE){
-			return texturizador->getG(this->p, pp);
-		}
-		return figura::getG(pp);
-	}
+            return texturizador->getG(this->p, pp);
+        }
+        return figura::getG(pp);
+    }
     int getB(point pp) override {
         if(this->text == IMAGE){
             return texturizador->getB(this->p, pp);
-		}
-		return figura::getB(pp);
-	}
-	
+        }
+        return figura::getB(pp);
+    }
+
 };
 
 class triangulo : public figura {
@@ -227,7 +239,7 @@ private:
     point v0, v1, v2;
     dir normal;
 public:
-    triangulo(point _v0, point _v1, point _v2,  materialProperties *_mp): figura(_mp){
+    triangulo(point _v0, point _v1, point _v2,  materialProperties _mp): figura(_mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
@@ -235,14 +247,14 @@ public:
         dir arista2 = this->v2 - this->v0;
         this -> normal =  cross(arista1, arista2);
     }
-    triangulo( point _v0, point _v1, point _v2, dir _normal,  materialProperties *_mp): figura(_mp){
+    triangulo( point _v0, point _v1, point _v2, dir _normal,  materialProperties _mp): figura(_mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
         this -> normal =  _normal;
     }
 
-	triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties *_mp): figura(t,_mp){
+    triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
@@ -251,16 +263,16 @@ public:
         this -> normal =  cross(arista1, arista2);
     }
 
-    triangulo(point _v0, point _v1, point _v2, dir _normal, texture_enum t, materialProperties *_mp): figura(t, _mp){
+    triangulo(point _v0, point _v1, point _v2, dir _normal, texture_enum t, materialProperties _mp): figura(t, _mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
         this -> normal =  _normal;
     }
-   /* bool implicit(point p) override  {
-        dir d = p - this -> p;
-        return dot(d, this -> n) <= 0;
-    }*/
+    /* bool implicit(point p) override  {
+         dir d = p - this -> p;
+         return dot(d, this -> n) <= 0;
+     }*/
 
     dir getNormal(){
         return this -> normal;
@@ -304,7 +316,7 @@ public:
         if (t > EPSILON && t < 1/EPSILON) {
             return true;
         }
-        // Intersecta la linea pero no el plano
+            // Intersecta la linea pero no el plano
         else {
             return false;
         }

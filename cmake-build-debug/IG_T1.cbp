@@ -107,6 +107,9 @@
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h">
 			<Option target="IG_T1"/>
 		</Unit>
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/path_tracer.h">
+			<Option target="IG_T1"/>
+		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h">
 			<Option target="IG_T1"/>
 		</Unit>
@@ -117,6 +120,9 @@
 			<Option target="IG_T1"/>
 		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h">
+			<Option target="IG_T1"/>
+		</Unit>
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h">
 			<Option target="IG_T1"/>
 		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/textures.h">

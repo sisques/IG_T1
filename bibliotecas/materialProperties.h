@@ -7,36 +7,33 @@
 #include <list>
 #include "punto_direccion.h"
 #include "camara.h"
+#include "russian_roulette.h"
 
 using namespace std;
-
-enum brdf_index {
-        PHONG_BRDF,
-        DELTA_BRDF,
-        DELTA_BTDF
-};
 
 class materialProperties{
 protected:
     bool light_source;
+	bool phong;
     int R, G, B;
-    double *brdfValues;
+    russianRoulette rR;
     //normalizar a 0.9 o el max de las 3
 public:
-    materialProperties(bool is_light_source, double _brdfValues[]){
+	materialProperties(){}
+    materialProperties(bool is_light_source, bool _phong, event_enum events[], double probs[]){
         this -> light_source = is_light_source;
-        this -> brdfValues = _brdfValues;
+        this -> rR = russianRoulette(events, probs);
+		phong = _phong;
     }
 
-    materialProperties(bool is_light_source, int _R, int _G, int _B, double _brdfValues[]){
+    materialProperties(bool is_light_source, int _R, int _G, int _B, bool _phong, event_enum events[], double probs[]){
         this -> light_source = is_light_source;
         this -> R = _R;
         this -> G = _G;
         this -> B = _B;
-        this -> brdfValues = _brdfValues;
+		this -> rR = russianRoulette(events, probs);
+		phong = _phong;
     }
-
-
 
     void setRGB(int _R,int _G,int _B){
         this -> R = _R;
@@ -51,6 +48,14 @@ public:
     bool isLightSource(){
         return this->light_source;
     }
+	
+	bool isPhong(){
+		return this->phong;
+	}
+
+	event_enum evento(){
+		return rR.event();
+	}
 
 };
 

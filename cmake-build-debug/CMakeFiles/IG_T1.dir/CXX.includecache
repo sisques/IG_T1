@@ -69,6 +69,8 @@ punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 camara.h
 /home/victor/gitRepos/IG_T1/bibliotecas/camara.h
+russian_roulette.h
+/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
 cstdlib
@@ -150,6 +152,20 @@ punto_direccion.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 cmath
+-
+
+/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
+iostream
+-
+math.h
+-
+camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
+list
+-
+memory
+-
+limits
 -
 
 /home/victor/gitRepos/IG_T1/bibliotecas/textures.h
