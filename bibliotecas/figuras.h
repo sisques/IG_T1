@@ -99,7 +99,9 @@ public:
         return false;
     }
 
-    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){}
+    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
+
+    }
 
     dir reflexion(dir in, dir n, point o){
         dir y = n;
