@@ -99,13 +99,11 @@ public:
         return false;
     }
 
-    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
-
-    }
+    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){}
 
     dir reflexion(dir in, dir n, point o){
         dir y = n;
-        dir x = newDir(((double) rand() / (RAND_MAX)), ((double) rand() / (RAND_MAX)) , ((double) rand() / (RAND_MAX)));
+        dir x = in;
         dir z = cross(x,y);
         x = cross(y,z);
 
@@ -115,19 +113,36 @@ public:
 
         dir inputRay = in*new_base;
         dir normal = n*new_base;
-        dir out = 2*dot(normal, inputRay)*normal -inputRay;
-        dir output =  out*original_Base;
+        dir output = 2*dot(normal, inputRay)*normal -inputRay;
 
-        if ( angle(in, n) != angle(output, n) ) {
-            return output;
-        } else {
-            return -output;
-        }
+        return output*original_Base;
+
     }
 
+    dir refraction(dir _in, dir _n, point o){
+        dir in = normalize(_in);
+        dir n = normalize(_n);
 
+        dir y = n;
+        dir x = in;
+        dir z = cross(x,y);
+        x = cross(y,z);
 
-    dir refraction(dir inputRay, dir normal, point o){}
+        double n1 = 1.00029;
+        double n2 = 1.33;
+
+        Matrix new_base = newBase(x,y,z,o);
+        Matrix original_Base = originalBase(x,y,z,o);
+
+        dir inputRay = in*new_base;
+        dir normal = n*new_base;
+        double r = n1 / n2;
+        double c1 = dot(-normal,inputRay);
+        double c2 = sqrt(1-r*r*(1-c1*c1));
+        dir output = r*inputRay + (r*c1 - c2)*normal;
+
+        return output*original_Base;
+    }
 
 };
 
