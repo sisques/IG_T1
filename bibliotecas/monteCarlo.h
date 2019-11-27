@@ -49,7 +49,7 @@ public:
 		double Rt = 0.0, Gt = 0.0, Bt = 0.0;
 		for(int i = 0; i < rays; ++i){
 			dir rayo = newDir(Xs[i],Ys[i],1);
-			pT.getRGB(cam, e, rayo, r, g, b);
+			pT.getRGB(cam.o, e, rayo, r, g, b);
 			Rt += r; // /p(a3[i])*p(b3[i])
 			Gt += g; // /p(a3[i])*p(b3[i]) 
 			Bt += b; // /p(a3[i])*p(b3[i])

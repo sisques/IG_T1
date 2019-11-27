@@ -25,7 +25,15 @@ public:
         }
     }
 
+    Matrix empty(){
+        Matrix m;
+        m.p = nullptr;
+        return m;
+    }
 
+    bool isEmpty(){
+        return this->p == nullptr;
+    }
 
     // operador de asignacion
     Matrix& operator= (const Matrix& a){
@@ -84,7 +92,7 @@ Matrix operator/ (const Matrix& a, const double& b)    {
     Matrix res = Matrix();
     for (int f = 0; f < 4; f++){
         for (int c = 0; c < 4; c++){
-            res.p[f][c] = res.p[f][c] / b;
+            res.p[f][c] = a.p[f][c] / b;
         }
     }
     return res;
@@ -101,6 +109,22 @@ point operator* (const Matrix& m, const point p)    {
 
 // operador de multiplicacion por direccion
 dir operator* (const Matrix& m, const dir& p)    {
+    double a,b,c,d;
+    a = p.x; b = p.y; c = p.z; d = p.w;
+    mulAux(m, a, b, c, d);
+    return newDir(a, b, c);
+}
+
+// operador de multiplicacion por punto
+point operator* (const point p, const Matrix& m)    {
+    double a,b,c,d;
+    a = p.x; b = p.y; c = p.z; d = p.w;
+    mulAux(m, a, b, c, d);
+    return newPoint(a, b, c);
+}
+
+// operador de multiplicacion por direccion
+dir operator* (const dir& p, const Matrix& m)    {
     double a,b,c,d;
     a = p.x; b = p.y; c = p.z; d = p.w;
     mulAux(m, a, b, c, d);
@@ -153,7 +177,7 @@ double det(const Matrix& m){
 Matrix adj(const Matrix& a){
     Matrix res = Matrix();
     for(int f = 0; f < 4; f++){
-        for(int c = 0; f < 4; c++){
+        for(int c = 0; c < 4; c++){
             double aux[3][3];
             int h = 0, k = 0;
             for(int x = 0; x < 4; x++){
@@ -166,7 +190,8 @@ Matrix adj(const Matrix& a){
                 if(x != f){h++;}
                 k = 0;
             }
-            res.p[f][c] = pow(-1.0, f+c)*det3x3(aux);
+            double test =  pow(-1.0, f+c)*det3x3(aux);
+            res.p[f][c] = test;
         }
     }
     return res;

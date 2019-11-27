@@ -8,6 +8,7 @@
 #include "textures.h"
 #include "camara.h"
 #include "materialProperties.h"
+#include "matrix.h"
 
 using namespace std;
 
@@ -16,7 +17,6 @@ protected:
     int R, G, B;
     texture_enum text;
     texture *texturizador;
-    string im = "";
     materialProperties mp;
 public:
     figura(materialProperties _mp){
@@ -72,10 +72,11 @@ public:
 	bool isLight(){
 		return mp.isLightSource();
 	}
+	
+	double probEvent(event_enum e){
+		return mp.probEvent(e);
+	}
 
-    virtual bool implicit(point p) {
-        return false;
-    };
     int getR(){ return this->R;}
     int getG(){ return this->G;}
     int getB(){ return this->B;}
@@ -102,6 +103,43 @@ public:
     virtual bool intersection(dir rd, point ro, double &t, double &dist){
         return false;
     }
+	
+	virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
+    }
+    
+	dir reflexion(dir _in, dir _n, point o){
+		dir in = normalize(_in);
+        dir n = normalize(_n);
+        dir y = n;
+        dir x = in;
+        dir z = cross(x,y);
+        x = cross(y,z);
+        Matrix new_base = newBase(x,y,z,o);
+        Matrix original_Base = originalBase(x,y,z,o);
+        dir inputRay = in*new_base;
+        dir normal = n*new_base;
+        dir output = 2*dot(normal, inputRay)*normal -inputRay;
+        return -normalize(output*original_Base);
+    }
+    dir refraction(dir _in, dir _n, point o){
+        dir in = normalize(_in);
+        dir n = normalize(_n);
+        dir y = n;
+        dir x = in;
+        dir z = cross(x,y);
+        x = cross(y,z);
+        double n1 = 1.00029;
+        double n2 = 1.33;
+        Matrix new_base = newBase(x,y,z,o);
+        Matrix original_Base = originalBase(x,y,z,o);
+        dir inputRay = in*new_base;
+        dir normal = n*new_base;
+        double r = n1 / n2;
+        double c1 = dot(-normal,inputRay);
+        double c2 = sqrt(1-r*r*(1-c1*c1));
+        dir output = r*inputRay + (r*c1 - c2)*normal;
+        return normalize(output*original_Base);
+    }
 };
 
 
@@ -126,12 +164,6 @@ public:
     double getRadius(){ return this->r;}
 
 
-    bool implicit(point p) override {
-        dir aux = p - this -> c;
-        return ( dot(aux, aux) - this -> r*this -> r ) <= 0;
-    }
-
-
     /*
      * Los puntos interseccion se calcularan usando la siguiente formula:
      *  p1 = ro + rd*(t-dist)
@@ -152,14 +184,22 @@ public:
     }
 	
 	int getR(point pp) override {
-		return figura::getR(pp);
-	}
+        return figura::getR(pp);
+    }
     int getG(point pp) override {
-		return figura::getG(pp);
-	}
+        return figura::getG(pp);
+    }
     int getB(point pp) override {
-		return figura::getB(pp);
-	}
+        return figura::getB(pp);
+    }
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = inputPoint - this -> getCenter();
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
+        }
+    }
 	
 };
 
@@ -183,10 +223,6 @@ public:
         this -> n = _n;
     }
 	
-    bool implicit(point p) override  {
-        dir d = p - this -> p;
-        return dot(d, this -> n) <= 0;
-    }
 
     point getPoint(){ return this->p;}
     dir getNormal(){ return this->n;}
@@ -232,6 +268,15 @@ public:
 		return figura::getB(pp);
 	}
 	
+	dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = this -> getNormal() ;
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
+        }
+    }
+	
 };
 
 class triangulo : public figura {
@@ -269,10 +314,6 @@ public:
         this -> v2 = _v2;
         this -> normal =  _normal;
     }
-   /* bool implicit(point p) override  {
-        dir d = p - this -> p;
-        return dot(d, this -> n) <= 0;
-    }*/
 
     dir getNormal(){
         return this -> normal;
@@ -313,14 +354,18 @@ public:
         dist = 0;
         t = f*dot(arista2, q);
         //Hay interseccion
-        if (t > EPSILON && t < 1/EPSILON) {
-            return true;
+	    return t > EPSILON && t < 1 / EPSILON;
+    }
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = this -> getNormal();
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
         }
-        // Intersecta la linea pero no el plano
-        else {
-            return false;
-        }
-
+		else{
+			return normal;
+		}
     }
 };
 

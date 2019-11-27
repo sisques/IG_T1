@@ -56,7 +56,10 @@ public:
 	event_enum evento(){
 		return rR.event();
 	}
-    //list<dir> nextRay(dir inputRay){}
+	
+	double probEvent(event_enum e){
+		return rR.probEvent(e);
+	}
 
 };
 
