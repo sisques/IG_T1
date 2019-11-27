@@ -49,10 +49,10 @@ list<shared_ptr<figura>> setUpScene(){
     shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.2,-0.2,0.5), 0.2, especular_refracion);
 
     materialProperties light = materialProperties(true,255,255,255, false, eventos, brdfValues);
-    point p1 = newPoint(-0.25,0.49,0.25);
-    point p2 = newPoint(0.25,0.49,0.25);
-    point p3 = newPoint(-0.25,0.49,0.75);
-    point p4 = newPoint(0.25,0.49,0.75);
+    point p1 = newPoint(-0.25,0.5,0.25);
+    point p2 = newPoint(0.25,0.5,0.25);
+    point p3 = newPoint(-0.25,0.5,0.75);
+    point p4 = newPoint(0.25,0.5,0.75);
     shared_ptr<figura> lght_src_1 = make_shared<triangulo>(triangulo(p1,p2,p3,light));
     shared_ptr<figura> lght_src_2 = make_shared<triangulo>(triangulo(p2,p3,p4,light));
 
@@ -122,8 +122,8 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 100;
-    w = 100;
+    h = 1000;
+    w = 1000;
     rpp = 10;
     int threads = 10;
     if (threads > h || threads > w){

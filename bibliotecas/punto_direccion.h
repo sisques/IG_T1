@@ -69,9 +69,13 @@ struct dir {
 
 	dir operator -(dir p, dir q)         {     
 		return newDir(p.x - q.x, p.y - q.y, p.z - q.z);     
-	}   
+	}
 
-	dir operator *( double q, dir p)         {     
+    dir operator -(dir d)         {
+        return newDir(-d.x, -d.y, -d.z);
+    }
+
+    dir operator *( double q, dir p)         {
 		return newDir(p.x*q, p.y*q, p.z*q);     
 	}
 

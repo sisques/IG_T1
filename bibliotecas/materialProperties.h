@@ -3,7 +3,7 @@
 
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <list>
 #include "punto_direccion.h"
 #include "camara.h"

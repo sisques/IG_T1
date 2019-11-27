@@ -49,7 +49,7 @@ punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 iostream
 -
-math.h
+cmath
 -
 textures.h
 /home/victor/gitRepos/IG_T1/bibliotecas/textures.h
@@ -61,7 +61,7 @@ materialProperties.h
 /home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 iostream
 -
-math.h
+cmath
 -
 list
 -
@@ -157,7 +157,7 @@ cmath
 /home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
 iostream
 -
-math.h
+cmath
 -
 camara.h
 /home/victor/gitRepos/IG_T1/bibliotecas/camara.h
