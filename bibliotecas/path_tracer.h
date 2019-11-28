@@ -17,10 +17,9 @@ private:
 
 	bool colision(point c, list<shared_ptr<figura>> e, dir rayo, shared_ptr<figura> &fig, point &col){
 		double t = 0;
-		double delta = 0;
 		double distMin = numeric_limits<double>::max();
 		double distActual = 0;
-		bool colision = true;
+		bool colision;
 		bool yes = false;
 		shared_ptr<figura> nearest;
 		for( auto it = e.begin(); it != e.end(); ++it){
@@ -28,7 +27,6 @@ private:
             colision = f->intersection(rayo, c, t);
             if (colision) {
                 point p = c + rayo * t;
-#warning  comprobar esto, igual hay que meterse en coordenads locales
                 distActual = mod(c - p);
                 if (distActual < distMin) {
                     nearest = f;
@@ -57,7 +55,7 @@ public:
 		else{
 			event = actualFig->evento();
 		}
-        double auxR, auxG, auxB;
+        double R_anterior, G_anterior, B_anterior;
 		
 		if(colisiona && actualFig->isLight()){
 			R = actualFig->getR(colP);
@@ -74,20 +72,21 @@ public:
 			
 			dirNewRay = actualFig->nextRay(event, rayo, colP);
 			
-			getRGB(colP,  e,  dirNewRay, auxR, auxG, auxB);
-			double luminance = (0.2126*auxR*1.0 + 0.7152*auxG*1.0 + 0.0722*auxB*1.0);
+			getRGB(colP,  e,  dirNewRay, R_anterior, G_anterior, B_anterior);
+
 			R = actualFig->getR(colP);
 			G = actualFig->getG(colP);
 			B = actualFig->getB(colP);
+            double luminance = (0.2126*R*1.0 + 0.7152*G*1.0 + 0.0722*B*1.0);
 			if(actualFig->isPhong()){
-				R = R*(1-actualFig->probEvent(event))+auxR*actualFig->probEvent(event);
-				G = G*(1-actualFig->probEvent(event))+auxG*actualFig->probEvent(event);
-				B = B*(1-actualFig->probEvent(event))+auxB*actualFig->probEvent(event);
+				R = R*(1-actualFig->probEvent(event))+R_anterior*actualFig->probEvent(event);
+				G = G*(1-actualFig->probEvent(event))+G_anterior*actualFig->probEvent(event);
+				B = B*(1-actualFig->probEvent(event))+B_anterior*actualFig->probEvent(event);
 			}
 			else{
-				R = R*(1-actualFig->probEvent(event))+auxR*actualFig->probEvent(event);
-				G = G*(1-actualFig->probEvent(event))+auxG*actualFig->probEvent(event);
-				B = B*(1-actualFig->probEvent(event))+auxB*actualFig->probEvent(event);
+				R = R*(1-actualFig->probEvent(event))+R_anterior*actualFig->probEvent(event);
+				G = G*(1-actualFig->probEvent(event))+G_anterior*actualFig->probEvent(event);
+				B = B*(1-actualFig->probEvent(event))+B_anterior*actualFig->probEvent(event);
 			}
 			R = R;//*luminance;
 			G = G;//*luminance;

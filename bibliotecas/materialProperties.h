@@ -23,6 +23,7 @@ public:
 	materialProperties(){}
     materialProperties(bool is_light_source, bool _phong, event_enum events[], double probs[]){
         this -> light_source = is_light_source;
+        this -> setRGB(0,0,0);
         this -> rR = russianRoulette(events, probs);
 		phong = _phong;
     }
@@ -33,7 +34,7 @@ public:
         this -> B = _B/255.0;
     }
 
-    materialProperties(bool is_light_source, double _R, double _G, double _B, bool _phong, event_enum events[], double probs[]){
+    materialProperties(bool is_light_source, bool _phong, event_enum events[], double probs[], double _R, double _G, double _B){
         this -> light_source = is_light_source;
         this -> setRGB(_R,_G,_B);
 		this -> rR = russianRoulette(events, probs);

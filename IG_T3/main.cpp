@@ -25,10 +25,11 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
 
-    double brdfValues[] = {0.4,0.4};
+    double spheres[] = {0.2,0.6};
+    double wall[] = {0.2,0.2};
     event_enum eventos[] = {REFRACTION, REFLEXION};
 
-    materialProperties mp = materialProperties(false, false, eventos, brdfValues);
+    materialProperties mp = materialProperties(false, false, eventos, wall);
     list<shared_ptr<figura>> elementos;
     mp.setRGB(120, 120, 120);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
@@ -39,14 +40,14 @@ list<shared_ptr<figura>> setUpScene(){
     mp.setRGB(0, 255, 0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 
-    materialProperties phong = materialProperties(false,0,0,255, false, eventos, brdfValues);
+    materialProperties phong = materialProperties(false, false, eventos, spheres,0,255,255);
     shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.75), 0.25, phong);
 
 
-    materialProperties especular_refracion = materialProperties(false,0,255,255, false, eventos, brdfValues);
+    materialProperties especular_refracion = materialProperties(false, false, eventos, spheres,255,255,0);
     shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.4,-0.4,0.9), 0.1, especular_refracion);
 
-    materialProperties light = materialProperties(true,255,255,255, false, eventos, brdfValues);
+    materialProperties light = materialProperties(true, false, eventos, wall,255,255,255);
     point p1 = newPoint(-0.25,0.5,0.25);
     point p2 = newPoint(0.25,0.5,0.25);
     point p3 = newPoint(-0.25,0.5,0.75);
@@ -64,11 +65,15 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(derecha);
     elementos.push_back(esferaPhong);
     elementos.push_back(esferaEspecularRefracion);
-    /*
-    shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), light));
+
+
+
+    double brdfValues2[] = {0.0,0.0};
+    materialProperties limit = materialProperties(false, false, eventos, brdfValues2,0,0,0);
+    shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
 
     elementos.push_back(limite);
-    */return elementos;
+    return elementos;
 }
 
 int completadas = 0;

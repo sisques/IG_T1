@@ -26,13 +26,13 @@ public:
 		eventos = new event_enum[nE]();
 		probs = new double[nE]();
 		double totalP = 0.0;
-		for(int i = 0; i < nE-1; ++i){
+		for(int i = 0; i < nE; ++i){
 			eventos[i] = _eventos[i];
 			probs[i] = _probs[i];
 			totalP += _probs[i];
 		}
-		probs[nE-1] = 1 - totalP;
-		eventos[nE-1] = DEATH;
+		probs[nE] = 1 - totalP;
+		eventos[nE] = DEATH;
 	}
 	~russianRoulette(){};
 	
