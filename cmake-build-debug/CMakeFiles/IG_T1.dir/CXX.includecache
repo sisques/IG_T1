@@ -19,6 +19,8 @@
 /home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h
 ../bibliotecas/ply_reader.h
 /home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
+../bibliotecas/globals.h
+/home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 iostream
 -
 string
@@ -57,6 +59,10 @@ camara.h
 /home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 materialProperties.h
 /home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
+matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
+
+/home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 iostream
@@ -65,6 +71,8 @@ cmath
 -
 list
 -
+globals.h
+/home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 camara.h
@@ -89,6 +97,24 @@ math.h
 -
 camara.h
 /home/victor/gitRepos/IG_T1/bibliotecas/camara.h
+list
+-
+memory
+-
+limits
+-
+path_tracer.h
+/home/victor/gitRepos/IG_T1/bibliotecas/path_tracer.h
+
+/home/victor/gitRepos/IG_T1/bibliotecas/path_tracer.h
+iostream
+-
+math.h
+-
+camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
+russian_roulette.h
+/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
 list
 -
 memory

@@ -4,9 +4,11 @@
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../IG_T3/main.cpp
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/camara.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/figuras.h
+CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/globals.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/materialProperties.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/matrix.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/monteCarlo.h
+CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/path_tracer.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/perlinNoise.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/ply_reader.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/ppm_reader.h
