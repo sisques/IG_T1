@@ -2,7 +2,7 @@
 #define RUSSIANROULETTE_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include "camara.h"
 #include <list>
 #include <memory>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH};
+enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH, PRUEBA};
 
 class russianRoulette
 {
@@ -22,17 +22,17 @@ public:
 	russianRoulette(){};
 	russianRoulette(event_enum _eventos[], double _probs[]){
 		srand(static_cast<unsigned int>(clock()));
-		nE = sizeof(_eventos)/sizeof(_eventos)+1;
+		nE = sizeof(event_enum)/sizeof(event_enum)+1;
 		eventos = new event_enum[nE]();
 		probs = new double[nE]();
 		double totalP = 0.0;
-		for(int i = 0; i < nE-1; ++i){
+		for(int i = 0; i < nE; ++i){
 			eventos[i] = _eventos[i];
 			probs[i] = _probs[i];
 			totalP += _probs[i];
 		}
-		probs[nE-1] = 1 - totalP;
-		eventos[nE-1] = DEATH;
+		probs[nE] = 1 - totalP;
+		eventos[nE] = DEATH;
 	}
 	~russianRoulette(){};
 	
