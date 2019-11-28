@@ -14,78 +14,89 @@ using namespace std;
 class pathTracer
 {
 private:
-public:
-	pathTracer(){}
-	~pathTracer(){};
-	
-	void getRGB(camara c, list<shared_ptr<figura>> e,  dir rayo, int& R, int& G, int& B){
+
+	bool colision(point c, list<shared_ptr<figura>> e, dir rayo, shared_ptr<figura> &fig, point &col){
 		double t = 0;
 		double delta = 0;
 		double distMin = numeric_limits<double>::max();
 		double distActual = 0;
-		bool colision;
+		bool colision = true;
+		bool yes = false;
 		shared_ptr<figura> nearest;
-		point colP;
 		for( auto it = e.begin(); it != e.end(); ++it){
 			shared_ptr<figura> f = *it;
-            colision = f->intersection(rayo, c.o, t, delta);
+            colision = f->intersection(rayo, c, t);
             if (colision) {
-                point p = c.o + rayo * (t - delta);
-                distActual = mod(c.o - p);
-                if (distActual < distMin && f->getR(p) != -1 && f->getG(p) != -1 && f->getB(p) != -1) {
+                point p = c + rayo * t;
+#warning  comprobar esto, igual hay que meterse en coordenads locales
+                distActual = mod(c - p);
+                if (distActual < distMin) {
                     nearest = f;
                     distMin = distActual;
-                    colP = p;
+                    col = p;
+					yes = true;
                 }
             }
-
 		}
-		event_enum event = nearest->evento();
-		int auxR, auxG, auxB;
-		if(event == DEATH){
+		fig = nearest;
+		return yes;
+	}
+
+public:
+	pathTracer(){}
+	~pathTracer(){};
+	
+	void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B){
+		shared_ptr<figura> actualFig;
+		point colP;
+		bool colisiona = colision(c,e,rayo,actualFig,colP);
+		event_enum event;
+		if(!colisiona){
+			event = DEATH;
+		}
+		else{
+			event = actualFig->evento();
+		}
+        double auxR, auxG, auxB;
+		
+		if(colisiona && actualFig->isLight()){
+			R = actualFig->getR(colP);
+			G = actualFig->getG(colP);
+			B = actualFig->getB(colP);
+		}
+		else if(event == DEATH){
 			R = 0;
 			G = 0;
 			B = 0;
 		}
-		else if(event == REFRACTION /*||*/&& event == REFLEXION){
-			dir d; 
-			if(event == REFRACTION){/* d = nearest.nextRay(REFRACTION, d, p);*/}
-			else{/* d = nearest.nextRay(REFLEXION, d, p);*/}
-			bool colisiona = false;
-			if(colisiona /* && figuraConLaQueIntersecciona.isLight()*/){
-				R = nearest->getR(colP);
-				G = nearest->getG(colP);
-				B = nearest->getB(colP);
-			}
-			else if(colisiona){
-				getRGB(c,  e,  d, auxR, auxG, auxB);
-				if(nearest->isPhong()){
-					if(event == REFRACTION){
-						
-					}
-					else{
-						
-					}
-				}
-				else{
-					if(event == REFRACTION){
-						
-					}
-					else{
-						
-					}
-				}
+		else if(event == REFRACTION || event == REFLEXION){
+			dir dirNewRay;
+			
+			dirNewRay = actualFig->nextRay(event, rayo, colP);
+			
+			getRGB(colP,  e,  dirNewRay, auxR, auxG, auxB);
+			double luminance = (0.2126*auxR*1.0 + 0.7152*auxG*1.0 + 0.0722*auxB*1.0);
+			R = actualFig->getR(colP);
+			G = actualFig->getG(colP);
+			B = actualFig->getB(colP);
+			if(actualFig->isPhong()){
+				R = R*(1-actualFig->probEvent(event))+auxR*actualFig->probEvent(event);
+				G = G*(1-actualFig->probEvent(event))+auxG*actualFig->probEvent(event);
+				B = B*(1-actualFig->probEvent(event))+auxB*actualFig->probEvent(event);
 			}
 			else{
-				R = 0;
-				G = 0;
-				B = 0;
+				R = R*(1-actualFig->probEvent(event))+auxR*actualFig->probEvent(event);
+				G = G*(1-actualFig->probEvent(event))+auxG*actualFig->probEvent(event);
+				B = B*(1-actualFig->probEvent(event))+auxB*actualFig->probEvent(event);
 			}
+			R = R;//*luminance;
+			G = G;//*luminance;
+			B = B;//*luminance;
 		}
 		else{
-			R = nearest->getR(colP);
-			G = nearest->getG(colP);
-			B = nearest->getB(colP);
+			R = actualFig->getR(colP);
+			G = actualFig->getG(colP);
+			B = actualFig->getB(colP);
 		}
 	}
 	

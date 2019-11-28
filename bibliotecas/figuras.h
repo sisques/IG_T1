@@ -8,15 +8,15 @@
 #include "textures.h"
 #include "camara.h"
 #include "materialProperties.h"
+#include "matrix.h"
 
 using namespace std;
 
 class figura{
 protected:
-    int R, G, B;
+    double R, G, B;
     texture_enum text;
     texture *texturizador;
-    string im = "";
     materialProperties mp;
 public:
     figura(materialProperties _mp){
@@ -61,46 +61,84 @@ public:
         }
     }
 
-    event_enum evento(){
-        return mp.evento();
-    }
+	event_enum evento(){
+		return mp.evento();
+	}
+	
+	bool isPhong(){
+		return mp.isPhong();
+	}
+	
+	bool isLight(){
+		return mp.isLightSource();
+	}
+	
+	double probEvent(event_enum e){
+		return mp.probEvent(e);
+	}
 
-    bool isPhong(){
-        return mp.isPhong();
-    }
+    double getR(){ return this->R;}
+    double getG(){ return this->G;}
+    double getB(){ return this->B;}
 
-    bool isLight(){
-        return mp.isLightSource();
-    }
-
-    virtual bool implicit(point p) {
-        return false;
-    };
-    int getR(){ return this->R;}
-    int getG(){ return this->G;}
-    int getB(){ return this->B;}
-
-    virtual int getR(point p){
+    virtual double getR(point p){
         if(this->text == WOOD|| this->text == PERLIN_NOISE){
             return texturizador->getR(p,this->R);
         }
         return this->R;
     }
-    virtual int getG(point p){
+    virtual double getG(point p){
         if(this->text == WOOD|| this->text == PERLIN_NOISE){
             return texturizador->getG(p,this->G);
         }
         return this->G;
     }
-    virtual int getB(point p){
+    virtual double getB(point p){
         if(this->text == WOOD|| this->text == PERLIN_NOISE){
             return texturizador->getB(p,this->B);
         }
         return this->B;
     }
 
-    virtual bool intersection(dir rd, point ro, double &t, double &dist){
+    virtual bool intersection(dir rd, point ro, double &t){
         return false;
+    }
+	
+	virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
+    }
+    
+	dir reflexion(dir _in, dir _n, point o){
+		dir in = normalize(_in);
+        dir n = normalize(_n);
+        dir y = n;
+        dir x = in;
+        dir z = cross(x,y);
+        x = cross(y,z);
+        Matrix new_base = newBase(x,y,z,o);
+        Matrix original_Base = originalBase(x,y,z,o);
+        dir inputRay = in*new_base;
+        dir normal = n*new_base;
+        dir output = 2*dot(normal, inputRay)*normal -inputRay;
+        return -normalize(output*original_Base);
+    }
+    dir refraction(dir _in, dir _n, point o){
+        dir in = normalize(_in);
+        dir n = normalize(_n);
+        dir y = n;
+        dir x = in;
+        dir z = cross(x,y);
+        x = cross(y,z);
+        double n1 = 1.00029;
+        double n2 = 1.33;
+        Matrix new_base = newBase(x,y,z,o);
+        Matrix original_Base = originalBase(x,y,z,o);
+        dir inputRay = in*new_base;
+        dir normal = n*new_base;
+        double r = n1 / n2;
+        double c1 = dot(-normal,inputRay);
+        double c2 = sqrt(1-r*r*(1-c1*c1));
+        dir output = r*inputRay + (r*c1 - c2)*normal;
+        return normalize(output*original_Base);
     }
 };
 
@@ -116,7 +154,7 @@ public:
         this -> r = _r;
     }
 
-    esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
+	esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> c = _c;
         this -> r = _r;
     }
@@ -126,41 +164,40 @@ public:
     double getRadius(){ return this->r;}
 
 
-    bool implicit(point p) override {
-        dir aux = p - this -> c;
-        return ( dot(aux, aux) - this -> r*this -> r ) <= 0;
-    }
-
-
-    /*
-     * Los puntos interseccion se calcularan usando la siguiente formula:
-     *  p1 = ro + rd*(t-dist)
-     *  p2 = ro + rd*(t+dist)
-     */
-    bool intersection(dir rd, point ro, double &t, double &dist) override {
-        point s = this->c;
-        double r = this->r;
-        t = dot(s - ro, rd);
-        point p = ro + rd*t;
-        double y = mod(s - p);
-        if ( y < r) {
-            dist = sqrt(r * r - y * y);
+    bool intersection(dir rd, point ro, double &t) override {
+        double aux  = dot(this->c - ro, rd);
+        if (aux < 0){
+            //corta detras del punto de origen
+            return false;
+        }
+        point p = ro + rd*aux;
+        double y = mod(this->c - p);
+        if ( y <= r) {
+            t = aux - sqrt(this->r * this->r - y * y);
             return true;
         } else {
             return false;
         }
     }
 
-    int getR(point pp) override {
+    double getR(point pp) override {
         return figura::getR(pp);
     }
-    int getG(point pp) override {
+    double getG(point pp) override {
         return figura::getG(pp);
     }
-    int getB(point pp) override {
+    double getB(point pp) override {
         return figura::getB(pp);
     }
-
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = inputPoint - this -> getCenter();
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
+        }
+    }
+	
 };
 
 class plano : public figura {
@@ -172,26 +209,22 @@ public:
         this -> p = _p;
         this -> n = _n;
     }
-
-    plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
+	
+	plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
         this -> p = _p;
         this -> n = _n;
     }
 
-    plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
+	plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
         this -> p = _p;
         this -> n = _n;
     }
-
-    bool implicit(point p) override  {
-        dir d = p - this -> p;
-        return dot(d, this -> n) <= 0;
-    }
+	
 
     point getPoint(){ return this->p;}
     dir getNormal(){ return this->n;}
 
-    bool intersection(dir rd, point ro, double &t, double &dist) override {
+    bool intersection(dir rd, point ro, double &t) override {
         dir diff = this->p - ro;
         double p1 = dot(diff, this->n);
         double p2 = dot(rd, this->n);
@@ -205,33 +238,42 @@ public:
             //hay un puntpo de interseccion
             t = p1 / p2;
             if (t < 0) {
+                //corta detras del punto de origenm
                 return false;
             }
-            dist = 0;
             return true;
         }
 
     }
 
-    int getR(point pp) override {
+    double getR(point pp) override {
+		if(this->text == IMAGE){
+			return texturizador->getR(this->p, pp);
+		}
+		return figura::getR(pp);
+	}
+    double getG(point pp) override {
         if(this->text == IMAGE){
-            return texturizador->getR(this->p, pp);
-        }
-        return figura::getR(pp);
-    }
-    int getG(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getG(this->p, pp);
-        }
-        return figura::getG(pp);
-    }
-    int getB(point pp) override {
+			return texturizador->getG(this->p, pp);
+		}
+		return figura::getG(pp);
+	}
+    double getB(point pp) override {
         if(this->text == IMAGE){
             return texturizador->getB(this->p, pp);
+		}
+		return figura::getB(pp);
+	}
+	
+	dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = this -> getNormal() ;
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
         }
-        return figura::getB(pp);
     }
-
+	
 };
 
 class triangulo : public figura {
@@ -254,7 +296,7 @@ public:
         this -> normal =  _normal;
     }
 
-    triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties _mp): figura(t,_mp){
+	triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
@@ -269,10 +311,6 @@ public:
         this -> v2 = _v2;
         this -> normal =  _normal;
     }
-    /* bool implicit(point p) override  {
-         dir d = p - this -> p;
-         return dot(d, this -> n) <= 0;
-     }*/
 
     dir getNormal(){
         return this -> normal;
@@ -282,7 +320,7 @@ public:
     point getVertice2(){ return this->v2;}
 
     //Implementacion del algoritmo de Möller-Trumbore
-    bool intersection(dir rd, point ro, double &t, double &dist) override {
+    bool intersection(dir rd, point ro, double &t) override {
         const double EPSILON = 0.0000001;
         dir arista1, arista2, h, s, q;
         double a, f, u, v;
@@ -310,17 +348,24 @@ public:
         }
 
         //Ahora se pasa a calcular t para obtener el punto de interseccion
-        dist = 0;
         t = f*dot(arista2, q);
-        //Hay interseccion
-        if (t > EPSILON && t < 1/EPSILON) {
-            return true;
-        }
-            // Intersecta la linea pero no el plano
-        else {
+        if (t < 0){
+            //corta detras del punto de origen
             return false;
         }
-
+        //Hay interseccion
+	    return t > EPSILON && t < 1 / EPSILON;
+    }
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        dir normal = this -> getNormal();
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint);
+        }
+		else{
+			return normal;
+		}
     }
 };
 

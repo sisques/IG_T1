@@ -4,7 +4,7 @@
 #include "../bibliotecas/matrix.h"
 #include "../bibliotecas/monteCarlo.h"
 #include "../bibliotecas/ply_reader.h"
-
+#include "../bibliotecas/globals.h"
 
 #include <iostream>
 #include <string>
@@ -24,14 +24,12 @@ camara c;
 
 
 list<shared_ptr<figura>> setUpScene(){
-    string file = "/home/victor/4o/IG/IG_T1/models/human.ply";
-    //int matrixSize = 3;
-    double brdfValues[] = {0.35,0.35};
-    event_enum eventos[] = {REFRACTION, REFLEXION};
-    //Matrix m[matrixSize] ={rotateX(-M_PI/2), rotateY(M_PI/4 + M_PI/2), translate(0,-0.3,0.5)};
-    materialProperties mp = materialProperties(false, false, eventos, brdfValues);
-    list<shared_ptr<figura>> elementos; //= plyReader(file,&mp, m, matrixSize);
 
+    double brdfValues[] = {0.4,0.4};
+    event_enum eventos[] = {REFRACTION, REFLEXION};
+
+    materialProperties mp = materialProperties(false, false, eventos, brdfValues);
+    list<shared_ptr<figura>> elementos;
     mp.setRGB(120, 120, 120);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
     shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
@@ -42,17 +40,17 @@ list<shared_ptr<figura>> setUpScene(){
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 
     materialProperties phong = materialProperties(false,0,0,255, false, eventos, brdfValues);
-    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.5), 0.25, phong);
+    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.75), 0.25, phong);
 
 
     materialProperties especular_refracion = materialProperties(false,0,255,255, false, eventos, brdfValues);
-    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.2,-0.2,0.5), 0.2, especular_refracion);
+    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.4,-0.4,0.9), 0.1, especular_refracion);
 
     materialProperties light = materialProperties(true,255,255,255, false, eventos, brdfValues);
-    point p1 = newPoint(-0.25,0.49,0.25);
-    point p2 = newPoint(0.25,0.49,0.25);
-    point p3 = newPoint(-0.25,0.49,0.75);
-    point p4 = newPoint(0.25,0.49,0.75);
+    point p1 = newPoint(-0.25,0.5,0.25);
+    point p2 = newPoint(0.25,0.5,0.25);
+    point p3 = newPoint(-0.25,0.5,0.75);
+    point p4 = newPoint(0.25,0.5,0.75);
     shared_ptr<figura> lght_src_1 = make_shared<triangulo>(triangulo(p1,p2,p3,light));
     shared_ptr<figura> lght_src_2 = make_shared<triangulo>(triangulo(p2,p3,p4,light));
 
@@ -66,10 +64,14 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(derecha);
     elementos.push_back(esferaPhong);
     elementos.push_back(esferaEspecularRefracion);
-    return elementos;
+    /*
+    shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), light));
+
+    elementos.push_back(limite);
+    */return elementos;
 }
 
-int lineasCompletadas = 0;
+int completadas = 0;
 
 void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
 					const string &fOut, const int hMin, const int hMax, const int w, const int h){
@@ -78,12 +80,12 @@ void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
 	flujoOut.open((fOut).c_str(), ios::out);
 	for (int i = hMin; i <= hMax; ++i){
         for (int j = 0; j < w; j++){
-            mc.rtx(e,i,j,R,G,B);
+            mc.rtx(e,i,j,R,G,B, false);
             flujoOut << R << " " << G << " " << B;
             flujoOut << "	";
         }
-        lineasCompletadas++;
-        double prog = (double)lineasCompletadas / (double)h;
+        completadas++;
+        double prog = (double)completadas / (double)h;
         cout << "\r" << "progreso: " << fixed << setprecision(2) << setw(6) << prog*100 << "%" << flush;
     }
 	flujoOut.close();
@@ -122,10 +124,10 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 100;
-    w = 100;
+    h = 200;
+    w = 200;
     rpp = 10;
-    int threads = 10;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -150,10 +152,10 @@ int main(){
     string fOutAux = ruta + fOut;
     flujoOut.open((fOutAux).c_str(), ios::out);
     flujoOut    <<      "P3"     << endl
-                <<   "#MAX=255"  << endl
+                <<   "#MAX="  << MAX << endl
                 <<  "# " << fOut << endl
                 << w << " " << h << endl
-                <<      "255"    << endl;
+                <<      CR      << endl;
 				
 	for(int i = 0; i < threads;++i){
 		string file = ruta+to_string(i);

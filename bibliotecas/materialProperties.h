@@ -5,6 +5,7 @@
 #include <iostream>
 #include <math.h>
 #include <list>
+#include "globals.h"
 #include "punto_direccion.h"
 #include "camara.h"
 #include "russian_roulette.h"
@@ -15,7 +16,7 @@ class materialProperties{
 protected:
     bool light_source;
 	bool phong;
-    int R, G, B;
+    double R, G, B;
     russianRoulette rR;
     //normalizar a 0.9 o el max de las 3
 public:
@@ -26,24 +27,24 @@ public:
 		phong = _phong;
     }
 
-    materialProperties(bool is_light_source, int _R, int _G, int _B, bool _phong, event_enum events[], double probs[]){
+    void setRGB(int _R,int _G,int _B){
+        this -> R = _R/255.0;
+        this -> G = _G/255.0;
+        this -> B = _B/255.0;
+    }
+
+    materialProperties(bool is_light_source, double _R, double _G, double _B, bool _phong, event_enum events[], double probs[]){
         this -> light_source = is_light_source;
-        this -> R = _R;
-        this -> G = _G;
-        this -> B = _B;
+        this -> setRGB(_R,_G,_B);
 		this -> rR = russianRoulette(events, probs);
 		phong = _phong;
     }
 
-    void setRGB(int _R,int _G,int _B){
-        this -> R = _R;
-        this -> G = _G;
-        this -> B = _B;
-    }
 
-    int getR(){ return this->R;}
-    int getG(){ return this->G;}
-    int getB(){ return this->B;}
+
+    double getR(){ return this->R;}
+    double getG(){ return this->G;}
+    double getB(){ return this->B;}
 
     bool isLightSource(){
         return this->light_source;
@@ -55,6 +56,10 @@ public:
 
 	event_enum evento(){
 		return rR.event();
+	}
+	
+	double probEvent(event_enum e){
+		return rR.probEvent(e);
 	}
 
 };

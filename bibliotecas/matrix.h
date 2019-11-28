@@ -115,6 +115,22 @@ dir operator* (const Matrix& m, const dir& p)    {
     return newDir(a, b, c);
 }
 
+// operador de multiplicacion por punto
+point operator* (const point p, const Matrix& m)    {
+    double a,b,c,d;
+    a = p.x; b = p.y; c = p.z; d = p.w;
+    mulAux(m, a, b, c, d);
+    return newPoint(a, b, c);
+}
+
+// operador de multiplicacion por direccion
+dir operator* (const dir& p, const Matrix& m)    {
+    double a,b,c,d;
+    a = p.x; b = p.y; c = p.z; d = p.w;
+    mulAux(m, a, b, c, d);
+    return newDir(a, b, c);
+}
+
 double det3x3(const double m[3][3]){
     return  m[0][0]*m[1][1]*m[2][2] +
             m[0][1]*m[1][2]*m[2][0] +

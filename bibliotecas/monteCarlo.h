@@ -25,8 +25,36 @@ private:
 public:
 	monteCarlo(camara c, int h, int w, int r):cam(c),height(h),wide(w),rays(r){}
 	~monteCarlo(){};
-	
-	void rtx(const list<shared_ptr<figura>> e, const int x, const int y, int& R, int& G, int& B){
+
+
+    void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B){
+        double t = 0;
+        double distMin = numeric_limits<double>::max();
+        double distActual = 0;
+        bool colision;
+        shared_ptr<figura> nearest;
+        point colP;
+        for( auto it = e.begin(); it != e.end(); ++it){
+            shared_ptr<figura> f = *it;
+            colision = f->intersection(rayo, c, t);
+            if (colision) {
+                point p = c + rayo * t;
+                distActual = mod(c - p);
+                if (distActual < distMin ) {
+                    nearest = f;
+                    distMin = distActual;
+                    colP = p;
+                }
+            }
+
+        }
+        R = nearest->getR(colP);
+        G = nearest->getG(colP);
+        B = nearest->getB(colP);
+    }
+
+
+	void rtx(const list<shared_ptr<figura>> e, const int x, const int y, int& R, int& G, int& B, bool basic){
 		int cX = y - (height/2);
 		int cY = (wide/2) - x;
 		double minX = (1.0/(wide/2)) * cX*1.0;
@@ -45,19 +73,23 @@ public:
 			Xs[i] = cFunc(a3[i], minX, maxX);
 			Ys[i] = cFunc(b3[i], minY, maxY);
 		}
-		int r, g, b;
+        double r, g, b;
 		double Rt = 0.0, Gt = 0.0, Bt = 0.0;
 		for(int i = 0; i < rays; ++i){
-			dir rayo = newDir(Xs[i],Ys[i],1);
-			pT.getRGB(cam, e, rayo, r, g, b);
+			dir rayo = normalize(newDir(Xs[i],Ys[i],1));
+			if (!basic) {
+                pT.getRGB(cam.o, e, rayo, r, g, b);
+            } else {
+                this->getRGB(cam.o, e, rayo, r, g, b);
+			}
 			Rt += r; // /p(a3[i])*p(b3[i])
 			Gt += g; // /p(a3[i])*p(b3[i]) 
 			Bt += b; // /p(a3[i])*p(b3[i])
 		}
 		
-		R = Rt / rays;
-		G = Gt / rays;
-		B = Bt / rays;
+		R = Rt * CR / rays;
+		G = Gt * CR / rays;
+		B = Bt * CR / rays;
 	}
 };
 

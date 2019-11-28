@@ -22,7 +22,7 @@ public:
 	russianRoulette(){};
 	russianRoulette(event_enum _eventos[], double _probs[]){
 		srand(static_cast<unsigned int>(clock()));
-		nE = sizeof(event_enum)/sizeof(_eventos[0])+1;
+		nE = sizeof(event_enum)/sizeof(event_enum)+1;
 		eventos = new event_enum[nE]();
 		probs = new double[nE]();
 		double totalP = 0.0;
@@ -46,6 +46,16 @@ public:
 			aux += probs[i];
 		}
 		return DEATH;
+	}
+	
+	double probEvent(event_enum e){
+		double aux = 0.0;
+		for(int i = 0; i < nE;++i){
+			if(eventos[i] == e){
+				aux = probs[i];
+			}
+		}
+		return aux;
 	}
 };
 
