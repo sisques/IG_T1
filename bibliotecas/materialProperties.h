@@ -3,7 +3,7 @@
 
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <list>
 #include "globals.h"
 #include "punto_direccion.h"

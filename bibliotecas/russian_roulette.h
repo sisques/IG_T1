@@ -2,7 +2,7 @@
 #define RUSSIANROULETTE_H
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include "camara.h"
 #include <list>
 #include <memory>
