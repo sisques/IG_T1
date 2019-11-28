@@ -9,6 +9,7 @@
 #include "camara.h"
 #include "materialProperties.h"
 #include "matrix.h"
+#include <list>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ protected:
     texture_enum text;
     texture *texturizador;
     materialProperties mp;
+    list<point> lightPoints;
 public:
     figura(materialProperties _mp){
         this -> mp = _mp;
@@ -76,6 +78,14 @@ public:
 	double probEvent(event_enum e){
 		return mp.probEvent(e);
 	}
+
+    double getIrradiance(){
+        return mp.getIrradiance();
+    }
+
+    virtual list<point> getLightPoints(){
+        return this->lightPoints;
+    }
 
     double getR(){ return this->R;}
     double getG(){ return this->G;}
@@ -156,11 +166,29 @@ public:
     esfera(point _c, double _r,  materialProperties _mp): figura(_mp){
         this -> c = _c;
         this -> r = _r;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x+r, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y+r, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z+r));
+            this->lightPoints.push_back(newPoint(c.x-r, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y-r, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
+        }
     }
 
 	esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> c = _c;
         this -> r = _r;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x+r, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y+r, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z+r));
+            this->lightPoints.push_back(newPoint(c.x-r, c.y, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y-r, c.z));
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
+        }
     }
 
 
@@ -222,16 +250,44 @@ public:
     plano( point _p, dir _n, materialProperties _mp): figura(_mp){
         this -> p = _p;
         this -> n = _n;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
+            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
+        }
+
     }
 	
 	plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
         this -> p = _p;
         this -> n = _n;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
+            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
+        }
     }
 
 	plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
         this -> p = _p;
         this -> n = _n;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
+            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
+        }
     }
 	
 
@@ -330,6 +386,15 @@ public:
     dir getNormal() override {
         return this -> normal;
     }
+
+    list<point> getLightPoints() override{
+        list<point> aux;
+        aux.push_back(v0);
+        aux.push_back(v1);
+        aux.push_back(v2);
+        return aux;
+    }
+
     dir getNormal(point p) override {return this->getNormal();}
     point getVertice0(){ return this->v0;}
     point getVertice1(){ return this->v1;}

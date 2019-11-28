@@ -17,11 +17,11 @@ private:
 	camara cam;
 	int height, wide, rays;
 	pathTracer pT;
-	
+
 	double cFunc(const double v, const double min, const double max){
 		return (max-min)*v + min;
 	}
-	
+
 public:
 	monteCarlo(camara c, int h, int w, int r):cam(c),height(h),wide(w),rays(r){}
 	~monteCarlo(){};
@@ -61,13 +61,15 @@ public:
 		double maxX = (1.0/(wide/2)) * (cX*1.0+1.0);
 		double maxY = (1.0/(height/2)) * cY*1.0;
 		double minY = (1.0/(height/2)) * (cY*1.0-1.0);
-		
-		double a3[rays], b3[rays];
+        double directL, indirectL;
+
+
+        double a3[rays], b3[rays];
 		for(int i = 0; i < rays;++i){
 			a3[i] = ((double)rand()-1) / (RAND_MAX);
 			b3[i] = ((double)rand()-1) / (RAND_MAX);
 		}
-		
+
 		double Xs[rays], Ys[rays];
 		for(int i = 0; i < rays; ++i){
 			Xs[i] = cFunc(a3[i], minX, maxX);
@@ -78,16 +80,17 @@ public:
 		for(int i = 0; i < rays; ++i){
 			dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 			if (!basic) {
-                pT.getRGB(cam.o, e, rayo, r, g, b);
+                pT.getRGB(cam.o, e, rayo, r, g, b, directL, indirectL);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
 			}
-			Rt += r; // /p(a3[i])*p(b3[i])
-			Gt += g; // /p(a3[i])*p(b3[i]) 
-			Bt += b; // /p(a3[i])*p(b3[i])
-		}
-		
-		R = Rt * CR / rays;
+            Rt += r;//* max(directL, indirectL);
+            Gt += g;//* max(directL, indirectL);
+            Bt += b;//* max(directL, indirectL);
+        }
+
+
+        R = Rt * CR / rays;
 		G = Gt * CR / rays;
 		B = Bt * CR / rays;
 	}
