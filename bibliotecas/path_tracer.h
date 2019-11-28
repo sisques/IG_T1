@@ -73,11 +73,11 @@ public:
 			dirNewRay = actualFig->nextRay(event, rayo, colP);
 			
 			getRGB(colP,  e,  dirNewRay, R_anterior, G_anterior, B_anterior);
-
+            double luminance = (0.2126*R_anterior*1.0 + 0.7152*G_anterior*1.0 + 0.0722*B_anterior*1.0);
 			R = actualFig->getR(colP);
 			G = actualFig->getG(colP);
 			B = actualFig->getB(colP);
-            double luminance = (0.2126*R*1.0 + 0.7152*G*1.0 + 0.0722*B*1.0);
+
 			if(actualFig->isPhong()){
 				R = R*(1-actualFig->probEvent(event))+R_anterior*actualFig->probEvent(event);
 				G = G*(1-actualFig->probEvent(event))+G_anterior*actualFig->probEvent(event);

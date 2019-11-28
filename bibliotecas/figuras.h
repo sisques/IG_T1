@@ -140,6 +140,10 @@ public:
         dir output = r*inputRay + (r*c1 - c2)*normal;
         return normalize(output*original_Base);
     }
+
+
+    virtual dir getNormal() {}
+    virtual dir getNormal(point p) {}
 };
 
 
@@ -189,6 +193,15 @@ public:
     double getB(point pp) override {
         return figura::getB(pp);
     }
+
+
+    dir getNormal() override {
+        return newDir(0,0,0);
+    }
+    dir getNormal(point p) override {
+        return p - this -> getCenter();
+    }
+
     dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
         dir normal = inputPoint - this -> getCenter();
         if ( evento == REFLEXION) {
@@ -197,6 +210,7 @@ public:
             return refraction(inputRay, normal, inputPoint);
         }
     }
+
 	
 };
 
@@ -222,7 +236,8 @@ public:
 	
 
     point getPoint(){ return this->p;}
-    dir getNormal(){ return this->n;}
+    dir getNormal() override { return this->n;}
+    dir getNormal(point p) override {return this->getNormal();}
 
     bool intersection(dir rd, point ro, double &t) override {
         dir diff = this->p - ro;
@@ -312,9 +327,10 @@ public:
         this -> normal =  _normal;
     }
 
-    dir getNormal(){
+    dir getNormal() override {
         return this -> normal;
     }
+    dir getNormal(point p) override {return this->getNormal();}
     point getVertice0(){ return this->v0;}
     point getVertice1(){ return this->v1;}
     point getVertice2(){ return this->v2;}

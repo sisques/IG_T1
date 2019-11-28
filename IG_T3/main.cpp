@@ -25,7 +25,7 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
 
-    double spheres[] = {0.2,0.6};
+    double spheres[] = {0.6,0.2};
     double wall[] = {0.2,0.2};
     event_enum eventos[] = {REFRACTION, REFLEXION};
 
@@ -40,11 +40,11 @@ list<shared_ptr<figura>> setUpScene(){
     mp.setRGB(0, 255, 0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 
-    materialProperties phong = materialProperties(false, false, eventos, spheres,0,255,255);
+    materialProperties phong = materialProperties(false, false, eventos, spheres,0,0,0);
     shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.75), 0.25, phong);
 
 
-    materialProperties especular_refracion = materialProperties(false, false, eventos, spheres,255,255,0);
+    materialProperties especular_refracion = materialProperties(false, false, eventos, spheres,0,0,0);
     shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.4,-0.4,0.9), 0.1, especular_refracion);
 
     materialProperties light = materialProperties(true, false, eventos, wall,255,255,255);
@@ -129,10 +129,10 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 200;
-    w = 200;
+    h = 1000;
+    w = 1000;
     rpp = 10;
-    int threads = 1;
+    int threads = 10;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);

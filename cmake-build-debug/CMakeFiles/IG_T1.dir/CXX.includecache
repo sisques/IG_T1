@@ -51,7 +51,7 @@ punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 iostream
 -
-cmath
+math.h
 -
 textures.h
 /home/victor/gitRepos/IG_T1/bibliotecas/textures.h
