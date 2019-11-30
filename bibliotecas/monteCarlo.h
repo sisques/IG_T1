@@ -61,7 +61,7 @@ public:
 		double maxX = (1.0/(wide/2)) * (cX*1.0+1.0);
 		double maxY = (1.0/(height/2)) * cY*1.0;
 		double minY = (1.0/(height/2)) * (cY*1.0-1.0);
-		double directL, indirectL;
+		double indirectL = 0;
 		
 		double a3[rays], b3[rays];
 		for(int i = 0; i < rays;++i){
@@ -76,19 +76,20 @@ public:
 		}
         double r, g, b;
 		double Rt = 0.0, Gt = 0.0, Bt = 0.0;
+		double aux = 0.0;
 		for(int i = 0; i < rays; ++i){
 			dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 			
 			if (!basic) {
-				pT.getRGB(cam.o, e, rayo, r, g, b, directL, indirectL);
+				pT.getRGB(cam.o, e, rayo, r, g, b, indirectL);
+				indirectL += aux;
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
 			}
-			Rt += r;//* max(directL, indirectL);
-			Gt += g;//* max(directL, indirectL);
-			Bt += b;//* max(directL, indirectL);
+			Rt += r * indirectL;
+			Gt += g * indirectL;
+			Bt += b * indirectL;
 		}
-		
 		R = Rt * CR / rays;
 		G = Gt * CR / rays;
 		B = Bt * CR / rays;

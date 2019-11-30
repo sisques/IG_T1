@@ -20,6 +20,7 @@ protected:
     texture *texturizador;
     materialProperties mp;
 	list<point> lightPoints;
+	
 public:
     figura(materialProperties _mp){
         this -> mp = _mp;
@@ -28,7 +29,7 @@ public:
         this -> B = mp.getB();
         this->text = NO_TEXTURE;
         texturizador = new texture();
-
+		srand(0);
     }
 
     figura(texture_enum t, materialProperties _mp){
@@ -47,6 +48,7 @@ public:
         else{//textures.flatColor
             texturizador = new texture();
         }
+		srand(0);
     }
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
@@ -61,14 +63,11 @@ public:
         else {
             texturizador = new texture();
         }
+		srand(0);
     }
 
 	event_enum evento(){
 		return mp.evento();
-	}
-	
-	bool isPhong(){
-		return mp.isPhong();
 	}
 	
 	bool isLight(){
@@ -78,10 +77,6 @@ public:
 	double probEvent(event_enum e){
 		return mp.probEvent(e);
 	}
-	
-	double getIrradiance(){
-        return mp.getIrradiance();
-    }
 	
 	virtual list<point> getLightPoints(){
 		return this->lightPoints;
@@ -237,6 +232,12 @@ public:
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
+		else if (evento == PHONG){
+			return newDir(rand(), rand(),rand());
+		}
+		else{
+			return normal;
+		}
     }
 
 	
@@ -342,6 +343,12 @@ public:
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
+		else if (evento == PHONG){
+return newDir(rand(), rand(),rand());
+		}
+		else{
+			return normal;
+		}
     }
 	
 };
@@ -444,6 +451,9 @@ public:
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
+		else if (evento == PHONG){
+			return newDir(rand(), rand(),rand());
+		}
 		else{
 			return normal;
 		}

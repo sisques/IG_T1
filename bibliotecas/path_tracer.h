@@ -9,6 +9,8 @@
 #include <memory>
 #include <limits>
 
+#define M_PI 3.14159265358979323846
+
 using namespace std;
 
 class pathTracer
@@ -77,7 +79,7 @@ public:
 	pathTracer(){}
 	~pathTracer(){};
 	
-	void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B, double &directL, double &indirectL){
+	void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B, double &indirectL){
 		shared_ptr<figura> actualFig;
 		point colP;
 		bool colisiona = colision(c,e,rayo,actualFig,colP);
@@ -94,34 +96,26 @@ public:
 			R = actualFig->getR(colP);
 			G = actualFig->getG(colP);
 			B = actualFig->getB(colP);
-			directL = 1.0;
 			indirectL = 1.0;
 		}
 		else if(event == DEATH){
 			R = 0;
 			G = 0;
 			B = 0;
-			directL = 0.0;
 			indirectL = 0.0;
 		}
-		else if(event == REFRACTION || event == REFLEXION){
+		else if(event == REFRACTION || event == REFLEXION || event == PHONG){
 			dir dirNewRay;
-			double next_dirL, ext_dirI;
 			dirNewRay = actualFig->nextRay(event, rayo, colP);
-			
-			getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, next_dirL, ext_dirI);
-
-			directL = luzDirecta(e, colP);
-			indirectL =  max(directL, indirectL)*actualFig->getIrradiance();
-
+			getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, indirectL);
 			R = actualFig->getR(colP);
 			G = actualFig->getG(colP);
 			B = actualFig->getB(colP);
 
-			if(actualFig->isPhong()){
-				R = R*(1-actualFig->probEvent(event))+R_siguiente*actualFig->probEvent(event);
-				G = G*(1-actualFig->probEvent(event))+G_siguiente*actualFig->probEvent(event);
-				B = B*(1-actualFig->probEvent(event))+B_siguiente*actualFig->probEvent(event);
+			if(event == PHONG){
+				R = R*0.8/M_PI;
+				G = G*0.8/M_PI;
+				B = B*0.8/M_PI;
 			}
 			else{
 				R = R*(1-actualFig->probEvent(event))+R_siguiente*actualFig->probEvent(event);
