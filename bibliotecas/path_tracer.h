@@ -8,8 +8,8 @@
 #include <list>
 #include <memory>
 #include <limits>
+#include "globals.h"
 
-#define M_PI 3.14159265358979323846
 
 using namespace std;
 

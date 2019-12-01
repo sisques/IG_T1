@@ -9,6 +9,8 @@
 #include "camara.h"
 #include "materialProperties.h"
 #include "matrix.h"
+#include "camara.h"
+#include "globals.h"
 #include <list>
 
 using namespace std;
@@ -20,6 +22,7 @@ protected:
     texture *texturizador;
     materialProperties mp;
 	list<point> lightPoints;
+	camara c =  newCamara(newPoint(0,0,0), newDir(0,1,0), newDir(1,0,0), newDir(0,0,1));
 	
 public:
     figura(materialProperties _mp){
@@ -233,7 +236,9 @@ public:
             return refraction(inputRay, normal, inputPoint);
         }
 		else if (evento == PHONG){
-			return newDir(rand(), rand(),rand());
+			double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
+			dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+			return aux;
 		}
 		else{
 			return normal;
@@ -344,7 +349,9 @@ public:
             return refraction(inputRay, normal, inputPoint);
         }
 		else if (evento == PHONG){
-return newDir(rand(), rand(),rand());
+			double x = (double)rand()/RAND_MAX, y = (double)rand()/RAND_MAX, z = (double)rand()/RAND_MAX;
+			dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+			return aux;
 		}
 		else{
 			return normal;
@@ -452,7 +459,9 @@ public:
             return refraction(inputRay, normal, inputPoint);
         }
 		else if (evento == PHONG){
-			return newDir(rand(), rand(),rand());
+			double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
+			dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+			return aux;
 		}
 		else{
 			return normal;
