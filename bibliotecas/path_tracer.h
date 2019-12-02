@@ -17,7 +17,7 @@ class pathTracer
 {
 private:
 
-    list<shared_ptr<figura>> getLuces(list<shared_ptr<figura>> e){
+    list<shared_ptr<figura>> getLuces(list<shared_ptr<figura>> &e){
         list<shared_ptr<figura>> luces;
         for(shared_ptr<figura> i:e){
             if(i->isLight()){
@@ -27,7 +27,7 @@ private:
         return luces;
     }
 
-    bool colision(point c, list<shared_ptr<figura>> e, dir rayo, shared_ptr<figura> &fig, point &col){
+    bool colision(point c, const list<shared_ptr<figura>> &e, dir rayo, shared_ptr<figura> &fig, point &col){
         double t = 0;
         double distMin = numeric_limits<double>::max();
         double distActual = 0;
@@ -54,7 +54,7 @@ private:
         return yes;
     }
 
-    double luzDirecta(list<shared_ptr<figura>> e, point p){
+    double luzDirecta(list<shared_ptr<figura>> &e, point p){
         list<shared_ptr<figura>> luces = getLuces(e);
         list<point> puntosLuces;
         for(shared_ptr<figura> i:luces){
@@ -81,7 +81,7 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
-    void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B, double &indirectL){
+    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &indirectL){
         shared_ptr<figura> actualFig;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
@@ -112,6 +112,7 @@ public:
             if ( event == REFRACTION) {
                 colision(c,e,dirNewRay,actualFig,colP);
                 dirNewRay = rayo;
+
             }
             getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, indirectL);
             R = actualFig->getR(colP);

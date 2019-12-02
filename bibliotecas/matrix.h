@@ -25,6 +25,13 @@ public:
         }
     }
 
+    ~Matrix(){
+        for (int i = 0; i < 4; ++i){
+            delete [] p[i];
+        }
+        delete [] p;
+    }
+
 
     Matrix empty(){
         Matrix m;

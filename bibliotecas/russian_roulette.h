@@ -10,21 +10,19 @@
 
 using namespace std;
 
-enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH, PRUEBA};
+enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH};
 
 class russianRoulette
 {
 private:
-    event_enum *eventos;
-    double *probs;
-    int nE = 0;
+    int nE = 3;
+    event_enum eventos[3];
+    double probs[3];
+
 public:
     russianRoulette(){};
     russianRoulette(event_enum _eventos[], double _probs[]){
         srand(static_cast<unsigned int>(clock()));
-        nE = sizeof(_eventos)/sizeof(event_enum) + 1;
-        eventos = new event_enum[nE]();
-        probs = new double[nE]();
         double totalP = 0.0;
         for(int i = 0; i < nE; ++i){
             eventos[i] = _eventos[i];
@@ -36,11 +34,7 @@ public:
     }
 
 
-    ~russianRoulette(){
-        delete [] probs;
-        delete [] eventos;
-    }
-
+    ~russianRoulette(){}
 
     event_enum event(){
         double k = (double)rand() / RAND_MAX;

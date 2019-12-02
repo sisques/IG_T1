@@ -27,7 +27,7 @@ public:
     ~monteCarlo(){};
 
 
-    void getRGB(point c, list<shared_ptr<figura>> e,  dir rayo, double& R, double& G, double& B){
+    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B){
         double t = 0;
         double distMin = numeric_limits<double>::max();
         double distActual = 0;
@@ -54,7 +54,7 @@ public:
     }
 
 
-    void rtx(const list<shared_ptr<figura>> e, const int x, const int y, int& R, int& G, int& B, bool basic){
+    void rtx(const list<shared_ptr<figura>> &e, const int x, const int y, int& R, int& G, int& B, bool basic){
         int cX = y - (height/2);
         int cY = (wide/2) - x;
         double minX = (1.0/(wide/2)) * cX*1.0;

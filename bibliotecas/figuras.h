@@ -234,8 +234,7 @@ public:
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
-        }
-        else if (evento == PHONG){
+        } else if (evento == PHONG){
             double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
             dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
             return aux;

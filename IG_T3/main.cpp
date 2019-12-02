@@ -25,16 +25,16 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
 
-    double reflection[] = {0,0.0,0.90};
-    double refraction[] = {0,0.90,0.0};
-    double wall[] = {0.90,0.0,0.0};
+    double reflection[] = {0,0.0,0.8};
+    double refraction[] = {0.8,0.0,0.1};
+    double wall[] = {0.99,0.0,0.0};
     event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
 
 
     materialProperties mp = materialProperties(false, eventos, wall);
     materialProperties light = materialProperties(true, eventos, wall,255,255,255);
-    materialProperties reflexion = materialProperties(false, eventos, reflection,0,200,0);
-    materialProperties refraccion = materialProperties(false, eventos, reflection,200,200,200);
+    materialProperties reflexion = materialProperties(false, eventos, reflection,0,255,0);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,255,0,0);
 
 
     list<shared_ptr<figura>> elementos;
@@ -48,8 +48,8 @@ list<shared_ptr<figura>> setUpScene(){
     mp.setRGB(0, 255, 0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 
-    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.0,0.0,0.5), 0.25, refraccion);
-    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(0,0,0.9), 0.1, reflexion);
+    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0,0.0,0.7), 0.1, refraccion);
+    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(0,-0.3,0.7), 0.2, reflexion);
 
 
     //elementos.push_back(espalda);
@@ -124,10 +124,10 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 100;
-    w = 100;
+    h = 400;
+    w = 400;
     rpp =10 ;
-    int threads = 1;
+    int threads = 10;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
