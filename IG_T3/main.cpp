@@ -25,8 +25,8 @@ camara c;
 
 list<shared_ptr<figura>> setUpScene(){
 
-    double spheres[] = {0,0.95};
-    double wall[] = {0.95,0};
+    double spheres[] = {0,0.90};
+    double wall[] = {0.60,0.3};
     event_enum eventos[] = {PHONG, REFLEXION};
 
     materialProperties mp = materialProperties(false, eventos, wall);
