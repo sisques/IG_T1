@@ -61,6 +61,12 @@ materialProperties.h
 /home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 matrix.h
 /home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
+camara.h
+/home/victor/gitRepos/IG_T1/bibliotecas/camara.h
+globals.h
+/home/victor/gitRepos/IG_T1/bibliotecas/globals.h
+list
+-
 
 /home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 
@@ -121,6 +127,8 @@ memory
 -
 limits
 -
+globals.h
+/home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h
 cmath

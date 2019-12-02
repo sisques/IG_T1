@@ -9,6 +9,8 @@
 #include "camara.h"
 #include "materialProperties.h"
 #include "matrix.h"
+#include "camara.h"
+#include "globals.h"
 #include <list>
 
 using namespace std;
@@ -20,6 +22,8 @@ protected:
     texture *texturizador;
     materialProperties mp;
     list<point> lightPoints;
+    camara c =  newCamara(newPoint(0,0,0), newDir(0,1,0), newDir(1,0,0), newDir(0,0,1));
+
 public:
     figura(materialProperties _mp){
         this -> mp = _mp;
@@ -28,7 +32,7 @@ public:
         this -> B = mp.getB();
         this->text = NO_TEXTURE;
         texturizador = new texture();
-
+        srand(0);
     }
 
     figura(texture_enum t, materialProperties _mp){
@@ -47,6 +51,7 @@ public:
         else{//textures.flatColor
             texturizador = new texture();
         }
+        srand(0);
     }
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
@@ -61,26 +66,19 @@ public:
         else {
             texturizador = new texture();
         }
+        srand(0);
     }
 
-	event_enum evento(){
-		return mp.evento();
-	}
-	
-	bool isPhong(){
-		return mp.isPhong();
-	}
-	
-	bool isLight(){
-		return mp.isLightSource();
-	}
-	
-	double probEvent(event_enum e){
-		return mp.probEvent(e);
-	}
+    event_enum evento(){
+        return mp.evento();
+    }
 
-    double getIrradiance(){
-        return mp.getIrradiance();
+    bool isLight(){
+        return mp.isLightSource();
+    }
+
+    double probEvent(event_enum e){
+        return mp.probEvent(e);
     }
 
     virtual list<point> getLightPoints(){
@@ -113,12 +111,12 @@ public:
     virtual bool intersection(dir rd, point ro, double &t){
         return false;
     }
-	
-	virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
+
+    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
     }
-    
-	dir reflexion(dir _in, dir _n, point o){
-		dir in = normalize(_in);
+
+    dir reflexion(dir _in, dir _n, point o){
+        dir in = normalize(_in);
         dir n = normalize(_n);
         dir y = n;
         dir x = in;
@@ -177,7 +175,7 @@ public:
         }
     }
 
-	esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
+    esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> c = _c;
         this -> r = _r;
         if(mp.isLightSource()){
@@ -237,9 +235,17 @@ public:
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
+        else if (evento == PHONG){
+            double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
+            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+            return aux;
+        }
+        else{
+            return normal;
+        }
     }
 
-	
+
 };
 
 class plano : public figura {
@@ -259,10 +265,9 @@ public:
             this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
         }
-
     }
-	
-	plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
+
+    plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
         this -> p = _p;
         this -> n = _n;
         if(mp.isLightSource()){
@@ -276,7 +281,7 @@ public:
         }
     }
 
-	plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
+    plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
         this -> p = _p;
         this -> n = _n;
         if(mp.isLightSource()){
@@ -289,7 +294,7 @@ public:
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
         }
     }
-	
+
 
     point getPoint(){ return this->p;}
     dir getNormal() override { return this->n;}
@@ -318,33 +323,41 @@ public:
     }
 
     double getR(point pp) override {
-		if(this->text == IMAGE){
-			return texturizador->getR(this->p, pp);
-		}
-		return figura::getR(pp);
-	}
+        if(this->text == IMAGE){
+            return texturizador->getR(this->p, pp);
+        }
+        return figura::getR(pp);
+    }
     double getG(point pp) override {
         if(this->text == IMAGE){
-			return texturizador->getG(this->p, pp);
-		}
-		return figura::getG(pp);
-	}
+            return texturizador->getG(this->p, pp);
+        }
+        return figura::getG(pp);
+    }
     double getB(point pp) override {
         if(this->text == IMAGE){
             return texturizador->getB(this->p, pp);
-		}
-		return figura::getB(pp);
-	}
-	
-	dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
+        }
+        return figura::getB(pp);
+    }
+
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
         dir normal = this -> getNormal() ;
         if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
+        else if (evento == PHONG){
+            double x = (double)rand()/RAND_MAX, y = (double)rand()/RAND_MAX, z = (double)rand()/RAND_MAX;
+            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+            return aux;
+        }
+        else{
+            return normal;
+        }
     }
-	
+
 };
 
 class triangulo : public figura {
@@ -367,7 +380,7 @@ public:
         this -> normal =  _normal;
     }
 
-	triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties _mp): figura(t,_mp){
+    triangulo(point _v0, point _v1, point _v2, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> v0 = _v0;
         this -> v1 = _v1;
         this -> v2 = _v2;
@@ -386,6 +399,7 @@ public:
     dir getNormal() override {
         return this -> normal;
     }
+
 
     list<point> getLightPoints() override{
         list<point> aux;
@@ -435,7 +449,7 @@ public:
             return false;
         }
         //Hay interseccion
-	    return t > EPSILON && t < 1 / EPSILON;
+        return t > EPSILON && t < 1 / EPSILON;
     }
     dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
         dir normal = this -> getNormal();
@@ -444,9 +458,14 @@ public:
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
-		else{
-			return normal;
-		}
+        else if (evento == PHONG){
+            double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
+            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
+            return aux;
+        }
+        else{
+            return normal;
+        }
     }
 };
 
