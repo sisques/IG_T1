@@ -16,6 +16,7 @@ class materialProperties{
 protected:
     bool light_source;
     double R, G, B;
+    double refValue;
     russianRoulette rR;
     //normalizar a 0.9 o el max de las 3
 public:
@@ -32,9 +33,19 @@ public:
         this -> B = _B/255.0;
     }
 
-    materialProperties(bool is_light_source, event_enum events[], double probs[], double _R, double _G, double _B){
+    void setRefValue(double _r){
+        this -> refValue = _r;
+    }
+
+    double getRefValue(){
+        return this -> refValue;
+    }
+
+
+    materialProperties(bool is_light_source, event_enum events[], double probs[], double _R, double _G, double _B, double _r){
         this -> light_source = is_light_source;
         this -> setRGB(_R,_G,_B);
+        this -> setRefValue(_r);
         this -> rR = russianRoulette(events, probs);
     }
 

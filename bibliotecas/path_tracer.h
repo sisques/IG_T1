@@ -36,19 +36,18 @@ private:
         shared_ptr<figura> nearest;
         for( auto it = e.begin(); it != e.end(); ++it){
             shared_ptr<figura> f = *it;
-            if ( f != fig) {
-                colision = f->intersection(rayo, c, t);
-                if (colision) {
-                    point p = c + rayo * t;
-                    distActual = mod(c - p);
-                    if (distActual < distMin) {
-                        nearest = f;
-                        distMin = distActual;
-                        col = p;
-                        yes = true;
-                    }
+            colision = f->intersection(rayo, c, t);
+            if (colision) {
+                point p = c + rayo * t;
+                distActual = mod(c - p);
+                if (distActual < distMin) {
+                    nearest = f;
+                    distMin = distActual;
+                    col = p;
+                    yes = true;
                 }
             }
+
         }
         fig = nearest;
         return yes;
@@ -108,10 +107,11 @@ public:
         }
         else if(event == REFRACTION || event == REFLEXION || event == PHONG){
             dir dirNewRay;
-            dirNewRay = actualFig->nextRay(event, rayo, colP);
+            point nextPoint;
+            dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
             if ( event == REFRACTION) {
-                colision(c,e,dirNewRay,actualFig,colP);
-                dirNewRay = rayo;
+                shared_ptr<figura> aux;
+                colision(nextPoint,e,dirNewRay,aux,colP);
 
             }
             getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, indirectL);

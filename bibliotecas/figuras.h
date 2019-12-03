@@ -112,46 +112,52 @@ public:
         return false;
     }
 
-    virtual dir nextRay(event_enum evento, dir inputRay, point inputPoint){
-    }
 
     dir reflexion(dir _in, dir _n, point o){
-        dir in = normalize(_in);
-        dir n = normalize(_n);
-        dir y = n;
-        dir x = in;
-        dir z = cross(x,y);
-        x = cross(y,z);
-        Matrix new_base = newBase(x,y,z,o);
-        Matrix original_Base = originalBase(x,y,z,o);
-        dir inputRay = in*new_base;
-        dir normal = n*new_base;
-        dir output = 2*dot(normal, inputRay)*normal -inputRay;
-        return -normalize(output*original_Base);
-    }
-    dir refraction(dir _in, dir _n, point o){
-        dir in = normalize(_in);
-        dir n = normalize(_n);
-        dir y = n;
-        dir x = in;
-        dir z = cross(x,y);
-        x = cross(y,z);
-        double n1 = 1.00029;
-        double n2 = 1.33;
-        Matrix new_base = newBase(x,y,z,o);
-        Matrix original_Base = originalBase(x,y,z,o);
-        dir inputRay = in*new_base;
-        dir normal = n*new_base;
-        double r = n1 / n2;
-        double c1 = dot(-normal,inputRay);
-        double c2 = sqrt(1-r*r*(1-c1*c1));
-        dir output = r*inputRay + (r*c1 - c2)*normal;
-        return normalize(output*original_Base);
-    }
 
+        dir inputRay = normalize(_in);
+        dir normal = normalize(_n);
+        dir output = 2*dot(normal, inputRay)*normal -inputRay;
+        return -normalize(output);
+    }
+    virtual dir refraction(dir _in, dir _n, point o, point &salida) {
+        double n1 = 1.00029;
+        double n2 = mp.getRefValue();
+
+        dir inputRay = normalize(_in);
+        dir normal = normalize(_n);
+        double r = n1 / n2;
+        double c = dot(-normal,inputRay);
+        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+
+
+
+       return normalize(output);
+
+        }
+
+
+    dir phong(dir _in, dir _n, point o){
+        return newPoint(0,0.5,0.5) - o;
+    }
 
     virtual dir getNormal() {}
     virtual dir getNormal(point p) {}
+
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
+        dir normal = this -> getNormal(inputPoint);
+        if ( evento == REFLEXION) {
+            return reflexion(inputRay, normal, inputPoint);
+        } else if (evento == REFRACTION) {
+            return refraction(inputRay, normal, inputPoint,outputPoint);
+        }
+        else if (evento == PHONG){
+            return phong(inputRay, normal, inputPoint);
+        }
+        else{
+            return normal;
+        }
+    }
 };
 
 
@@ -228,21 +234,30 @@ public:
         return p - this -> getCenter();
     }
 
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
-        dir normal = inputPoint - this -> getCenter();
-        if ( evento == REFLEXION) {
-            return reflexion(inputRay, normal, inputPoint);
-        } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint);
-        } else if (evento == PHONG){
-            double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
-            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
-            return aux;
-        }
-        else{
-            return normal;
-        }
+
+    dir refraction(dir inputRay, dir normal, point o, point &salida) override{
+        double n1 = 1.00029;
+        double n2 = mp.getRefValue();
+        double r = n1 / n2;
+        double c = dot(-normal,inputRay);
+        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+        double t;
+        intersection(output, o, t);
+        salida = o + output * t;
+
+
+        r = n2 / n1;
+        c = dot(-normalize(this->getNormal(salida)),output);
+
+        dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+
+        return normalize(output2);
     }
+
+
+
+
+
 
 
 };
@@ -340,22 +355,7 @@ public:
         return figura::getB(pp);
     }
 
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
-        dir normal = this -> getNormal() ;
-        if ( evento == REFLEXION) {
-            return reflexion(inputRay, normal, inputPoint);
-        } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint);
-        }
-        else if (evento == PHONG){
-            double x = (double)rand()/RAND_MAX, y = (double)rand()/RAND_MAX, z = (double)rand()/RAND_MAX;
-            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
-            return aux;
-        }
-        else{
-            return normal;
-        }
-    }
+
 
 };
 
@@ -450,22 +450,7 @@ public:
         //Hay interseccion
         return t > EPSILON && t < 1 / EPSILON;
     }
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint) override {
-        dir normal = this -> getNormal();
-        if ( evento == REFLEXION) {
-            return reflexion(inputRay, normal, inputPoint);
-        } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint);
-        }
-        else if (evento == PHONG){
-            double x = rand()/RAND_MAX, y = rand()/RAND_MAX, z = rand()/RAND_MAX;
-            dir aux = ((normal*rotateX(x*M_PI_2))*rotateY(y*M_PI_2))*rotateZ(z*M_PI_2);
-            return aux;
-        }
-        else{
-            return normal;
-        }
-    }
+
 };
 
 #endif

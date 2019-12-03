@@ -26,15 +26,15 @@ camara c;
 list<shared_ptr<figura>> setUpScene(){
 
     double reflection[] = {0,0.0,0.8};
-    double refraction[] = {0.8,0.0,0.1};
+    double refraction[] = {0.0,0.8,0.0};
     double wall[] = {0.99,0.0,0.0};
     event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
 
 
     materialProperties mp = materialProperties(false, eventos, wall);
-    materialProperties light = materialProperties(true, eventos, wall,255,255,255);
-    materialProperties reflexion = materialProperties(false, eventos, reflection,0,255,0);
-    materialProperties refraccion = materialProperties(false, eventos, refraction,255,0,0);
+    materialProperties light = materialProperties(true, eventos, wall,255,255,255,1);
+    materialProperties reflexion = materialProperties(false, eventos, reflection,0,255,0,1.33);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,255,0,0,1.33);
 
 
     list<shared_ptr<figura>> elementos;
@@ -48,8 +48,8 @@ list<shared_ptr<figura>> setUpScene(){
     mp.setRGB(0, 255, 0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 
-    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0,0.0,0.7), 0.1, refraccion);
-    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(0,-0.3,0.7), 0.2, reflexion);
+    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0,0.0,0.7), 0.15, refraccion);
+    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0,0.0,0.7), 0.1, reflexion);
 
 
     //elementos.push_back(espalda);
@@ -58,13 +58,13 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    elementos.push_back(esferaPhong);
-    elementos.push_back(esferaEspecularRefracion);
+    elementos.push_back(ESFERArefraccion);
+    //elementos.push_back(ESFERAreflexion);
 
 
 
     double brdfValues2[] = {0.0,0.0};
-    materialProperties limit = materialProperties(false, eventos, brdfValues2,0,0,0);
+    materialProperties limit = materialProperties(false, eventos, brdfValues2,0,0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
 
     elementos.push_back(limite);
@@ -127,7 +127,7 @@ int main(){
     h = 400;
     w = 400;
     rpp =10 ;
-    int threads = 10;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);

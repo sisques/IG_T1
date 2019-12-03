@@ -1,6 +1,8 @@
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
+
+#define CAMBIO_BASE
 /*
 int MAX = 65535;
 int CR = 10000000;
