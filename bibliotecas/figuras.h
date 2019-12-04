@@ -231,7 +231,7 @@ public:
         return newDir(0,0,0);
     }
     dir getNormal(point p) override {
-        return p - this -> getCenter();
+        return normalize(p - this -> getCenter());
     }
 
 
@@ -240,14 +240,14 @@ public:
         double n2 = mp.getRefValue();
         double r = n1 / n2;
         double c = dot(-normal,inputRay);
-        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+        dir output = normalize(inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c))));
         double t;
         intersection(output, o, t);
         salida = o + output * t;
 
 
         r = n2 / n1;
-        c = dot(-normalize(this->getNormal(salida)),output);
+        c = dot(this->getNormal(salida),output);
 
         dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
 
@@ -311,7 +311,7 @@ public:
 
 
     point getPoint(){ return this->p;}
-    dir getNormal() override { return this->n;}
+    dir getNormal() override { return normalize(this->n);}
     dir getNormal(point p) override {return this->getNormal();}
 
     bool intersection(dir rd, point ro, double &t) override {
@@ -396,7 +396,7 @@ public:
     }
 
     dir getNormal() override {
-        return this -> normal;
+        return normalize(this -> normal);
     }
 
 
