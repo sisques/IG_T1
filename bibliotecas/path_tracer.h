@@ -9,6 +9,7 @@
 #include <memory>
 #include <limits>
 #include "globals.h"
+#include "phong.h"
 
 
 using namespace std;
@@ -81,7 +82,7 @@ public:
     ~pathTracer(){};
 
     void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &indirectL){
-        shared_ptr<figura> actualFig;
+        shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
         event_enum event;
@@ -108,7 +109,8 @@ public:
         else if(event == REFRACTION || event == REFLEXION || event == PHONG){
             dir dirNewRay;
             point nextPoint;
-            dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
+			dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
+			
             if ( event == REFRACTION) {
                 colP = nextPoint;
             }
@@ -118,15 +120,21 @@ public:
             B = actualFig->getB(colP);
 
             if(event == PHONG){
-                R = R*0.8/M_PI;
-                G = G*0.8/M_PI;
-                B = B*0.8/M_PI;
+                R = R;//*(0.4/M_PI + 0.4*(2+2)/(2*M_PI));
+                G = G;//*(0.4/M_PI + 0.4*(2+2)/(2*M_PI));
+                B = B;//*(0.4/M_PI + 0.4*(2+2)/(2*M_PI));
             }
             else{
                 R = R*(1-actualFig->probEvent(event))+R_siguiente*actualFig->probEvent(event);
                 G = G*(1-actualFig->probEvent(event))+G_siguiente*actualFig->probEvent(event);
                 B = B*(1-actualFig->probEvent(event))+B_siguiente*actualFig->probEvent(event);
             }
+			double maxC = R_siguiente;
+			if(maxC < G_siguiente){maxC = G_siguiente;}
+			if(maxC < B_siguiente){maxC = B_siguiente;}
+			/*R = R*maxC;
+			G = G*maxC;
+			B = B*maxC;*/
         }
         else{
             R = actualFig->getR(colP);

@@ -1,5 +1,5 @@
-#ifndef _REFLECTANCE_H_
-#define _REFLECTANCE_H_
+#ifndef _MATERIAL_PROPERTIES_H_
+#define _MATERIAL_PROPERTIES_H_
 
 
 #include <iostream>
@@ -15,16 +15,17 @@ using namespace std;
 class materialProperties{
 protected:
     bool light_source;
-	double R, G, B;
+    double R, G, B;
+    double refValue;
     russianRoulette rR;
-	//normalizar a 0.9 o el max de las 3
+    //normalizar a 0.9 o el max de las 3
 public:
-	materialProperties(){}
+    materialProperties(){}
     materialProperties(bool is_light_source, event_enum events[], double probs[]){
         this -> light_source = is_light_source;
         this -> setRGB(0,0,0);
         this -> rR = russianRoulette(events, probs);
-	}
+    }
 
     void setRGB(int _R,int _G,int _B){
         this -> R = _R/255.0;
@@ -32,13 +33,23 @@ public:
         this -> B = _B/255.0;
     }
 
-    materialProperties(bool is_light_source, event_enum events[], double probs[], double _R, double _G, double _B){
+    void setRefValue(double _r){
+        this -> refValue = _r;
+    }
+
+    double getRefValue(){
+        return this -> refValue;
+    }
+
+
+    materialProperties(bool is_light_source, event_enum events[], double probs[], double _R, double _G, double _B, double _r){
         this -> light_source = is_light_source;
         this -> setRGB(_R,_G,_B);
-		this -> rR = russianRoulette(events, probs);
-	}
+        this -> setRefValue(_r);
+        this -> rR = russianRoulette(events, probs);
+    }
 
-		double getR(){ return this->R;}
+    double getR(){ return this->R;}
     double getG(){ return this->G;}
     double getB(){ return this->B;}
 
@@ -46,13 +57,13 @@ public:
         return this->light_source;
     }
 
-	event_enum evento(){
-		return rR.event();
-	}
-	
-	double probEvent(event_enum e){
-		return rR.probEvent(e);
-	}
+    event_enum evento(){
+        return rR.event();
+    }
+
+    double probEvent(event_enum e){
+        return rR.probEvent(e);
+    }
 
 };
 

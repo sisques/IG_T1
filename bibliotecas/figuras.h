@@ -11,6 +11,7 @@
 #include "matrix.h"
 #include "camara.h"
 #include "globals.h"
+#include "phong.h"
 #include <list>
 
 using namespace std;
@@ -22,7 +23,7 @@ protected:
     texture *texturizador;
     materialProperties mp;
     list<point> lightPoints;
-    camara c =  newCamara(newPoint(0,0,0), newDir(0,1,0), newDir(1,0,0), newDir(0,0,1));
+    Phong phong;
 
 public:
     figura(materialProperties _mp){
@@ -136,13 +137,8 @@ public:
 
         }
 
-
-    dir phong(dir _in, dir _n, point o){
-        return newPoint(0,0.5,0.5) - o;
-    }
-
-    virtual dir getNormal() {}
-    virtual dir getNormal(point p) {}
+    virtual dir getNormal() {return newDir(0,0,0);}
+    virtual dir getNormal(point p) {return newDir(0,0,0);}
 
     dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
         dir normal = this -> getNormal(inputPoint);
@@ -152,7 +148,7 @@ public:
             return refraction(inputRay, normal, inputPoint,outputPoint);
         }
         else if (evento == PHONG){
-            return phong(inputRay, normal, inputPoint);
+            return phong.sample_phong(inputRay, normal, 4);
         }
         else{
             return normal;
