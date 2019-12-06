@@ -5,6 +5,7 @@
 #include "bibliotecas/monteCarlo.h"
 #include "bibliotecas/ply_reader.h"
 #include "bibliotecas/globals.h"
+#include "bibliotecas/phong.h"
 
 #include <iostream>
 #include <string>
@@ -21,59 +22,50 @@ using namespace std;
 
 camara c;
 
-
-
 list<shared_ptr<figura>> setUpScene(){
 
-    double spheres[] = {0,0.90};
-    double wall[] = {0.60,0.3};
-    event_enum eventos[] = {PHONG, REFLEXION};
+    double reflection[] = {0,0.0,0.9};
+    double refraction[] = {0.0,0.9,0.0};
+    double wall[] = {0.90,0.0,0.0};
+    event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
+
 
     materialProperties mp = materialProperties(false, eventos, wall);
-	materialProperties light = materialProperties(true, eventos, wall,255,255,255);
-	materialProperties especular_refracion = materialProperties(false, eventos, spheres,200,200,200);
-	materialProperties phong = materialProperties(false, eventos, spheres,200,200,200);
+    materialProperties light = materialProperties(true, eventos, wall,255,255,255,1);
+    materialProperties reflexion = materialProperties(false, eventos, reflection,0,0,0,1.33);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,0,0,0,1.33);
+
+
     list<shared_ptr<figura>> elementos;
     mp.setRGB(120, 120, 120);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
     shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
     shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),light));
-	shared_ptr<figura> espalda = make_shared<plano>(plano(newPoint(0,0,-0.1), newDir(0,0,1),mp));
+    shared_ptr<figura> espalda = make_shared<plano>(plano(newPoint(0,0,-0.1), newDir(0,0,1),mp));
     mp.setRGB(255, 0, 0);
     shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),mp));
     mp.setRGB(0, 255, 0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
+    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0,0.0,0.3), 0.15, refraccion);
+    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0,0,0.7), 0.2, reflexion);
 
-    shared_ptr<figura> esferaPhong = make_shared<esfera>(newPoint(0.25,-0.25,0.75), 0.25, phong);
-    shared_ptr<figura> esferaEspecularRefracion = make_shared<esfera>(newPoint(-0.4,-0.4,0.9), 0.1, especular_refracion);
 
-    
-    point p1 = newPoint(-0.25,0.5,0.25);
-    point p2 = newPoint(0.25,0.5,0.25);
-    point p3 = newPoint(-0.25,0.5,0.75);
-    point p4 = newPoint(0.25,0.5,0.75);
-    shared_ptr<figura> lght_src_1 = make_shared<triangulo>(triangulo(p1,p2,p3,light));
-    shared_ptr<figura> lght_src_2 = make_shared<triangulo>(triangulo(p2,p3,p4,light));
-
-    elementos.push_back(lght_src_1);
-    elementos.push_back(lght_src_2);
-
-	elementos.push_back(espalda);
+    //elementos.push_back(espalda);
     elementos.push_back(fondo);
     elementos.push_back(suelo);
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    elementos.push_back(esferaPhong);
-    elementos.push_back(esferaEspecularRefracion);
+    //elementos.push_back(ESFERArefraccion);
+    elementos.push_back(ESFERAreflexion);
 
 
 
-    double brdfValues2[] = {0.0,0.0};
-    materialProperties limit = materialProperties(false, eventos, brdfValues2,0,0,0);
+    double brdfValues2[] = {0.0,0.0,0.0};
+    materialProperties limit = materialProperties(false, eventos, brdfValues2,0,0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
 
-    elementos.push_back(limite);
+elementos.push_back(limite);
     return elementos;
 }
 
