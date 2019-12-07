@@ -10,7 +10,7 @@
 
 using namespace std;
 
-enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH};
+enum event_enum {PHONG, REFRACTION, REFLEXION, EMISSION, DEATH};
 
 class russianRoulette
 {

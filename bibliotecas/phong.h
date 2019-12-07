@@ -11,7 +11,6 @@ using namespace std;
 
 class Phong{
 private:
-	//russianRoulette rR;
 	dir reflexion(const dir in, const dir n){
 		dir inputRay = normalize(in);
 		dir normal = normalize(n);
@@ -22,14 +21,16 @@ private:
 public:
 	Phong(){}
 	
-	double phong(const dir indir, const dir outdir, const dir n, double specexp) {
+	/*double phong(const dir indir, const dir outdir, const dir n, double specexp) {
 		dir refindir = reflexion(indir, n);
 		double s = dot(refindir, outdir);
 		if (s < 0.0) {
 			return 0.0;
 		}
 		return pow(s, specexp);
-	}
+	}*/
+	
+	
 
 	double lambert(const dir &indir, const dir &n) {
 		double d = dot(n, indir);
