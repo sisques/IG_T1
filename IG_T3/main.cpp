@@ -31,22 +31,41 @@ list<shared_ptr<figura>> setUpScene(){
 
 
     materialProperties mp = materialProperties(false, eventos, wall);
-    materialProperties light = materialProperties(true, eventos, wall,255,255,255,1);
-    materialProperties reflexion = materialProperties(false, eventos, reflection,0,0,0,1.33);
-    materialProperties refraccion = materialProperties(false, eventos, refraction,0,0,0,1.33);
+	mp.setAlfa(0);
+    materialProperties light = materialProperties(true, eventos, wall,1);
+	light.setKs(255,255,255);
+    materialProperties reflexion = materialProperties(false, eventos, reflection,1.33);
+	reflexion.setKd(0,0,0);
+	reflexion.setKs(255,255,255);
+	reflexion.setKdPhong(255,255,255);
+	reflexion.setKsPhong(255,255,255);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,1.33);
+	refraccion.setKd(255,255,255);
+	refraccion.setKs(0,0,0);
+	refraccion.setKdPhong(0,0,0);
+	refraccion.setKsPhong(0,0,0);
 
 
     list<shared_ptr<figura>> elementos;
-    mp.setRGB(120, 120, 120);
+	mp.setKd(120, 120, 120);
+	mp.setKs(120, 120, 120);
+	mp.setKdPhong(120, 120, 120);
+	mp.setKsPhong(120, 120, 120);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
     shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
     shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),light));
     shared_ptr<figura> espalda = make_shared<plano>(plano(newPoint(0,0,-0.1), newDir(0,0,1),mp));
-    mp.setRGB(255, 0, 0);
+    mp.setKd(255,0,0);
+	mp.setKs(255,0,0);
+	mp.setKdPhong(255,0,0);
+	mp.setKsPhong(255,0,0);
     shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),mp));
-    mp.setRGB(0, 255, 0);
+    mp.setKd(0,255,0);
+	mp.setKs(0,255,0);
+	mp.setKdPhong(0,255,0);
+	mp.setKsPhong(0,255,0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
-    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0,0.0,0.3), 0.15, refraccion);
+    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,0.0,0.3), 0.15, refraccion);
     shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0,0,0.7), 0.2, reflexion);
 
 
@@ -56,16 +75,20 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    //elementos.push_back(ESFERArefraccion);
+    elementos.push_back(ESFERArefraccion);
     elementos.push_back(ESFERAreflexion);
 
 
 
-    double brdfValues2[] = {0.0,0.0,0.0};
-    materialProperties limit = materialProperties(false, eventos, brdfValues2,0,0,0,0);
+    double brdfValues2[] = {0.9,0.0,0.0};
+    materialProperties limit = materialProperties(false, eventos, brdfValues2,0);
+	limit.setKd(0,0,0);
+	limit.setKs(0,0,0);
+	limit.setKdPhong(0,0,0);
+	limit.setKsPhong(0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
 
-elementos.push_back(limite);
+	elementos.push_back(limite);
     return elementos;
 }
 
@@ -122,8 +145,8 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 400;
-    w = 400;
+    h = 500;
+    w = 500;
     rpp = 10;
     int threads = 10;
     if (threads > h || threads > w){
