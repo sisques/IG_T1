@@ -48,9 +48,7 @@ public:
             }
 
         }
-        R = nearest->getR(colP);
-        G = nearest->getG(colP);
-        B = nearest->getB(colP);
+        nearest->getRGB(REFLEXION,R,G,B);
     }
 
 
@@ -81,14 +79,17 @@ public:
             dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 
             if (!basic) {
-                pT.getRGB(cam.o, e, rayo, r, g, b, indirectL);
-                indirectL += aux;
+                double dist = 0;
+                pT.getRGB(cam.o, e, rayo, r, g, b, dist);
+                r = pow(r, 0.15);//pow(dist,2);
+                g = pow(g, 0.15);//pow(dist,2);
+                b = pow(b, 0.15);//pow(dist,2);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }
-            Rt += r * indirectL;
-            Gt += g * indirectL;
-            Bt += b * indirectL;
+            Rt += r;
+            Gt += g;
+            Bt += b;
         }
         R = Rt * CR / rays;
         G = Gt * CR / rays;

@@ -10,14 +10,14 @@
 
 using namespace std;
 
-enum event_enum {PHONG, REFRACTION, REFLEXION, DEATH};
+enum event_enum {PHONG, REFRACTION, REFLEXION, EMISSION, DEATH};
 
 class russianRoulette
 {
 private:
-    int nE = 3;
-    event_enum eventos[3];
-    double probs[3];
+    int nE = 4;
+    event_enum eventos[4];
+    double probs[4];
 
 public:
     russianRoulette(){};
@@ -29,7 +29,10 @@ public:
             probs[i] = _probs[i];
             totalP += _probs[i];
         }
-        probs[nE] = 1 - totalP;
+        for(int i = 0; i < nE; ++i){
+            probs[i] = 0.9*probs[i]/totalP;
+        }
+        probs[nE] = 0.1;
         eventos[nE] = DEATH;
     }
 

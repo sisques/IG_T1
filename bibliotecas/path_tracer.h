@@ -9,6 +9,7 @@
 #include <memory>
 #include <limits>
 #include "globals.h"
+#include "phong.h"
 
 
 using namespace std;
@@ -80,10 +81,11 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
-    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &indirectL){
-        shared_ptr<figura> actualFig;
+    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &dist){
+        shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
+        dist += mod(c-colP);
         event_enum event;
         if(!colisiona){
             event = DEATH;
@@ -94,46 +96,33 @@ public:
         double R_siguiente, G_siguiente, B_siguiente;
 
         if(colisiona && actualFig->isLight()){
-            R = actualFig->getR(colP);
-            G = actualFig->getG(colP);
-            B = actualFig->getB(colP);
-            indirectL = 1.0;
+            actualFig->getRGB(EMISSION, R,G,B);
         }
         else if(event == DEATH){
             R = 0;
             G = 0;
             B = 0;
-            indirectL = 0.0;
         }
         else if(event == REFRACTION || event == REFLEXION || event == PHONG){
             dir dirNewRay;
             point nextPoint;
             dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
             if ( event == REFRACTION) {
-                shared_ptr<figura> aux;
-                colision(nextPoint,e,dirNewRay,aux,colP);
-
+                colP = nextPoint;
             }
-            getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, indirectL);
-            R = actualFig->getR(colP);
-            G = actualFig->getG(colP);
-            B = actualFig->getB(colP);
-
+            getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, dist);
             if(event == PHONG){
-                R = R*0.8/M_PI;
-                G = G*0.8/M_PI;
-                B = B*0.8/M_PI;
+                actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
             }
             else{
-                R = R*(1-actualFig->probEvent(event))+R_siguiente*actualFig->probEvent(event);
-                G = G*(1-actualFig->probEvent(event))+G_siguiente*actualFig->probEvent(event);
-                B = B*(1-actualFig->probEvent(event))+B_siguiente*actualFig->probEvent(event);
+                actualFig->getRGB(event,R,G,B);
             }
+            R = R*R_siguiente*abs(dot(-rayo,dirNewRay));
+            G = G*G_siguiente*abs(dot(-rayo,dirNewRay));
+            B = B*B_siguiente*abs(dot(-rayo,dirNewRay));
         }
         else{
-            R = actualFig->getR(colP);
-            G = actualFig->getG(colP);
-            B = actualFig->getB(colP);
+            actualFig->getRGB(REFLEXION,R,G,B);
         }
     }
 

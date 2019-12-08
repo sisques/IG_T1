@@ -11,25 +11,21 @@
 #include "matrix.h"
 #include "camara.h"
 #include "globals.h"
+#include "phong.h"
 #include <list>
 
 using namespace std;
 
 class figura{
 protected:
-    double R, G, B;
     texture_enum text;
     texture *texturizador;
     materialProperties mp;
     list<point> lightPoints;
-    camara c =  newCamara(newPoint(0,0,0), newDir(0,1,0), newDir(1,0,0), newDir(0,0,1));
 
 public:
     figura(materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp.getR();
-        this -> G = mp.getG();
-        this -> B = mp.getB();
         this->text = NO_TEXTURE;
         texturizador = new texture();
         srand(0);
@@ -37,9 +33,6 @@ public:
 
     figura(texture_enum t, materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp.getR();
-        this -> G = mp.getG();
-        this -> B = mp.getB();
         this->text = t;
         if(t == WOOD){
             texturizador = new texture1();
@@ -56,9 +49,6 @@ public:
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
         this -> mp = _mp;
-        this -> R = mp.getR();
-        this -> G = mp.getG();
-        this -> B = mp.getB();
         this->text = t;
         if(t == IMAGE){
             texturizador = new texture3(im, d);
@@ -85,11 +75,28 @@ public:
         return this->lightPoints;
     }
 
-    double getR(){ return this->R;}
-    double getG(){ return this->G;}
-    double getB(){ return this->B;}
+    void getRGB(event_enum e, double &r, double &g, double &b){
+        if ( e == REFLEXION || e == EMISSION) {
+            r = mp.getKsR();
+            g = mp.getKsG();
+            b = mp.getKsB();
+        } else if (e == REFRACTION) {
+            r = mp.getKdR();
+            g = mp.getKdG();
+            b = mp.getKdB();
+        }
+    }
 
-    virtual double getR(point p){
+    void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
+        dir refindir = reflexion(indir, getNormal(p),p);
+        double cos = dot(refindir, outdir);
+        double aux = pow(cos, mp.getAlfa());
+        r = (mp.getKdPhongR()/M_PI) + (mp.getKsPhongR()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+        g = (mp.getKdPhongG()/M_PI) + (mp.getKsPhongG()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+        b = (mp.getKdPhongB()/M_PI) + (mp.getKsPhongB()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+    }
+
+    /*virtual double getR(point p){
         if(this->text == WOOD|| this->text == PERLIN_NOISE){
             return texturizador->getR(p,this->R);
         }
@@ -106,7 +113,7 @@ public:
             return texturizador->getB(p,this->B);
         }
         return this->B;
-    }
+    }*/
 
     virtual bool intersection(dir rd, point ro, double &t){
         return false;
@@ -132,17 +139,52 @@ public:
 
 
 
-       return normalize(output);
+        return normalize(output);
 
-        }
-
-
-    dir phong(dir _in, dir _n, point o){
-        return newPoint(0,0.5,0.5) - o;
     }
 
-    virtual dir getNormal() {}
-    virtual dir getNormal(point p) {}
+    dir phongDir(dir outdir, dir n, double specexp) {
+        Matrix mat;
+        dir ldir = normalize(outdir);
+
+        dir ref = reflexion(ldir, n, newPoint(0,0,0));
+
+        double ndotl = dot(ldir, n);
+
+        if(1.0 - ndotl > EPSILON) {
+            dir ivec, kvec, jvec;
+
+            // build orthonormal basis
+            if(fabs(ndotl) < EPSILON) {
+                kvec = -normalize(ldir);
+                jvec = n;
+                ivec = cross(jvec, kvec);
+            } else {
+                ivec = normalize(cross(ldir, ref));
+                jvec = ref;
+                kvec = cross(ref, ivec);
+            }
+
+            mat = originalBase(ivec, jvec, kvec, newPoint(0,0,0));
+        }
+
+        double rnd1 = (double)rand() / RAND_MAX;
+        double rnd2 = (double)rand() / RAND_MAX;
+
+        double phi = acos(pow(rnd1, 1.0 / (specexp + 1)));
+        double theta = 2.0 * M_PI * rnd2;
+
+        dir v;
+        v.x = cos(theta) * sin(phi);
+        v.y = cos(phi);
+        v.z = sin(theta) * sin(phi);
+        v = v*mat;
+
+        return v;
+    }
+
+    virtual dir getNormal() {return newDir(0,0,0);}
+    virtual dir getNormal(point p) {return newDir(0,0,0);}
 
     dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
         dir normal = this -> getNormal(inputPoint);
@@ -152,7 +194,7 @@ public:
             return refraction(inputRay, normal, inputPoint,outputPoint);
         }
         else if (evento == PHONG){
-            return phong(inputRay, normal, inputPoint);
+            return phongDir(inputRay, normal, mp.getAlfa());
         }
         else{
             return normal;
@@ -204,19 +246,23 @@ public:
         double aux  = dot(this->c - ro, rd);
         if (aux < 0){
             //corta detras del punto de origen
+            t = aux;
             return false;
         }
         point p = ro + rd*aux;
         double y = mod(this->c - p);
         if ( y <= r) {
             t = aux - sqrt(this->r * this->r - y * y);
+            if(t == 0){
+                t = aux + sqrt(this->r * this->r - y * y);
+            }
             return true;
         } else {
             return false;
         }
     }
 
-    double getR(point pp) override {
+    /*double getR(point pp) override {
         return figura::getR(pp);
     }
     double getG(point pp) override {
@@ -224,7 +270,7 @@ public:
     }
     double getB(point pp) override {
         return figura::getB(pp);
-    }
+    }*/
 
 
     dir getNormal() override {
@@ -245,13 +291,12 @@ public:
         intersection(output, o, t);
         salida = o + output * t;
 
-
         r = n2 / n1;
         c = dot(this->getNormal(salida),output);
 
         dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
 
-        return normalize(output2);
+        return output2;
     }
 
 
@@ -336,7 +381,7 @@ public:
 
     }
 
-    double getR(point pp) override {
+    /*double getR(point pp) override {
         if(this->text == IMAGE){
             return texturizador->getR(this->p, pp);
         }
@@ -353,7 +398,7 @@ public:
             return texturizador->getB(this->p, pp);
         }
         return figura::getB(pp);
-    }
+    }*/
 
 
 

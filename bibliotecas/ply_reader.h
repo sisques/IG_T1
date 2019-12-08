@@ -17,7 +17,7 @@ using namespace std;
 
 
 
-//Devuelve true si y solo si no ha habido ningún problema durante el tone mapping
+
 list<shared_ptr<figura>> plyReader(const string fileIn,materialProperties mp, const Matrix trans[],int arrSize) {
     list<shared_ptr<figura>> output;
 
@@ -113,7 +113,12 @@ list<shared_ptr<figura>> plyReader(const string fileIn,materialProperties mp, co
             G = 0;
             B = 0;
         }
-        mp.setRGB(R,G,B);
+
+        mp.setKd(R,G,B);
+        mp.setKs(R,G,B);
+        mp.setKdPhong(R,G,B);
+        mp.setKsPhong(R,G,B);
+
         shared_ptr<figura> fig;
         if(normal) {
             fig = make_shared<triangulo>(triangulo(v0, v1, v2, normals[a],mp));
