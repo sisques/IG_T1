@@ -79,11 +79,11 @@ public:
             dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 
             if (!basic) {
-				double dist = 0;
+				double dist = 0.0;
                 pT.getRGB(cam.o, e, rayo, r, g, b, dist);
-				r = pow(r, 0.15);//pow(dist,2);
-				g = pow(g, 0.15);//pow(dist,2);
-				b = pow(b, 0.15);//pow(dist,2);
+				r = pow(r, 0.05);//pow(dist,2.0);
+				g = pow(g, 0.05);//pow(dist,2.0);
+				b = pow(b, 0.05);//pow(dist,2.0);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }

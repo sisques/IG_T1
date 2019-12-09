@@ -82,6 +82,7 @@ public:
     ~pathTracer(){};
 
     void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &dist){
+		bool guarro = true;
         shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
@@ -117,17 +118,28 @@ public:
             else{
                 actualFig->getRGB(event,R,G,B);
             }
-			R = R*R_siguiente*abs(dot(-rayo,dirNewRay));
-			G = G*G_siguiente*abs(dot(-rayo,dirNewRay));
-			B = B*B_siguiente*abs(dot(-rayo,dirNewRay));
+			double p = actualFig->probEvent(event);
+			dir n = actualFig->getNormal(colP);
+			if(!guarro){
+				R = R*R_siguiente*abs(dot(n,dirNewRay))/p;
+				G = G*G_siguiente*abs(dot(n,dirNewRay))/p;
+				B = B*B_siguiente*abs(dot(n,dirNewRay))/p;
+			}
+			else{
+				double m = (R_siguiente+G_siguiente+B_siguiente)/3;
+				if(event == REFLEXION || event == REFRACTION){
+					R = R*(1-p) + R_siguiente*p;
+					G = G*(1-p) + G_siguiente*p;
+					B = B*(1-p) + B_siguiente*p;
+				}
+				R = R*m*abs(dot(n,dirNewRay))/p;
+				G = G*m*abs(dot(n,dirNewRay))/p;
+				B = B*m*abs(dot(n,dirNewRay))/p;
+			}
         }
         else{
             actualFig->getRGB(REFLEXION,R,G,B);
         }
-    }
-
-    double cFunc(const double v, const double min, const double max){
-        return (max-min)*v + min;
     }
 };
 

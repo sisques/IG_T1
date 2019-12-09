@@ -44,7 +44,7 @@ public:
         else{//textures.flatColor
             texturizador = new texture();
         }
-        srand(0);
+		srand (time(NULL));
     }
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
@@ -56,7 +56,7 @@ public:
         else {
             texturizador = new texture();
         }
-        srand(0);
+		srand (time(NULL));
     }
 
     event_enum evento(){
@@ -124,7 +124,7 @@ public:
 
         dir inputRay = normalize(_in);
         dir normal = normalize(_n);
-        dir output = 2*dot(normal, inputRay)*normal -inputRay;
+        dir output = 2.0*dot(normal, inputRay)*normal -inputRay;
         return -normalize(output);
     }
     virtual dir refraction(dir _in, dir _n, point o, point &salida) {
@@ -171,14 +171,14 @@ public:
 		double rnd1 = (double)rand() / RAND_MAX;
 		double rnd2 = (double)rand() / RAND_MAX;
 
-		double phi = acos(pow(rnd1, 1.0 / (specexp + 1)));
+		double phi = acos(pow(rnd1, 1.0 / (specexp + 1.0)));
 		double theta = 2.0 * M_PI * rnd2;
 
 		dir v;
 		v.x = cos(theta) * sin(phi);
 		v.y = cos(phi);
 		v.z = sin(theta) * sin(phi);
-		v = v*mat;
+		v = mat*v;
 
 		return v;
 	}
