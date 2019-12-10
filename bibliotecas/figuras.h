@@ -27,7 +27,7 @@ public:
     figura(materialProperties _mp){
         this -> mp = _mp;
         this->text = NO_TEXTURE;
-        texturizador = new texture();
+        texturizador = nullptr;//new texture();
         srand(0);
     }
 
@@ -191,10 +191,10 @@ public:
         if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint,outputPoint);
+			return refraction(inputRay, normal, inputPoint,outputPoint);
         }
         else if (evento == PHONG){
-            return phongDir(inputRay, normal, mp.getAlfa());
+			return phongDir(inputRay, normal, mp.getAlfa());
         }
         else{
             return normal;

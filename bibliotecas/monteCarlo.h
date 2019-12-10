@@ -52,7 +52,7 @@ public:
     }
 
 
-    void rtx(const list<shared_ptr<figura>> &e, const int x, const int y, int& R, int& G, int& B, bool basic){
+    void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic){
         int cX = y - (height/2);
         int cY = (wide/2) - x;
         double minX = (1.0/(wide/2)) * cX*1.0;

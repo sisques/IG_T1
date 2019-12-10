@@ -28,8 +28,8 @@ private:
         return luces;
     }
 
-    bool colision(point c, const list<shared_ptr<figura>> &e, dir rayo, shared_ptr<figura> &fig, point &col){
-        double t = 0;
+    bool colision(const point &c, const list<shared_ptr<figura>> &e, const dir &rayo, shared_ptr<figura> &fig, point &col){
+		double t = 0;
         double distMin = numeric_limits<double>::max();
         double distActual = 0;
         bool colision;
@@ -81,7 +81,7 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
-    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &dist){
+    void getRGB(const point &c, const list<shared_ptr<figura>> &e,  const dir &rayo, double& R, double& G, double& B, double &dist){
 		bool guarro = true;
         shared_ptr<figura> actualFig = nullptr;
         point colP;
