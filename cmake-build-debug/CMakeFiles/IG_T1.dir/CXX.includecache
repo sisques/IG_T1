@@ -21,6 +21,8 @@
 /home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
 ../bibliotecas/globals.h
 /home/victor/gitRepos/IG_T1/bibliotecas/globals.h
+../bibliotecas/phong.h
+/home/victor/gitRepos/IG_T1/bibliotecas/phong.h
 iostream
 -
 string
@@ -65,6 +67,8 @@ camara.h
 /home/victor/gitRepos/IG_T1/bibliotecas/camara.h
 globals.h
 /home/victor/gitRepos/IG_T1/bibliotecas/globals.h
+phong.h
+/home/victor/gitRepos/IG_T1/bibliotecas/phong.h
 list
 -
 
@@ -129,6 +133,8 @@ limits
 -
 globals.h
 /home/victor/gitRepos/IG_T1/bibliotecas/globals.h
+phong.h
+/home/victor/gitRepos/IG_T1/bibliotecas/phong.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/perlinNoise.h
 cmath
@@ -145,6 +151,18 @@ stdlib.h
 -
 time.h
 -
+
+/home/victor/gitRepos/IG_T1/bibliotecas/phong.h
+math.h
+-
+stdlib.h
+-
+matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
+punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
+russian_roulette.h
+/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
 iostream

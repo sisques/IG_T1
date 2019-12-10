@@ -19,6 +19,16 @@ struct dir {
 		double w;
 };
 
+
+    point newPoint(double _x, double _y, double _z, double _w) {
+        point p;
+        p.x = _x;
+        p.y = _y;
+        p.z = _z;
+        p.w = _w;
+        return p;
+    }
+
 	point newPoint(double _x, double _y, double _z) {
 		point p;
 		p.x = _x;

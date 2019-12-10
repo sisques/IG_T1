@@ -22,23 +22,23 @@ using namespace std;
 
 camara c;
 
+
 list<shared_ptr<figura>> setUpScene(){
 
     double reflection[] = {0,0.0,0.9};
     double refraction[] = {0.0,0.9,0.0};
     double wall[] = {0.90,0.0,0.0};
     event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
-
-
     materialProperties mp = materialProperties(false, eventos, wall);
     mp.setAlfa(0);
     materialProperties light = materialProperties(true, eventos, wall,1);
     light.setKs(255,255,255);
     materialProperties reflexion = materialProperties(false, eventos, reflection,1.33);
+    //reflexion.setKd(0,0,0);
+    //reflexion.setKs(0,0,0);
     reflexion.setKd(0,0,0);
     reflexion.setKs(255,255,255);
-    reflexion.setKdPhong(255,255,255);
-    reflexion.setKsPhong(255,255,255);
+    reflexion.setAlfa(10);
     materialProperties refraccion = materialProperties(false, eventos, refraction,1.33);
     refraccion.setKd(255,255,255);
     refraccion.setKs(0,0,0);
@@ -66,7 +66,13 @@ list<shared_ptr<figura>> setUpScene(){
     mp.setKsPhong(0,255,0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
     shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,0.0,0.3), 0.15, refraccion);
-    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0,0,0.7), 0.2, reflexion);
+    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
+    shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
+    shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
+    shared_ptr<figura> ESFERAreflexion4 = make_shared<esfera>(newPoint(-0.3,-0.3,0.7), 0.2, reflexion);
+    mp.setKdPhong(0,0,255);
+    mp.setKsPhong(0,0,255);
+    shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0.3,-0.2,0.4), 0.1, mp);
 
 
     //elementos.push_back(espalda);
@@ -75,15 +81,19 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    elementos.push_back(ESFERArefraccion);
+    //elementos.push_back(ESFERArefraccion);
     elementos.push_back(ESFERAreflexion);
+    elementos.push_back(ESFERAreflexion2);
+    elementos.push_back(ESFERAreflexion3);
+    elementos.push_back(ESFERAreflexion4);
+    elementos.push_back(ESFERAphong);
 
 
 
     double brdfValues2[] = {0.9,0.0,0.0};
     materialProperties limit = materialProperties(false, eventos, brdfValues2,0);
-    limit.setKd(0,0,0);
-    limit.setKs(0,0,0);
+    //limit.setKd(0,0,0);
+    //limit.setKs(0,0,0);
     limit.setKdPhong(0,0,0);
     limit.setKsPhong(0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
@@ -94,8 +104,8 @@ list<shared_ptr<figura>> setUpScene(){
 
 int completadas = 0;
 
-void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
-					const string &fOut, const int hMin, const int hMax, const int w, const int h){
+void generateScene( const monteCarlo &mc, const list<shared_ptr<figura>> &e,
+					const string &fOut, const int &hMin, const int &hMax, const int &w, const int &h){
 	int R,G,B;
 	fstream flujoOut;
 	flujoOut.open((fOut).c_str(), ios::out);
@@ -147,8 +157,8 @@ int main(){
     */
     h = 400;
     w = 400;
-    rpp =10 ;
-    int threads = 10;
+    rpp =10;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);

@@ -28,7 +28,7 @@ private:
         return luces;
     }
 
-    bool colision(point c, const list<shared_ptr<figura>> &e, dir rayo, shared_ptr<figura> &fig, point &col){
+    bool colision( const point &c, const list<shared_ptr<figura>> &e, const dir &rayo, shared_ptr<figura> &fig, point &col) const {
         double t = 0;
         double distMin = numeric_limits<double>::max();
         double distActual = 0;
@@ -81,52 +81,64 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
-    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B, double &dist){
-        shared_ptr<figura> actualFig = nullptr;
-        point colP;
-        bool colisiona = colision(c,e,rayo,actualFig,colP);
-        dist += mod(c-colP);
-        event_enum event;
-        if(!colisiona){
-            event = DEATH;
-        }
-        else{
-            event = actualFig->evento();
-        }
-        double R_siguiente, G_siguiente, B_siguiente;
+    point getRGB( const point &inputPoint,const list<shared_ptr<figura>> &scene,const dir &inputRay ) const {
 
-        if(colisiona && actualFig->isLight()){
-            actualFig->getRGB(EMISSION, R,G,B);
-        }
-        else if(event == DEATH){
-            R = 0;
-            G = 0;
-            B = 0;
-        }
-        else if(event == REFRACTION || event == REFLEXION || event == PHONG){
-            dir dirNewRay;
-            point nextPoint;
-            dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
-            if ( event == REFRACTION) {
-                colP = nextPoint;
+        shared_ptr<figura> actualFig = nullptr;
+        point puntoColision;
+        bool colisiona = false;
+        event_enum event;
+        double R_actual = 0, G_actual = 0, B_actual = 0;
+        double R_acumulado = 0, G_acumulado = 0, B_acumulado = 0, dist = 0;
+
+        colisiona = colision(inputPoint,scene,inputRay,actualFig,puntoColision);
+        dir dirNewRay = inputRay;
+        point nextPoint = inputPoint;
+        dir rayoAnterior = dirNewRay;
+
+
+        while ( colisiona && event != DEATH) {
+
+            dist += mod(nextPoint-puntoColision);
+
+            event = actualFig->evento();
+
+            if ( colisiona && actualFig -> isLight() ) {
+                actualFig -> getRGB(EMISSION, R_actual, G_actual, B_actual);
+            } else if ( event == DEATH ) {
+                R_actual = 0; G_actual = 0; B_actual = 0;
+            } else if(event == REFRACTION || event == REFLEXION || event == PHONG){
+
+                rayoAnterior = dirNewRay;
+
+                dirNewRay = actualFig->nextRay(event, rayoAnterior, puntoColision,nextPoint);
+
+                if ( event == REFRACTION) {
+                    puntoColision = nextPoint;
+                }
+
+
+                if (event == PHONG) {
+                    actualFig -> phongColor(rayoAnterior, dirNewRay, puntoColision, R_actual, G_actual, B_actual );
+                } else {
+                    actualFig -> getRGB(event, R_actual, G_actual, B_actual);
+                }
+
+                R_acumulado = R_actual*R_acumulado*abs(dot(-rayoAnterior,dirNewRay));
+                G_acumulado = G_actual*G_acumulado*abs(dot(-rayoAnterior,dirNewRay));
+                B_acumulado = B_actual*B_acumulado*abs(dot(-rayoAnterior,dirNewRay));
+            } else {
+                //ESTO PQ SAUL PQ E DIME PQ
+                actualFig->getRGB(REFLEXION, R_actual, G_actual, B_actual);
             }
-            getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, dist);
-            if(event == PHONG){
-                actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
-            }
-            else{
-                actualFig->getRGB(event,R,G,B);
-            }
-            R = R*R_siguiente*abs(dot(-rayo,dirNewRay));
-            G = G*G_siguiente*abs(dot(-rayo,dirNewRay));
-            B = B*B_siguiente*abs(dot(-rayo,dirNewRay));
+
+            colisiona = colision(nextPoint,scene,dirNewRay,actualFig,puntoColision);
         }
-        else{
-            actualFig->getRGB(REFLEXION,R,G,B);
-        }
+
+
+        return newPoint(R_acumulado,G_acumulado,B_acumulado,dist);
     }
 
-    double cFunc(const double v, const double min, const double max){
+    double cFunc(const double &v, const double &min, const double &max){
         return (max-min)*v + min;
     }
 };
