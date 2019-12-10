@@ -65,7 +65,7 @@ list<shared_ptr<figura>> setUpScene(){
 	mp.setKsPhong(0,255,0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
     shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,0.0,0.3), 0.15, refraccion);
-    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0,0,0.7), 0.2, reflexion);
+    shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion4 = make_shared<esfera>(newPoint(-0.3,-0.3,0.7), 0.2, reflexion);
@@ -80,12 +80,12 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    elementos.push_back(ESFERArefraccion);
+    //elementos.push_back(ESFERArefraccion);
     elementos.push_back(ESFERAreflexion);
-	/*elementos.push_back(ESFERAreflexion2);
+	elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
 	elementos.push_back(ESFERAreflexion4);
-	elementos.push_back(ESFERAphong);*/
+	elementos.push_back(ESFERAphong);
 
 
 
@@ -104,7 +104,7 @@ list<shared_ptr<figura>> setUpScene(){
 int completadas = 0;
 
 void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
-					const string &fOut, const int hMin, const int hMax, const int w, const int h){
+					const string &fOut, const int &hMin, const int &hMax, const int &w, const int &h){
 	int R,G,B;
 	fstream flujoOut;
 	flujoOut.open((fOut).c_str(), ios::out);
@@ -157,7 +157,7 @@ int main(){
     h = 500;
     w = 500;
     rpp = 10;
-    int threads = 10;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -169,7 +169,8 @@ int main(){
 	thread th[threads];
 	int hMin = 0, hMax = - 1 + h/threads;
 	for(int i = 0; i < threads;++i){
-		monteCarlo mc(c,h,w,rpp);
+		camara c2 = c;
+		monteCarlo mc(c2,h,w,rpp);
 		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w, h);
 		hMin += h/threads;
