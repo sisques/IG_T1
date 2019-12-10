@@ -11,7 +11,6 @@ CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/monteCarlo.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/path_tracer.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/perlinNoise.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/phong.h
-CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/ply_reader.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/ppm_reader.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/punto_direccion.h
 CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o: ../bibliotecas/russian_roulette.h

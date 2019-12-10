@@ -11,31 +11,21 @@
 
 class Matrix{
 public:
-    double** p;     // puntero a matriz de doubles
+    double p[4][4];     // puntero a matriz de doubles
 
 
     // constructor
     Matrix(){
-        p = new double*[4];
         for (int f = 0; f < 4; f++){
-            p[f] = new double[4];
             for (int c = 0; c < 4; c++) {
                 p[f][c] = 0;
             }
         }
     }
 
-    ~Matrix(){
-        for (int i = 0; i < 4; ++i){
-            delete [] p[i];
-        }
-        delete [] p;
-    }
-
 
     Matrix empty(){
         Matrix m;
-        m.p = nullptr;
         return m;
     }
 
@@ -45,9 +35,7 @@ public:
 
     // operador de asignacion
     Matrix& operator= (const Matrix& a){
-        p = new double*[4];
         for (int f = 0; f < 4; f++) {
-            p[f] = new double[4];
             for (int c = 0; c < 4; c++){
                 p[f][c] = a.p[f][c];
             }

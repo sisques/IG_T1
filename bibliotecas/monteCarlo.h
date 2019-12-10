@@ -18,7 +18,7 @@ private:
     int height, wide, rays;
     pathTracer pT;
 
-    double cFunc(const double &v, const double &min, const double &max) const {
+    double cFunc(const double v, const double min, const double max){
         return (max-min)*v + min;
     }
 
@@ -27,7 +27,7 @@ public:
     ~monteCarlo(){};
 
 
-    void getRGB(const point &c, const list<shared_ptr<figura>> &e, const dir &rayo, double& R, double& G, double& B) const {
+    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B){
         double t = 0;
         double distMin = numeric_limits<double>::max();
         double distActual = 0;
@@ -52,7 +52,7 @@ public:
     }
 
 
-    void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic) const{
+    void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic){
         int cX = y - (height/2);
         int cY = (wide/2) - x;
         double minX = (1.0/(wide/2)) * cX*1.0;
@@ -79,11 +79,11 @@ public:
             dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 
             if (!basic) {
-                double dist = 0;
-                point colores = pT.getRGB(cam.o, e, rayo);
-                r = pow(colores.x, 0.15);//pow(dist,2);
-                g = pow(colores.y, 0.15);//pow(dist,2);
-                b = pow(colores.z, 0.15);//pow(dist,2);
+                double dist = 0.0;
+                pT.getRGB(cam.o, e, rayo, r, g, b, dist);
+                r = pow(r, 0.05);//pow(dist,2.0);
+                g = pow(g, 0.05);//pow(dist,2.0);
+                b = pow(b, 0.05);//pow(dist,2.0);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }

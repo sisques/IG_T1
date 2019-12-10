@@ -25,6 +25,7 @@ protected:
     russianRoulette rR;
 
 public:
+    ~materialProperties(){}
     materialProperties(){}
     materialProperties(bool is_light_source, event_enum events[], double probs[], double r = 1.00029){
         this -> light_source = is_light_source;

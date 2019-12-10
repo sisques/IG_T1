@@ -27,7 +27,7 @@ public:
     figura(materialProperties _mp){
         this -> mp = _mp;
         this->text = NO_TEXTURE;
-        texturizador = new texture();
+        texturizador = nullptr;//new texture();
         srand(0);
     }
 
@@ -143,7 +143,7 @@ public:
 
     }
 
-    dir phongDir( dir outdir, dir n, double specexp) {
+    dir phongDir(dir outdir, dir n, double specexp) {
         Matrix mat;
         dir ldir = normalize(outdir);
 
@@ -186,7 +186,7 @@ public:
     virtual dir getNormal() {return newDir(0,0,0);}
     virtual dir getNormal(point p) {return newDir(0,0,0);}
 
-    dir nextRay(const event_enum &evento, const dir &inputRay, const point &inputPoint, point &outputPoint) {
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
         dir normal = this -> getNormal(inputPoint);
         if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
