@@ -129,8 +129,6 @@ public:
     }
 
     bool contrary(dir d1, dir d2, point colision){
-
-
         dir y = d1;
         dir z = d2;
         dir x = cross(y,z);
@@ -143,19 +141,51 @@ public:
     }
 
     virtual dir refraction(dir _in, dir _n, point o) {
-        double n1 = VACUUM;
+        dir I = normalize(_in);
+        dir N = normalize(_n);
+        double cosi = dot(I, N);
+
+        double n1 = 1, n2 = this->mp.getRefValue();
+        dir n = N;
+        if (cosi > 1) {
+            cosi = 1;
+        } else if( cosi < -1){
+            cosi = -1;
+        }
+
+        if (cosi < 0) { cosi = -cosi; }
+        else { std::swap(n1, n2); n= -N; }
+
+        double r = n1 / n2;
+        double k = 1 - r * r * (1 - cosi * cosi);
+
+        dir out;
+        if(k < 0){
+            out =  2.0*cosi*N + I;
+        } else {
+            out = r * I + (r * cosi - sqrt(k)) * n;
+        }
+        return -normalize(out);
+
+        /*double n1 = VACUUM;
         double n2 = mp.getRefValue();
 
         dir inputRay = normalize(_in);
         dir normal = normalize(_n);
-        double r = n1 / n2;
+        double r, c;
+        dir output;
         if(contrary(normal, inputRay, o)){
             cout << "contrary" << endl;
             r = n2 / n1;
+            c = dot(normal,inputRay);
+            output = inputRay*r + -normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+        } else {
+            r = n1 / n2;
+            c = dot(-normal,inputRay);
+            output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
         }
-        double c = dot(-normal,inputRay);
-        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-        return -normalize(output);
+        //dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+        return -normalize(output);*/
     }
 
     dir phongDir(dir outdir, dir n, double specexp) {
@@ -257,7 +287,18 @@ public:
 
 
     bool intersection(dir rd, point ro, double &t) override {
-        double aux  = dot(this->c - ro, rd);
+        dir origin_center = ro - this->c;
+        double b  = dot(rd, origin_center);
+        double disc =   b*b - dot(origin_center,origin_center) +
+                        this->r*this->r;
+        if(disc < EPSILON ){
+            t = INFINITY;
+        } else {
+            t = -b -sqrt(disc);
+            return true;
+        };
+
+        /* double aux  = dot(this->c - ro, rd);
         point p = ro + rd*aux;
         double y = mod(this->c - p);
         double difPts = 0.0;
@@ -272,7 +313,7 @@ public:
             return true;
         } else {
             return false;
-        }
+        }*/
     }
 
     /*double getR(point pp) override {
