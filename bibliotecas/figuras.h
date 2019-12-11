@@ -127,20 +127,35 @@ public:
         dir output = 2.0*dot(normal, inputRay)*normal -inputRay;
         return -normalize(output);
     }
-    virtual dir refraction(dir _in, dir _n, point o, point &salida) {
-        double n1 = 1.00029;
+
+    bool contrary(dir d1, dir d2, point colision){
+
+
+        dir y = d1;
+        dir z = d2;
+        dir x = cross(y,z);
+        z = cross(x,y);
+        Matrix base = newBase(x,y,z,colision);
+        dir aux = d2*base;
+        return aux.y > 0;
+
+
+    }
+
+    virtual dir refraction(dir _in, dir _n, point o) {
+        double n1 = VACUUM;
         double n2 = mp.getRefValue();
 
         dir inputRay = normalize(_in);
         dir normal = normalize(_n);
         double r = n1 / n2;
+        if(contrary(normal, inputRay, o)){
+            cout << "contrary" << endl;
+            r = n2 / n1;
+        }
         double c = dot(-normal,inputRay);
         dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-
-
-
-        return normalize(output);
-
+        return -normalize(output);
     }
 
     dir phongDir(dir outdir, dir n, double specexp) {
@@ -154,7 +169,6 @@ public:
         if(1.0 - ndotl > EPSILON) {
             dir ivec, kvec, jvec;
 
-            // build orthonormal basis
             if(fabs(ndotl) < EPSILON) {
                 kvec = -normalize(ldir);
                 jvec = n;
@@ -186,12 +200,12 @@ public:
     virtual dir getNormal() {return newDir(0,0,0);}
     virtual dir getNormal(point p) {return newDir(0,0,0);}
 
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint){
         dir normal = this -> getNormal(inputPoint);
         if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint,outputPoint);
+            return refraction(inputRay, normal, inputPoint);
         }
         else if (evento == PHONG){
             return phongDir(inputRay, normal, mp.getAlfa());
@@ -244,16 +258,15 @@ public:
 
     bool intersection(dir rd, point ro, double &t) override {
         double aux  = dot(this->c - ro, rd);
-        if (aux < 0){
-            //corta detras del punto de origen
-            t = aux;
-            return false;
-        }
         point p = ro + rd*aux;
         double y = mod(this->c - p);
+        double difPts = 0.0;
         if ( y <= r) {
             t = aux - sqrt(this->r * this->r - y * y);
-            if(t == 0){
+            p = ro + rd*t;
+            difPts = mod(ro - p);
+            if(difPts <= EPSILON){
+                cout << " ee";
                 t = aux + sqrt(this->r * this->r - y * y);
             }
             return true;
@@ -281,7 +294,7 @@ public:
     }
 
 
-    dir refraction(dir inputRay, dir normal, point o, point &salida) override{
+    /*dir refraction(dir inputRay, dir normal, point o, point &salida) override{
         double n1 = 1.00029;
         double n2 = mp.getRefValue();
         double r = n1 / n2;
@@ -297,7 +310,7 @@ public:
         dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
 
         return output2;
-    }
+    }*/
 
 
 

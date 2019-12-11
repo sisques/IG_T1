@@ -48,7 +48,11 @@ public:
             }
 
         }
-        nearest->getRGB(REFLEXION,R,G,B);
+       /* R = (nearest->mp.getKdPhongR());
+        G = (nearest->mp.getKdPhongG());
+        B = (nearest->mp.getKdPhongB());
+        */
+        nearest->phongColor(rayo,-rayo,colP,R,G,B);
     }
 
 

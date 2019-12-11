@@ -79,10 +79,9 @@ private:
 
 public:
     pathTracer(){}
-    ~pathTracer(){};
+    ~pathTracer(){}
 
     void getRGB(const point &c, const list<shared_ptr<figura>> &e,  const dir &rayo, double& R, double& G, double& B, double &dist){
-        bool guarro = true;
         shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
@@ -107,10 +106,7 @@ public:
         else if(event == REFRACTION || event == REFLEXION || event == PHONG){
             dir dirNewRay;
             point nextPoint;
-            dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
-            if ( event == REFRACTION) {
-                colP = nextPoint;
-            }
+            dirNewRay = actualFig->nextRay(event, rayo, colP);
             getRGB(colP,  e,  dirNewRay, R_siguiente, G_siguiente, B_siguiente, dist);
             if(event == PHONG){
                 actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
@@ -120,22 +116,10 @@ public:
             }
             double p = actualFig->probEvent(event);
             dir n = actualFig->getNormal(colP);
-            if(!guarro){
-                R = R*R_siguiente*abs(dot(n,dirNewRay))/p;
-                G = G*G_siguiente*abs(dot(n,dirNewRay))/p;
-                B = B*B_siguiente*abs(dot(n,dirNewRay))/p;
-            }
-            else{
-                double m = (R_siguiente+G_siguiente+B_siguiente)/3;
-                if(event == REFLEXION || event == REFRACTION){
-                    R = R*(1-p) + R_siguiente*p;
-                    G = G*(1-p) + G_siguiente*p;
-                    B = B*(1-p) + B_siguiente*p;
-                }
-                R = R*m*abs(dot(n,dirNewRay))/p;
-                G = G*m*abs(dot(n,dirNewRay))/p;
-                B = B*m*abs(dot(n,dirNewRay))/p;
-            }
+            R = R*R_siguiente*abs(dot(n,dirNewRay))/p;
+            G = G*G_siguiente*abs(dot(n,dirNewRay))/p;
+            B = B*B_siguiente*abs(dot(n,dirNewRay))/p;
+
         }
         else{
             actualFig->getRGB(REFLEXION,R,G,B);

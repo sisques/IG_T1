@@ -38,27 +38,31 @@ public:
     }
 
     void setKd(int _R,int _G,int _B){
-        this -> kdR = _R/255.0;
-        this -> kdG = _G/255.0;
-        this -> kdB = _B/255.0;
+        double d = (double)MAX;
+        this -> kdR = _R/d;
+        this -> kdG = _G/d;
+        this -> kdB = _B/d;
     }
 
     void setKs(int _R,int _G,int _B){
-        this -> ksR = _R/255.0;
-        this -> ksG = _G/255.0;
-        this -> ksB = _B/255.0;
+        double d = (double)MAX;
+        this -> ksR = _R/d;
+        this -> ksG = _G/d;
+        this -> ksB = _B/d;
     }
 
     void setKdPhong(int _R,int _G,int _B){
-        this -> PkdR = _R/255.0;
-        this -> PkdG = _G/255.0;
-        this -> PkdB = _B/255.0;
+        double d = (double)MAX;
+        this -> PkdR = _R/d;
+        this -> PkdG = _G/d;
+        this -> PkdB = _B/d;
     }
 
     void setKsPhong(int _R,int _G,int _B){
-        this -> PksR = _R/255.0;
-        this -> PksG = _G/255.0;
-        this -> PksB = _B/255.0;
+        double d = (double)MAX;
+        this -> PksR = _R/d;
+        this -> PksG = _G/d;
+        this -> PksB = _B/d;
     }
 
     double getKdR(){ return this->kdR;}

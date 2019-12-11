@@ -53,11 +53,11 @@ struct dir {
 	}   
 	 
 	dir operator -(point p, point q)         {     
-		return newDir(p.x - q.x, p.y - q.y, p.z - q.z);   
+		return newDir(p.x - q.x, p.y - q.y, p.z - q.z);
 	} 
 
 	point operator +(point p, dir q)         {     
-		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);     
+		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);
 	}
 
     point operator -(point p, dir q)         {

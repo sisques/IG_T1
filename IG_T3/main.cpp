@@ -1,8 +1,10 @@
-#include "../bibliotecas/punto_direccion.h"
-#include "../bibliotecas/camara.h"
 #include "../bibliotecas/figuras.h"
+#include "../bibliotecas/camara.h"
 #include "../bibliotecas/monteCarlo.h"
+#include "../bibliotecas/punto_direccion.h"
 #include "../bibliotecas/ply_reader.h"
+#include "../bibliotecas/scenes.h"
+
 
 #include <iostream>
 #include <string>
@@ -17,111 +19,6 @@ using namespace std;
 
 camara c;
 
-list<shared_ptr<figura>> setUpScene(){
-
-    double reflection[] = {0,0.0,0.9};
-    double refraction[] = {0.0,0.9,0.0};
-    double wall[] = {0.90,0.0,0.0};
-    event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
-    materialProperties mp = materialProperties(false, eventos, wall);
-    mp.setAlfa(0);
-
-    materialProperties light = materialProperties(true, eventos, wall,1);
-    light.setKs(255,255,255);
-
-    materialProperties reflexion = materialProperties(false, eventos, reflection,1.33);
-    reflexion.setKdPhong(255,255,255);
-    reflexion.setKsPhong(255,255,255);
-    reflexion.setAlfa(10);
-
-
-
-    string macaco = "/home/victor/gitRepos/IG_T1/models/macaco.ply";
-
-    Matrix transformation[] = { scale(0.05,0.05,0.05)};
-
-
-
-    //list<shared_ptr<figura>> elementos = plyReader(macaco,mp, transformation,1);
-
-    list<shared_ptr<figura>> elementos;
-
-
-    light.setKs(120,0,0);
-    shared_ptr<figura> lght_src_1 = make_shared<plano>(plano(newPoint(-0.5,0.4,0), newDir(1,-1,0),light));
-    light.setKs(0,120,0);
-    shared_ptr<figura> lght_src_2 = make_shared<plano>(plano(newPoint(0.5,0.4,0), newDir(-1,-1,0),light));
-    light.setKs(120,120,120);
-    shared_ptr<figura> lght_src_3 = make_shared<plano>(plano(newPoint(0,0.4,1), newDir(0,-1,-1),light));
-
-
-
-
-
-    elementos.push_back(lght_src_1);
-    elementos.push_back(lght_src_2);
-    elementos.push_back(lght_src_3);
-
-    mp.setKdPhong(120, 120, 120);
-    mp.setKsPhong(120, 120, 120);
-    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
-    shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
-    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),mp));
-
-
-    mp.setKdPhong(255,0,0);
-    mp.setKsPhong(255,0,0);
-    shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),mp));
-
-    mp.setKdPhong(0,255,0);
-    mp.setKsPhong(0,255,0);
-    shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
-
-
-
-    shared_ptr<figura> reflexion_1 = make_shared<esfera>(newPoint(0.3,-0.3,0.8), 0.2, reflexion);
-
-    mp.setKdPhong(0,0,255);
-    mp.setKsPhong(0,0,255);
-    shared_ptr<figura> phong_1 = make_shared<esfera>(newPoint(0.4,-0.02,0.9), 0.1, mp);
-
-
-    point p1 = newPoint(-0.5,0.2,0.75);
-    point p2 = newPoint(-0.5,-0.5,0.75);
-    point p3 = newPoint(-0.1,0.2,1);
-    point p4 = newPoint(-0.1,-0.5,1);
-
-    shared_ptr<figura> espejo_1 = make_shared<triangulo>(triangulo(p1,p2,p3,reflexion));
-
-     shared_ptr<figura> espejo_2 = make_shared<triangulo>(triangulo(p2,p3,p4,reflexion));
-
-    elementos.push_back(espejo_1);
-    elementos.push_back(espejo_2);
-
-    elementos.push_back(fondo);
-    elementos.push_back(suelo);
-    elementos.push_back(techo);
-    elementos.push_back(izquierda);
-    elementos.push_back(derecha);
-
-
-
-    elementos.push_back(reflexion_1);
-    elementos.push_back(phong_1);
-
-
-
-
-    double brdfValues2[] = {0.9,0.0,0.0};
-    materialProperties limit = materialProperties(false, eventos, brdfValues2,0);
-    limit.setKdPhong(0,0,0);
-    limit.setKsPhong(0,0,0);
-    shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
-
-    elementos.push_back(limite);
-
-    return elementos;
-}
 
 int completadas = 0;
 
@@ -145,7 +42,7 @@ void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
 
 int main(){
 
-    clock_t tStart = clock();
+    time_t tStart = time (NULL);;
     /*
      * camara       x   y   z
      *      o   =   0   0   0
@@ -175,10 +72,10 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 1000;
-    w = 1000;
-    rpp = 512;
-    int threads = 4;
+    h = 256;
+    w = 256;
+    rpp = 50;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -187,9 +84,10 @@ int main(){
     string ruta = "/home/victor/gitRepos/IG_T1/imagenes/";
 
 
-    list<shared_ptr<figura>> e = setUpScene();
+    list<shared_ptr<figura>> e = scene_2();
     thread th[threads];
     int hMin = 0, hMax = - 1 + h/threads;
+
     for(int i = 0; i < threads;++i){
         camara c2 = c;
         monteCarlo mc(c2,h,w,rpp);
@@ -224,10 +122,10 @@ int main(){
     }
     flujoOut.close();
 
-    clock_t tEnd = clock();
+    time_t tEnd = time (NULL);;
 
     cout << endl;
-    cout << "segundos en ejecución -> " <<(double)(tEnd - tStart)/CLOCKS_PER_SEC << endl;
+    cout << "segundos en ejecución -> " << tEnd - tStart << endl;
 
 
 }
