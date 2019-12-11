@@ -15,6 +15,8 @@
 /home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
 ../bibliotecas/monteCarlo.h
 /home/victor/gitRepos/IG_T1/bibliotecas/monteCarlo.h
+../bibliotecas/ply_reader.h
+/home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
 iostream
 -
 string
@@ -151,6 +153,28 @@ punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
 russian_roulette.h
 /home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h
+
+/home/victor/gitRepos/IG_T1/bibliotecas/ply_reader.h
+iostream
+-
+string
+-
+fstream
+-
+memory
+-
+list
+-
+figuras.h
+/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h
+punto_direccion.h
+/home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
+matrix.h
+/home/victor/gitRepos/IG_T1/bibliotecas/matrix.h
+materialProperties.h
+/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
+textures.h
+/home/victor/gitRepos/IG_T1/bibliotecas/textures.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/ppm_reader.h
 iostream
