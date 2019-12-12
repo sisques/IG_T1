@@ -51,8 +51,18 @@ public:
         nearest->getRGB(REFLEXION,R,G,B);
     }
 
+	list<shared_ptr<figura>> getLuces(const list<shared_ptr<figura>> &e){
+        list<shared_ptr<figura>> luces;
+        for(shared_ptr<figura> i:e){
+            if(i->isLight()){
+                luces.push_back(i);
+            }
+        }
+        return luces;
+    }
 
     void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic){
+		list<shared_ptr<figura>> luces = getLuces(e);
         int cX = y - (height/2);
         int cY = (wide/2) - x;
         double minX = (1.0/(wide/2)) * cX*1.0;
@@ -80,7 +90,7 @@ public:
 
             if (!basic) {
 				double dist = 0.0;
-                pT.getRGB(cam.o, e, rayo, r, g, b, dist);
+                pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist);
 				r = pow(r, 0.05);//pow(dist,2.0);
 				g = pow(g, 0.05);//pow(dist,2.0);
 				b = pow(b, 0.05);//pow(dist,2.0);

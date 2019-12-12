@@ -127,6 +127,16 @@ public:
         dir output = 2.0*dot(normal, inputRay)*normal -inputRay;
         return -normalize(output);
     }
+	
+	bool contrary(dir d1, dir d2){
+		dir y = d1;
+		dir x = cross(d1,d2);
+		dir z = cross(d1,x);
+		Matrix base = newBase(x,y,z,newPoint(0,0,0));
+		dir aux = d2*base;
+		return aux.y > 0;
+	}
+	
     virtual dir refraction(dir _in, dir _n, point o, point &salida) {
         double n1 = 1.00029;
         double n2 = mp.getRefValue();
@@ -134,14 +144,13 @@ public:
         dir inputRay = normalize(_in);
         dir normal = normalize(_n);
         double r = n1 / n2;
+		if(contrary(normal, inputRay)){
+			r = n2 / n1;
+		}
         double c = dot(-normal,inputRay);
         dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-
-
-
-       return normalize(output);
-
-        }
+		return normalize(output);
+	}
 		
 	dir phongDir(dir outdir, dir n, double specexp) {
 		Matrix mat;
@@ -202,7 +211,26 @@ public:
     }
 };
 
-
+class punto : public figura {
+private:
+    point c;
+public:
+	punto(point _c, materialProperties _mp): figura(_mp){
+		c = _c;
+		if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
+        }
+	}
+	
+	bool intersection(dir rd, point ro, double &t) override {
+        dir d = normalize(c - ro);
+		rd = normalize(rd);
+		t = mod(d)/mod(rd);
+		return (d.x+EPSILON > rd.x &&  d.x-EPSILON < rd.x) 
+				&& (d.y+EPSILON > rd.y &&  d.y-EPSILON < rd.y)
+				&& (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
+    }
+};
 
 class esfera : public figura {
 private:
