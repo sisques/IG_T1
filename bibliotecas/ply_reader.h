@@ -114,8 +114,6 @@ list<shared_ptr<figura>> plyReader(const string fileIn,materialProperties mp, co
             B = 0;
         }
 
-        mp.setKd(R,G,B);
-        mp.setKs(R,G,B);
         mp.setKdPhong(R,G,B);
         mp.setKsPhong(R,G,B);
 

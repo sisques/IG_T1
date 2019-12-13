@@ -48,15 +48,21 @@ public:
             }
 
         }
-       /* R = (nearest->mp.getKdPhongR());
-        G = (nearest->mp.getKdPhongG());
-        B = (nearest->mp.getKdPhongB());
-        */
-        nearest->phongColor(rayo,-rayo,colP,R,G,B);
+        nearest->getRGB(REFLEXION,R,G,B);
     }
 
+    list<shared_ptr<figura>> getLuces(const list<shared_ptr<figura>> &e){
+        list<shared_ptr<figura>> luces;
+        for(shared_ptr<figura> i:e){
+            if(i->isLight()){
+                luces.push_back(i);
+            }
+        }
+        return luces;
+    }
 
     void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic){
+        list<shared_ptr<figura>> luces = getLuces(e);
         int cX = y - (height/2);
         int cY = (wide/2) - x;
         double minX = (1.0/(wide/2)) * cX*1.0;
@@ -84,10 +90,10 @@ public:
 
             if (!basic) {
                 double dist = 0.0;
-                pT.getRGB(cam.o, e, rayo, r, g, b, dist);
-                r = pow(r, 0.05);//pow(dist,2.0);
-                g = pow(g, 0.05);//pow(dist,2.0);
-                b = pow(b, 0.05);//pow(dist,2.0);
+                pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist);
+                if(r > 1 || g > 1 || b > 1){
+                    r = r;
+                }
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }
@@ -95,9 +101,16 @@ public:
             Gt += g;
             Bt += b;
         }
-        R = Rt * CR / rays;
-        G = Gt * CR / rays;
-        B = Bt * CR / rays;
+        if(Rt / rays > 1 || Gt / rays > 1 || Bt / rays > 1){
+            r = r;
+        }
+        Rt = pow(Rt / rays,0.25);
+        Gt = pow(Gt / rays,0.25);
+        Bt = pow(Bt / rays,0.25);
+
+        R = Rt * CR;
+        G = Gt * CR;
+        B = Bt * CR;
     }
 };
 

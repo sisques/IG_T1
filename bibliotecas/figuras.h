@@ -85,10 +85,16 @@ public:
             g = mp.getKdG();
             b = mp.getKdB();
         }
+        if (r < 0) { r = 0; }
+        else if (r > 1) { r = 1; }
+        if (g < 0) { g = 0; }
+        else if (g > 1) { g = 1; }
+        if (b < 0) { b = 0; }
+        else if (b > 1) { b = 1; }
     }
 
     void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
-        dir refindir = reflexion(indir, getNormal(p),p);
+        dir refindir = reflection(indir, getNormal(p),p);
         double cos = dot(refindir, outdir);
         double aux = pow(cos, mp.getAlfa());
         r = (mp.getKdPhongR()/M_PI) + (mp.getKsPhongR()*(mp.getAlfa()+2)/(2*M_PI))*aux;
@@ -120,7 +126,7 @@ public:
     }
 
 
-    dir reflexion(dir _in, dir _n, point o){
+    dir reflection(dir _in, dir _n, point o){
 
         dir inputRay = normalize(_in);
         dir normal = normalize(_n);
@@ -128,77 +134,61 @@ public:
         return -normalize(output);
     }
 
-    bool contrary(dir d1, dir d2, point colision){
-        dir y = d1;
-        dir z = d2;
-        dir x = cross(y,z);
-        z = cross(x,y);
-        Matrix base = newBase(x,y,z,colision);
-        dir aux = d2*base;
-        return aux.y > 0;
-
-
+      double reflectance0(double n1, double n2) {
+        double sqrt_R0 = (n1 - n2) / (n1 + n2);
+        return sqrt_R0 * sqrt_R0;
     }
 
-    virtual dir refraction(dir _in, dir _n, point o) {
-        dir I = normalize(_in);
-        dir N = normalize(_n);
-        double cosi = dot(I, N);
+      double schlickReflectance(double n1, double n2, double c) {
+        double R0 = reflectance0(n1, n2);
+        return R0 + (1 - R0) * c * c * c * c * c;
+    }
 
-        double n1 = 1, n2 = this->mp.getRefValue();
-        dir n = N;
-        if (cosi > 1) {
-            cosi = 1;
-        } else if( cosi < -1){
-            cosi = -1;
+// basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java
+    virtual dir refraction(dir d, dir n, point o) {
+        dir d_Re = reflection(d,n,o);
+        bool fuer_a_dent = dot(n,d);
+        dir nl = fuer_a_dent ? n : n;
+        double n_out = mp.getIndiceRefraccionMedio();
+        double n_in = mp.getIndiceRefraccionObjeto();
+        double r = fuer_a_dent ? n_out / n_in : n_in / n_out;
+        double cos_theta = dot(d,nl);
+        double cos2_phi = 1.0 - r * r * (1.0 - cos_theta * cos_theta);
+
+        //reflexion interna
+        if (cos2_phi < 0) {
+            return d_Re;
         }
 
-        if (cosi < 0) { cosi = -cosi; }
-        else { std::swap(n1, n2); n= -N; }
+        dir d_Tr = normalize(r*d - nl*(r*cos_theta + sqrt(cos2_phi)));
+        double c = 1.0 - (fuer_a_dent ? -cos_theta : dot(d_Tr,n));
+        double Re = schlickReflectance(n_out, n_in, c);
+        double p_Re = 0.25 + 0.5 * Re;
 
-        double r = n1 / n2;
-        double k = 1 - r * r * (1 - cosi * cosi);
 
-        dir out;
-        if(k < 0){
-            out =  2.0*cosi*N + I;
-        } else {
-            out = r * I + (r * cosi - sqrt(k)) * n;
+        double rnd = (double)rand() / RAND_MAX;
+        if (rnd < p_Re) {
+            return d_Re;
         }
-        return -normalize(out);
-
-        /*double n1 = VACUUM;
-        double n2 = mp.getRefValue();
-
-        dir inputRay = normalize(_in);
-        dir normal = normalize(_n);
-        double r, c;
-        dir output;
-        if(contrary(normal, inputRay, o)){
-            cout << "contrary" << endl;
-            r = n2 / n1;
-            c = dot(normal,inputRay);
-            output = inputRay*r + -normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-        } else {
-            r = n1 / n2;
-            c = dot(-normal,inputRay);
-            output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+        else  {
+            return d_Tr;
         }
-        //dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-        return -normalize(output);*/
+
+
     }
 
     dir phongDir(dir outdir, dir n, double specexp) {
         Matrix mat;
         dir ldir = normalize(outdir);
 
-        dir ref = reflexion(ldir, n, newPoint(0,0,0));
+        dir ref = reflection(ldir, n, newPoint(0,0,0));
 
         double ndotl = dot(ldir, n);
 
         if(1.0 - ndotl > EPSILON) {
             dir ivec, kvec, jvec;
 
+            // build orthonormal basis
             if(fabs(ndotl) < EPSILON) {
                 kvec = -normalize(ldir);
                 jvec = n;
@@ -230,10 +220,10 @@ public:
     virtual dir getNormal() {return newDir(0,0,0);}
     virtual dir getNormal(point p) {return newDir(0,0,0);}
 
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint){
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) {
         dir normal = this -> getNormal(inputPoint);
         if ( evento == REFLEXION) {
-            return reflexion(inputRay, normal, inputPoint);
+            return reflection(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
             return refraction(inputRay, normal, inputPoint);
         }
@@ -246,7 +236,26 @@ public:
     }
 };
 
+class punto : public figura {
+private:
+    point c;
+public:
+    punto(point _c, materialProperties _mp): figura(_mp){
+        c = _c;
+        if(mp.isLightSource()){
+            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
+        }
+    }
 
+    bool intersection(dir rd, point ro, double &t) override {
+        dir d = normalize(c - ro);
+        rd = normalize(rd);
+        t = mod(d)/mod(rd);
+        return (d.x+EPSILON > rd.x &&  d.x-EPSILON < rd.x)
+               && (d.y+EPSILON > rd.y &&  d.y-EPSILON < rd.y)
+               && (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
+    }
+};
 
 class esfera : public figura {
 private:
@@ -287,33 +296,23 @@ public:
 
 
     bool intersection(dir rd, point ro, double &t) override {
-        dir origin_center = ro - this->c;
-        double b  = dot(rd, origin_center);
-        double disc =   b*b - dot(origin_center,origin_center) +
-                        this->r*this->r;
-        if(disc < EPSILON ){
-            t = INFINITY;
-        } else {
-            t = -b -sqrt(disc);
-            return true;
-        };
-
-        /* double aux  = dot(this->c - ro, rd);
+        double aux  = dot(this->c - ro, rd);
+        if (aux < 0){
+            //corta detras del punto de origen
+            t = aux;
+            return false;
+        }
         point p = ro + rd*aux;
         double y = mod(this->c - p);
-        double difPts = 0.0;
         if ( y <= r) {
             t = aux - sqrt(this->r * this->r - y * y);
-            p = ro + rd*t;
-            difPts = mod(ro - p);
-            if(difPts <= EPSILON){
-                cout << " ee";
+            if(t == 0){
                 t = aux + sqrt(this->r * this->r - y * y);
             }
             return true;
         } else {
             return false;
-        }*/
+        }
     }
 
     /*double getR(point pp) override {
@@ -333,25 +332,6 @@ public:
     dir getNormal(point p) override {
         return normalize(p - this -> getCenter());
     }
-
-
-    /*dir refraction(dir inputRay, dir normal, point o, point &salida) override{
-        double n1 = 1.00029;
-        double n2 = mp.getRefValue();
-        double r = n1 / n2;
-        double c = dot(-normal,inputRay);
-        dir output = normalize(inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c))));
-        double t;
-        intersection(output, o, t);
-        salida = o + output * t;
-
-        r = n2 / n1;
-        c = dot(this->getNormal(salida),output);
-
-        dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-
-        return output2;
-    }*/
 
 
 

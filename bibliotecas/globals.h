@@ -3,10 +3,10 @@
 
 
 #define CAMBIO_BASE
-/*
-int MAX = 65535;
-int CR = 10000000;
-*/
+
+//const static int MAX = 65535;
+//const static int CR = 10000000;
+
 const static int MAX = 255;
 const static int CR = 255;
 const static double EPSILON = 0.0000001;
