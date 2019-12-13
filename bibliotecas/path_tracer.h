@@ -107,7 +107,9 @@ public:
 			dir luz;// = luzDirecta(e, luces,actualFig->getNormal(colP),colP);
             dir dirNewRay;
             point nextPoint;
+			double p = 0.0;
 			dirNewRay = actualFig->nextRay(event, rayo, colP,nextPoint);
+			p = actualFig->probEvent(event);
             if ( event == REFRACTION) {
                 colP = nextPoint;
             }
@@ -128,9 +130,6 @@ public:
             else{
                 actualFig->getRGB(event,R,G,B);
             }
-			
-			
-			double p = actualFig->probEvent(event);
 			
 			if(!guarro){
 				R = R*luz.x/p;

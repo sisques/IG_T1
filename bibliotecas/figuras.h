@@ -182,7 +182,7 @@ public:
 
 		double phi = acos(pow(rnd1, 1.0 / (specexp + 1.0)));
 		double theta = 2.0 * M_PI * rnd2;
-
+		
 		dir v;
 		v.x = cos(theta) * sin(phi);
 		v.y = cos(phi);
@@ -197,7 +197,7 @@ public:
 
     dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
         dir normal = this -> getNormal(inputPoint);
-        if ( evento == REFLEXION) {
+		if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
 			return refraction(inputRay, normal, inputPoint,outputPoint);

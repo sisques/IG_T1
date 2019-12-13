@@ -91,9 +91,9 @@ public:
             if (!basic) {
 				double dist = 0.0;
                 pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist);
-				r = pow(r, 0.05);//pow(dist,2.0);
-				g = pow(g, 0.05);//pow(dist,2.0);
-				b = pow(b, 0.05);//pow(dist,2.0);
+				if(r > 1 || g > 1 || b > 1){
+					r = r;
+				}
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }
@@ -101,9 +101,16 @@ public:
             Gt += g;
             Bt += b;
         }
-        R = Rt * CR / rays;
-        G = Gt * CR / rays;
-        B = Bt * CR / rays;
+		if(Rt / rays > 1 || Gt / rays > 1 || Bt / rays > 1){
+			r = r;
+		}
+		Rt = pow(Rt / rays,0.25);
+        Gt = pow(Gt / rays,0.25);
+        Bt = pow(Bt / rays,0.25);
+		
+        R = Rt * CR;
+        G = Gt * CR;
+        B = Bt * CR;
     }
 };
 
