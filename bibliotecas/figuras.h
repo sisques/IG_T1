@@ -11,7 +11,6 @@
 #include "matrix.h"
 #include "camara.h"
 #include "globals.h"
-#include "phong.h"
 #include <list>
 
 using namespace std;
@@ -119,7 +118,6 @@ public:
         return false;
     }
 
-
     dir reflexion(dir _in, dir _n, point o){
 
         dir inputRay = normalize(_in);
@@ -128,30 +126,43 @@ public:
         return -normalize(output);
     }
 	
-	bool contrary(dir d1, dir d2){
-		dir y = d1;
-		dir x = cross(d1,d2);
-		dir z = cross(d1,x);
-		Matrix base = newBase(x,y,z,newPoint(0,0,0));
-		dir aux = d2*base;
-		return aux.y > 0;
-	}
+	double reflectance0(double n1, double n2) {	
+        double sqrt_R0 = (n1 - n2) / (n1 + n2);	
+        return sqrt_R0 * sqrt_R0;	
+    }
 	
-    virtual dir refraction(dir _in, dir _n, point o, point &salida) {
-        double n1 = 1.00029;
-        double n2 = mp.getRefValue();
-
-        dir inputRay = normalize(_in);
-        dir normal = normalize(_n);
-        double r = n1 / n2;
-		if(contrary(normal, inputRay)){
-			r = n2 / n1;
-		}
-        double c = dot(-normal,inputRay);
-        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-		return normalize(output);
-	}
-		
+	double schlickReflectance(double n1, double n2, double c) {	
+        double R0 = reflectance0(n1, n2);	
+        return R0 + (1 - R0) * c * c * c * c * c;	
+    }
+	
+    // basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java	
+    virtual dir refraction(dir d, dir n, point o) {
+        dir d_Re = reflexion(d,n,o);
+        bool fuer_a_dent = dot(n,d);
+        dir nl = fuer_a_dent ? n : n;
+        double n_out = mp.getIndiceRefraccionMedio();
+        double n_in = mp.getIndiceRefraccionObjeto();
+        double r = fuer_a_dent ? n_out / n_in : n_in / n_out;
+        double cos_theta = dot(d,nl);
+        double cos2_phi = 1.0 - r * r * (1.0 - cos_theta * cos_theta);
+        //reflexion interna
+        if (cos2_phi < 0) {
+            return d_Re;
+        }
+        dir d_Tr = normalize(r*d - nl*(r*cos_theta + sqrt(cos2_phi)));
+        double c = 1.0 - (fuer_a_dent ? -cos_theta : dot(d_Tr,n));
+        double Re = schlickReflectance(n_out, n_in, c);	
+        double p_Re = 0.25 + 0.5 * Re;
+        double rnd = (double)rand() / RAND_MAX;
+        if (rnd < p_Re) {
+            return d_Re;
+        }
+        else  {
+            return d_Tr;
+        }
+    }
+	
 	dir phongDir(dir outdir, dir n, double specexp) {
 		Matrix mat;
 		dir ldir = normalize(outdir);
@@ -195,15 +206,15 @@ public:
     virtual dir getNormal() {return newDir(0,0,0);}
     virtual dir getNormal(point p) {return newDir(0,0,0);}
 
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint, point &outputPoint) {
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint) {
         dir normal = this -> getNormal(inputPoint);
-		if ( evento == REFLEXION) {
+        if ( evento == REFLEXION) {
             return reflexion(inputRay, normal, inputPoint);
         } else if (evento == REFRACTION) {
-			return refraction(inputRay, normal, inputPoint,outputPoint);
+            return refraction(inputRay, normal, inputPoint);
         }
         else if (evento == PHONG){
-			return phongDir(inputRay, normal, mp.getAlfa());
+            return phongDir(inputRay, normal, mp.getAlfa());
         }
         else{
             return normal;
@@ -265,7 +276,6 @@ public:
         }
     }
 
-
     point getCenter(){ return this->c;}
     double getRadius(){ return this->r;}
 
@@ -307,32 +317,6 @@ public:
     dir getNormal(point p) override {
         return normalize(p - this -> getCenter());
     }
-
-
-    dir refraction(dir inputRay, dir normal, point o, point &salida) override{
-        double n1 = 1.00029;
-        double n2 = mp.getRefValue();
-        double r = n1 / n2;
-        double c = dot(-normal,inputRay);
-        dir output = normalize(inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c))));
-        double t;
-        intersection(output, o, t);
-        salida = o + output * t;
-		
-        r = n2 / n1;
-        c = dot(this->getNormal(salida),output);
-
-        dir output2 = output*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
-
-        return output2;
-    }
-
-
-
-
-
-
-
 };
 
 class plano : public figura {
@@ -382,7 +366,6 @@ public:
         }
     }
 
-
     point getPoint(){ return this->p;}
     dir getNormal() override { return normalize(this->n);}
     dir getNormal(point p) override {return this->getNormal();}
@@ -427,9 +410,6 @@ public:
         }
         return figura::getB(pp);
     }*/
-
-
-
 };
 
 class triangulo : public figura {

@@ -61,7 +61,8 @@ public:
         return luces;
     }
 
-    void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B, const bool &basic){
+    void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B,
+			const bool &luzPuntual, const bool &basic){
 		list<shared_ptr<figura>> luces = getLuces(e);
         int cX = y - (height/2);
         int cY = (wide/2) - x;
@@ -90,10 +91,7 @@ public:
 
             if (!basic) {
 				double dist = 0.0;
-                pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist);
-				if(r > 1 || g > 1 || b > 1){
-					r = r;
-				}
+                pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist, luzPuntual);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }
@@ -101,9 +99,7 @@ public:
             Gt += g;
             Bt += b;
         }
-		if(Rt / rays > 1 || Gt / rays > 1 || Bt / rays > 1){
-			r = r;
-		}
+		
 		Rt = pow(Rt / rays,0.25);
         Gt = pow(Gt / rays,0.25);
         Bt = pow(Bt / rays,0.25);
@@ -111,6 +107,13 @@ public:
         R = Rt * CR;
         G = Gt * CR;
         B = Bt * CR;
+		
+		if (R < 0) { R = 0; }
+        else if (R > MAX) { R = MAX; }
+        if (G < 0) { G = 0; }
+        else if (G > MAX) { G = MAX; }
+        if (B < 0) { B = 0; }
+        else if (B > MAX) { B = MAX; }
     }
 };
 
