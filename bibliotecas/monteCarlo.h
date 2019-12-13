@@ -111,6 +111,12 @@ public:
         R = Rt * CR;
         G = Gt * CR;
         B = Bt * CR;
+        if (R < 0) { R = 0; }
+        else if (R > MAX) { R = MAX; }
+        if (G < 0) { G = 0; }
+        else if (G > MAX) { G = MAX; }
+        if (B < 0) { B = 0; }
+        else if (B > MAX) { B = MAX; }
     }
 };
 

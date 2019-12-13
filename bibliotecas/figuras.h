@@ -85,12 +85,7 @@ public:
             g = mp.getKdG();
             b = mp.getKdB();
         }
-        if (r < 0) { r = 0; }
-        else if (r > 1) { r = 1; }
-        if (g < 0) { g = 0; }
-        else if (g > 1) { g = 1; }
-        if (b < 0) { b = 0; }
-        else if (b > 1) { b = 1; }
+
     }
 
     void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
