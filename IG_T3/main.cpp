@@ -29,7 +29,7 @@ void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
     flujoOut.open((fOut).c_str(), ios::out);
     for (int i = hMin; i <= hMax; ++i){
         for (int j = 0; j < w; j++){
-            mc.rtx(e,i,j,R,G,B,false);
+            mc.rtx(e,i,j,R,G,B,false, false);
             flujoOut << R << " " << G << " " << B << " ";
         }
         completadas++;
@@ -71,9 +71,9 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 250;
-    w = 250;
-    rpp = 250;
+    h = 256;
+    w = 256;
+    rpp = 500;
     int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;

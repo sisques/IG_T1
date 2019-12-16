@@ -9,7 +9,6 @@
 #include <memory>
 #include <limits>
 #include "globals.h"
-#include "phong.h"
 
 
 using namespace std;
@@ -80,8 +79,8 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
-    void getRGB(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, const dir &rayo, double& R, double& G, double& B, double &dist){
-        bool guarro = false;
+    void getRGB(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
+                const dir &rayo, double& R, double& G, double& B, double &dist, const bool &luzPuntual){
         shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
@@ -104,25 +103,29 @@ public:
             B = 0;
         }
         else if(event == REFRACTION || event == REFLEXION || event == PHONG){
-            dir luz;// = luzDirecta(e, luces,actualFig->getNormal(colP),colP);
+            dir luz = newDir(0.0,0.0,0.0);
+            if(luzPuntual){
+                luz =  luzDirecta(e, luces,actualFig->getNormal(colP),colP);
+            }
             dir dirNewRay;
             point nextPoint;
             double p = 0.0;
             dirNewRay = actualFig->nextRay(event, rayo, colP);
             p = actualFig->probEvent(event);
-            if ( event == REFRACTION) {
-                colP = nextPoint;
-            }
-            getRGB(colP,  e, luces, dirNewRay, R_siguiente, G_siguiente, B_siguiente, dist);
+            getRGB(colP,  e, luces, dirNewRay, R_siguiente, G_siguiente, B_siguiente, dist, luzPuntual);
 
             dir n = actualFig->getNormal(colP);
 
-            /*if(mod(luz) != 0){normalize(luz);}
-            if((double)rand() / RAND_MAX < 0.5){*/
-            luz.x = R_siguiente * abs(dot(n,dirNewRay));
-            luz.y = G_siguiente * abs(dot(n,dirNewRay));
-            luz.z = B_siguiente * abs(dot(n,dirNewRay));
-            //}
+            if(luz.x == 0 && luz.y == 0 && luz.z == 0 || event != PHONG){
+                luz.x = R_siguiente * abs(dot(n,dirNewRay));
+                luz.y = G_siguiente * abs(dot(n,dirNewRay));
+                luz.z = B_siguiente * abs(dot(n,dirNewRay));
+            }
+            else{
+                luz.x = (luz.x*0.5 + R_siguiente * abs(dot(n,dirNewRay)))/2;
+                luz.y = (luz.y*0.5 + G_siguiente * abs(dot(n,dirNewRay)))/2;
+                luz.z = (luz.z*0.5 + B_siguiente * abs(dot(n,dirNewRay)))/2;
+            }
 
             if(event == PHONG){
                 actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
@@ -131,22 +134,9 @@ public:
                 actualFig->getRGB(event,R,G,B);
             }
 
-            if(!guarro){
-                R = R*luz.x/p;
-                G = G*luz.y/p;
-                B = B*luz.z/p;
-            }
-            else{
-                double m = (R_siguiente+G_siguiente+B_siguiente)/3;
-                if(event == REFLEXION || event == REFRACTION){
-                    R = R*(1-p) + R_siguiente*p;
-                    G = G*(1-p) + G_siguiente*p;
-                    B = B*(1-p) + B_siguiente*p;
-                }
-                R = R*m*abs(dot(n,dirNewRay))/p;
-                G = G*m*abs(dot(n,dirNewRay))/p;
-                B = B*m*abs(dot(n,dirNewRay))/p;
-            }
+            R = R*luz.x/p;
+            G = G*luz.y/p;
+            B = B*luz.z/p;
         }
         else{
             actualFig->getRGB(REFLEXION,R,G,B);
