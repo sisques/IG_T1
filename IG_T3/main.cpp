@@ -73,9 +73,9 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 256;
-    w = 256;
-    rpp = 64;
+    h = 2048;
+    w = 2048;
+    rpp = 512;
     int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
