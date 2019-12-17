@@ -19,21 +19,20 @@ protected:
     double ksR, ksG, ksB;
     double PkdR, PkdG, PkdB;
     double PksR, PksG, PksB;
-    double indiceRefraccionObjeto, indiceRefraccionMedio;
+    double indiceRefraccionObjeto;
     double alfa;
     russianRoulette rR;
 
 public:
     ~materialProperties(){}
     materialProperties(){}
-    materialProperties(bool is_light_source, event_enum events[], double probs[], double r_obj = GLASS, double r_mdo = VACUUM ){
+    materialProperties(bool is_light_source, event_enum events[], double probs[], double r_obj = GLASS){
         this -> light_source = is_light_source;
         this -> setKd(0,0,0);
         this -> setKs(0,0,0);
         this -> setKdPhong(0,0,0);
         this -> setKsPhong(0,0,0);
         this -> setIndiceRefraccionObjeto(r_obj);
-        this -> setIndiceRefraccionMedio(r_mdo);
 
         this -> rR = russianRoulette(events, probs);
     }
@@ -91,9 +90,6 @@ public:
 
     double getIndiceRefraccionObjeto(){return this->indiceRefraccionObjeto;}
 
-    void setIndiceRefraccionMedio(double r){this->indiceRefraccionMedio = r;}
-
-    double getIndiceRefraccionMedio(){return this->indiceRefraccionMedio;}
 
     bool isLightSource(){
         return this->light_source;

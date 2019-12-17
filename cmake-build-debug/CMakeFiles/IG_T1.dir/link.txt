@@ -1,1 +1,1 @@
-/usr/bin/c++   -std=c++11 -pthread -std=c++11 -pthread   CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o  -o IG_T1 
+/usr/bin/c++   -std=c++11 -pthread -g   CMakeFiles/IG_T1.dir/IG_T3/main.cpp.o  -o IG_T1 
