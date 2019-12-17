@@ -55,7 +55,6 @@ private:
         for(point d:puntosLuces){
             rayos.push_back(d-p);
         }
-		int l = 0;
         for(dir i:rayos){
             shared_ptr<figura> fig;
             point p2;
@@ -63,15 +62,17 @@ private:
             if(colisiona && fig->isLight()){
 				double r,g,b;
 				fig->getRGB(EMISSION,r,g,b);
-				luz.x += r*abs(dot(n,i));//pow(mod(p2-p),2.0);
-				luz.y += g*abs(dot(n,i));//pow(mod(p2-p),2.0);
-				luz.z += b*abs(dot(n,i));//pow(mod(p2-p),2.0);
-				++l;
+				luz.x += r*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
+				luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
+				luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
             }
         }
 		luz.x /= rayos.size();
 		luz.y /= rayos.size();
 		luz.z /= rayos.size();
+		if (luz.x > 1) { luz.x = 1; }
+		if (luz.y > 1) { luz.y = 1; }
+		if (luz.z > 1) { luz.z = 1; }
         return luz;
     }
 
@@ -115,15 +116,15 @@ public:
 			
 			dir n = actualFig->getNormal(colP);
 			
-			if(luz.x == 0 && luz.y == 0 && luz.z == 0 || event != PHONG){
+			if((luz.x == 0 && luz.y == 0 && luz.z == 0) || event != PHONG){
 				luz.x = R_siguiente * abs(dot(n,dirNewRay));
 				luz.y = G_siguiente * abs(dot(n,dirNewRay));
 				luz.z = B_siguiente * abs(dot(n,dirNewRay));
 			}
 			else{
-				luz.x = (luz.x*0.5 + R_siguiente * abs(dot(n,dirNewRay)))/2;
-				luz.y = (luz.y*0.5 + G_siguiente * abs(dot(n,dirNewRay)))/2;
-				luz.z = (luz.z*0.5 + B_siguiente * abs(dot(n,dirNewRay)))/2;
+				luz.x = (luz.x + R_siguiente * abs(dot(n,dirNewRay)))/2;
+				luz.y = (luz.y + G_siguiente * abs(dot(n,dirNewRay)))/2;
+				luz.z = (luz.z + B_siguiente * abs(dot(n,dirNewRay)))/2;
 			}
 			
             if(event == PHONG){
