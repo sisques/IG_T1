@@ -63,9 +63,9 @@ private:
             if(colisiona && fig->isLight()){
                 double r,g,b;
                 fig->getRGB(EMISSION,r,g,b);
-                luz.x += r*abs(dot(n,i));//pow(mod(p2-p),2.0);
-                luz.y += g*abs(dot(n,i));//pow(mod(p2-p),2.0);
-                luz.z += b*abs(dot(n,i));//pow(mod(p2-p),2.0);
+                luz.x += r*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
+                luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
+                luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
                 ++l;
             }
         }
@@ -122,9 +122,9 @@ public:
                 luz.z = B_siguiente * abs(dot(n,dirNewRay));
             }
             else{
-                luz.x = (luz.x*0.5 + R_siguiente * abs(dot(n,dirNewRay)))/2;
-                luz.y = (luz.y*0.5 + G_siguiente * abs(dot(n,dirNewRay)))/2;
-                luz.z = (luz.z*0.5 + B_siguiente * abs(dot(n,dirNewRay)))/2;
+                luz.x = (luz.x + R_siguiente * abs(dot(n,dirNewRay)))/2;
+                luz.y = (luz.y + G_siguiente * abs(dot(n,dirNewRay)))/2;
+                luz.z = (luz.z + B_siguiente * abs(dot(n,dirNewRay)))/2;
             }
 
             if(event == PHONG){

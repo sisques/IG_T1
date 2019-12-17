@@ -138,6 +138,20 @@ public:
 
     // basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java
     virtual dir refraction(dir d, dir n, point o) {
+
+       /* double n1 = mp.getIndiceRefraccionMedio();
+        double n2 = mp.getIndiceRefraccionObjeto();
+
+        dir inputRay = normalize(d);
+        dir normal = normalize(n);
+        double r = n1 / n2;
+        double c = dot(-normal,inputRay);
+        dir output = inputRay*r + normal*(r*c - sqrt(1.0 - r*r*(1.0 - c*c)));
+
+
+
+        return -normalize(output);
+*/
 #warning  BUSCAR AQUELLA REFRACCION QUE NO QUEDABA TAN MAL
         dir d_Re = -reflexion(d,n,o);
         bool fuer_a_dent = dot(n,d);
