@@ -26,8 +26,10 @@ list<shared_ptr<figura>> setUpScene(){
     double reflection[] = {0,0.0,0.9};
     double refraction[] = {0.0,0.9,0.0};
     double wall[] = {0.90,0.0,0.0};
+	double pelota[] = {0.20,0.0,0.7};
     event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
     materialProperties mp = materialProperties(false, eventos, wall);
+	materialProperties PR = materialProperties(false, eventos,pelota);
 	mp.setAlfa(0);
     materialProperties light = materialProperties(true, eventos, wall,1);
 	light.setKs(255,255,255);
@@ -45,33 +47,38 @@ list<shared_ptr<figura>> setUpScene(){
 
 
     list<shared_ptr<figura>> elementos;
-	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,-0.49,0.5), light));
+	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0.4,0.5), light));
 	//mp.setKd(120, 120, 120);
 	//mp.setKs(120, 120, 120);
-	mp.setKdPhong(120, 120, 120);
+	mp.setKdPhong(170, 170, 170);
 	mp.setKsPhong(120, 120, 120);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
     shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
-    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),light));
+    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),mp));
     //mp.setKd(255,0,0);
 	//mp.setKs(255,0,0);
 	mp.setKdPhong(255,0,0);
-	mp.setKsPhong(255,0,0);
+	mp.setKsPhong(120,0,0);
     shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),mp));
     //mp.setKd(0,255,0);
 	//mp.setKs(0,255,0);
 	mp.setKdPhong(0,255,0);
-	mp.setKsPhong(0,255,0);
+	mp.setKsPhong(0,120,0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
     shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,-0.3,0.5), 0.15, refraccion);
     shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion4 = make_shared<esfera>(newPoint(-0.3,-0.3,0.7), 0.2, reflexion);
+	PR.setKd(120,120,120);
+	PR.setKs(120,120,120);
+	PR.setKdPhong(120,120,120);
+	PR.setKsPhong(120,120,120);
+	PR.setAlfa(2);
+	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.4,0.8), 0.1, PR);
 	mp.setKdPhong(0,0,255);
 	mp.setKsPhong(0,0,120);
 	mp.setAlfa(4);
-	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.4,0.8), 0.1, mp);
 	shared_ptr<figura> ESFERAphong2 = make_shared<esfera>(newPoint(0.3,0.2,0.9), 0.1, mp);
 	shared_ptr<figura> ESFERAphong3 = make_shared<esfera>(newPoint(-0.3,0.15,0.7), 0.1, mp);
 	shared_ptr<figura> ESFERAphong4 = make_shared<esfera>(newPoint(0,0.35,0.8), 0.1, mp);
@@ -79,13 +86,13 @@ list<shared_ptr<figura>> setUpScene(){
 	shared_ptr<figura> ESFERAphong6 = make_shared<esfera>(newPoint(0.15,0.275,0.85), 0.1, mp);
 
 
-    //elementos.push_back(puntoLuz);
+    elementos.push_back(puntoLuz);
 	elementos.push_back(fondo);
     elementos.push_back(suelo);
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    elementos.push_back(ESFERArefraccion);
+    //elementos.push_back(ESFERArefraccion);
     elementos.push_back(ESFERAreflexion);
 	elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
@@ -106,7 +113,7 @@ list<shared_ptr<figura>> setUpScene(){
 	limit.setKsPhong(0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,-1), limit));
 
-	//elementos.push_back(limite);
+	elementos.push_back(limite);
     return elementos;
 }
 
@@ -164,10 +171,10 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-	bool luzPuntual = false;
-    h = 500;
-    w = 500;
-    rpp = 10;
+	bool luzPuntual = true;
+    h = 600;
+    w = 600;
+    rpp = 128;
     int threads = 10;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
