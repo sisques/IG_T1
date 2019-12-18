@@ -73,9 +73,9 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-    h = 2048;
-    w = 2048;
-    rpp = 512;
+    h = 128;
+    w = 128;
+    rpp = 8;
     int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
@@ -85,7 +85,7 @@ int main(){
     string ruta = "/home/victor/gitRepos/IG_T1/imagenes/";
 
 
-    list<shared_ptr<figura>> e = scene_3();
+    list<shared_ptr<figura>> e = scene_5();
     thread th[threads];
     int hMin = 0, hMax = - 1 + h/threads;
 

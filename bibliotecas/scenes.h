@@ -363,6 +363,79 @@ list <shared_ptr<figura>> scene_4(){
 
 }
 
+list<shared_ptr<figura>> scene_5 (){
+
+
+
+    double reflection[] = {0.05,0,0.90};
+    double refraction[] = {0,0.90,0.05};
+    double wall[] = {0.90,0,0};
+
+
+    event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
+    materialProperties phong = materialProperties(false, eventos, wall,VACUUM);
+    phong.setAlfa(1);
+
+    materialProperties luz = materialProperties(true, eventos, wall,VACUUM);
+    luz.setKs(255,255,255);
+
+    luz.setAlfa(10);
+
+    materialProperties refraccion = materialProperties(false, eventos, refraction,GLASS);
+
+    refraccion.setKd(255,255,255);
+    refraccion.setKs(10,10,10);
+    refraccion.setKdPhong(255,255,255);
+    refraccion.setKsPhong(255,255,255);
+
+    materialProperties reflexion = materialProperties(false, eventos, reflection,WATER);
+
+    reflexion.setKs(255,255,255);
+
+
+
+
+
+
+    shared_ptr<figura> SKYBOX = make_shared<esfera>(newPoint(0,0,0), 10, phong);
+    shared_ptr<figura> puntoLuz_1 = make_shared<punto>(punto(newPoint(0,1,3), luz));
+    shared_ptr<figura> puntoLuz_2 = make_shared<punto>(punto(newPoint(-2,-1,5), luz));
+    shared_ptr<figura> puntoLuz_3 = make_shared<punto>(punto(newPoint(5,2,7), luz));
+    phong.setKdPhong(0,0,255);
+    phong.setKsPhong(0,0,255);
+    shared_ptr<figura> TIERRA = make_shared<esfera>(newPoint(0,10,0), 2, luz);
+
+
+    string human = "/home/victor/gitRepos/IG_T1/models/Sputnik3.ply";
+
+    int numElem = 4;
+    Matrix transformation[4] = { rotateZ(M_PI/4),
+                                rotateY(M_PI),
+                                rotateX(M_PI/2),
+                                translate(-0.1,-0.45,0.65)};
+
+
+    list<shared_ptr<figura>> elementos = plyReader(human,reflexion, transformation,numElem);
+
+
+
+
+    elementos.push_back(SKYBOX);
+/*
+    elementos.push_back(puntoLuz_1);
+    elementos.push_back(puntoLuz_2);
+    elementos.push_back(puntoLuz_3);
+
+    elementos.push_back(TIERRA);
+*/
+
+
+
+
+
+    return elementos;
+}
+
 #endif
 
 
