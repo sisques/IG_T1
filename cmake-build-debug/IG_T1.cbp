@@ -95,6 +95,9 @@
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/camara.h">
 			<Option target="IG_T1"/>
 		</Unit>
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/color.h">
+			<Option target="IG_T1"/>
+		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h">
 			<Option target="IG_T1"/>
 		</Unit>

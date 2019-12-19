@@ -21,4 +21,4 @@ add_executable(IG_T1
         bibliotecas/russian_roulette.h
         bibliotecas/textures.h
         bibliotecas/ToneMapping.h
-        IG_T3/main.cpp)
+        IG_T3/main.cpp bibliotecas/color.h)

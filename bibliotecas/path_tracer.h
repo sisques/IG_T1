@@ -55,7 +55,6 @@ private:
         for(point d:puntosLuces){
             rayos.push_back(d-p);
         }
-        int l = 0;
         for(dir i:rayos){
             shared_ptr<figura> fig;
             point p2;
@@ -66,12 +65,14 @@ private:
                 luz.x += r*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
                 luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
                 luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
-                ++l;
             }
         }
         luz.x /= rayos.size();
         luz.y /= rayos.size();
         luz.z /= rayos.size();
+        if (luz.x > 1) { luz.x = 1; }
+        if (luz.y > 1) { luz.y = 1; }
+        if (luz.z > 1) { luz.z = 1; }
         return luz;
     }
 
@@ -108,7 +109,6 @@ public:
                 luz =  luzDirecta(e, luces,actualFig->getNormal(colP),colP);
             }
             dir dirNewRay;
-            point nextPoint;
             double p = 0.0;
             dirNewRay = actualFig->nextRay(event, rayo, colP);
             p = actualFig->probEvent(event);
@@ -116,7 +116,7 @@ public:
 
             dir n = actualFig->getNormal(colP);
 
-            if(luz.x == 0 && luz.y == 0 && luz.z == 0 || event != PHONG){
+            if((luz.x == 0 && luz.y == 0 && luz.z == 0) || event != PHONG){
                 luz.x = R_siguiente * abs(dot(n,dirNewRay));
                 luz.y = G_siguiente * abs(dot(n,dirNewRay));
                 luz.z = B_siguiente * abs(dot(n,dirNewRay));

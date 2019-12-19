@@ -85,7 +85,7 @@ int main(){
     string ruta = "/home/victor/gitRepos/IG_T1/imagenes/";
 
 
-    list<shared_ptr<figura>> e = scene_5();
+    list<shared_ptr<figura>> e = scene_4();
     thread th[threads];
     int hMin = 0, hMax = - 1 + h/threads;
 
