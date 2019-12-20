@@ -78,8 +78,10 @@ public:
     virtual list<point> getLightPoints(){
         return this->lightPoints;
     }
+	
+	void setScale(double p){texturizador->setScale(p);}
 
-    void getRGB(event_enum e, double &r, double &g, double &b){
+    virtual void getRGB(event_enum e, point p, double &r, double &g, double &b){
 		if ( e == REFLEXION || e == EMISSION) {
             r = mp.getKsR();
 			g = mp.getKsG();
@@ -89,35 +91,26 @@ public:
 			g = mp.getKdG();
 			b = mp.getKdB();
         }
+		if(this->text == WOOD|| this->text == PERLIN_NOISE){
+            r = texturizador->getR(p,r);
+			g = texturizador->getG(p,g);
+			b = texturizador->getB(p,b);
+        }
 	}
 	
-	void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
+	virtual void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
 		dir refindir = reflexion(indir, getNormal(p),p);
 		double cos = dot(refindir, outdir);
 		double aux = pow(cos, mp.getAlfa());
 		r = (mp.getKdPhongR()/M_PI) + (mp.getKsPhongR()*(mp.getAlfa()+2)/(2*M_PI))*aux;
 		g = (mp.getKdPhongG()/M_PI) + (mp.getKsPhongG()*(mp.getAlfa()+2)/(2*M_PI))*aux;
 		b = (mp.getKdPhongB()/M_PI) + (mp.getKsPhongB()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+		if(this->text == WOOD|| this->text == PERLIN_NOISE){
+            r = texturizador->getR(p,r);
+			g = texturizador->getG(p,g);
+			b = texturizador->getB(p,b);
+        }
 	}
-
-    /*virtual double getR(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getR(p,this->R);
-        }
-        return this->R;
-    }
-    virtual double getG(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getG(p,this->G);
-        }
-        return this->G;
-    }
-    virtual double getB(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getB(p,this->B);
-        }
-        return this->B;
-    }*/
 
     virtual bool intersection(dir rd, point ro, double &t){
         return false;
@@ -282,7 +275,7 @@ public:
             this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
         }
     }
-
+	
     point getCenter(){ return this->c;}
     double getRadius(){ return this->r;}
 
@@ -370,12 +363,31 @@ public:
             this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
-        }
-    }
+		}
+	}
 
     point getPoint(){ return this->p;}
+	
     dir getNormal() override { return normalize(this->n);}
+	
     dir getNormal(point p) override {return this->getNormal();}
+	
+	void phongColor(const dir indir, const dir outdir, point pp, double &r, double &g, double &b) override {
+		if(this->text == IMAGE){
+			dir refindir = reflexion(indir, getNormal(p),p);
+			double cos = dot(refindir, outdir);
+			double aux = pow(cos, mp.getAlfa());
+            r = texturizador->getR(p,pp);
+			g = texturizador->getG(p,pp);
+			b = texturizador->getB(p,pp);
+			r = (r/M_PI) + (r*(mp.getAlfa()+2)/(2*M_PI))*aux;
+			g = (g/M_PI) + (g*(mp.getAlfa()+2)/(2*M_PI))*aux;
+			b = (b/M_PI) + (b*(mp.getAlfa()+2)/(2*M_PI))*aux;
+        }
+		else{
+			figura::phongColor(indir,outdir,pp,r,g,b);
+		}
+	}
 
     bool intersection(dir rd, point ro, double &t) override {
         dir diff = this->p - ro;
@@ -399,24 +411,16 @@ public:
 
     }
 
-    /*double getR(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getR(this->p, pp);
-        }
-        return figura::getR(pp);
-    }
-    double getG(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getG(this->p, pp);
-        }
-        return figura::getG(pp);
-    }
-    double getB(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getB(this->p, pp);
-        }
-        return figura::getB(pp);
-    }*/
+	void getRGB(event_enum e, point pp, double &r, double &g, double &b) override{
+		if(this->text == IMAGE){
+			r = texturizador->getR(this->p, pp);
+			g = texturizador->getG(this->p, pp);
+			b = texturizador->getB(this->p, pp);
+		}
+		else{
+			figura::getRGB(e,p,r,g,b);
+		}
+	}
 };
 
 class triangulo : public figura {

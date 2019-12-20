@@ -16,6 +16,7 @@ class monteCarlo
 private:
     camara cam;
     int height, wide, rays;
+	double gamma;
     pathTracer pT;
 
     double cFunc(const double v, const double min, const double max){
@@ -23,7 +24,7 @@ private:
     }
 
 public:
-    monteCarlo(camara c, int h, int w, int r):cam(c),height(h),wide(w),rays(r){}
+    monteCarlo(camara c, int h, int w, int r, double g):cam(c),height(h),wide(w),rays(r),gamma(g){}
     ~monteCarlo(){};
 
 
@@ -48,7 +49,7 @@ public:
             }
 
         }
-        nearest->getRGB(REFLEXION,R,G,B);
+        nearest->getRGB(REFLEXION,colP,R,G,B);
     }
 
 	list<shared_ptr<figura>> getLuces(const list<shared_ptr<figura>> &e){
@@ -100,9 +101,9 @@ public:
             Bt += b;
         }
 		
-		Rt = pow(Rt / rays,0.25);
-        Gt = pow(Gt / rays,0.25);
-        Bt = pow(Bt / rays,0.25);
+		Rt = pow(Rt / rays,gamma);
+        Gt = pow(Gt / rays,gamma);
+        Bt = pow(Bt / rays,gamma);
 		
         R = Rt * CR;
         G = Gt * CR;

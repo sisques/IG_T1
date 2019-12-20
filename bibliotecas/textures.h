@@ -15,22 +15,27 @@ enum texture_enum { NO_TEXTURE, WOOD, PERLIN_NOISE, IMAGE};
 
 class texture{
 protected:
-	int cr = 256;
+	double cr = 256.0;
+	double scale = 25;
 public:
     texture(){}
-	texture(int _cr){cr = _cr;}
+	texture(double _cr){cr = _cr;}
 
-	virtual int getR(point p, int r){ return r;}
-    virtual int getG(point p, int g){ return g;}
-    virtual int getB(point p, int b){ return b;}
+	void setScale(double p){
+		scale = p;
+	}
 
-	virtual int getR(point c, point p, int r){ return r;}
-    virtual int getG(point c, point p, int g){ return g;}
-    virtual int getB(point c, point p, int b){ return b;}
+	virtual double getR(point p, double r){ return r;}
+    virtual double getG(point p, double g){ return g;}
+    virtual double getB(point p, double b){ return b;}
 
-	virtual int getR(point c, point p){ return cr-1;}
-    virtual int getG(point c, point p){ return cr-1;}
-    virtual int getB(point c, point p){ return cr-1;}
+	virtual double getR(point c, point p, double r){ return r;}
+    virtual double getG(point c, point p, double g){ return g;}
+    virtual double getB(point c, point p, double b){ return b;}
+
+	virtual double getR(point c, point p){ return cr-1;}
+    virtual double getG(point c, point p){ return cr-1;}
+    virtual double getB(point c, point p){ return cr-1;}
 };
 
 //Madera
@@ -41,24 +46,24 @@ public:
 	texture1():texture(){
 		pn = perlinNoise();
 	}
-	texture1(int _cr):texture(_cr){
+	texture1(double _cr):texture(_cr){
 		pn = perlinNoise();
 	}
 
-	int getR(point p, int r) override {
-		double n = 20 * pn.noise(p.x/10, p.y/10, p.z/10);
+	double getR(point p, double r) override {
+		double n = 20.0 * pn.noise(p.x*scale, p.y*scale, p.z*scale);
 		n = n - floor(n);
-		return floor(r * n);
+		return r * n;
 	}
-    int getG(point p, int g) override {
-		double n = 20 * pn.noise(p.x/10, p.y/10, p.z/10);
+    double getG(point p, double g) override {
+		double n = 20.0 * pn.noise(p.x*scale, p.y*scale, p.z*scale);
 		n = n - floor(n);
-		return floor(g * n);
+		return g * n;
 	}
-    int getB(point p, int b) override {
-		double n = 20 * pn.noise(p.x/10, p.y/10, p.z/10);
+    double getB(point p, double b) override {
+		double n = 20.0 * pn.noise(p.x*scale, p.y*scale, p.z*scale);
 		n = n - floor(n);
-		return floor(b * n);
+		return b * n;
 	}
 };
 
@@ -66,25 +71,26 @@ public:
 class texture2 : public texture {
 private:
 	perlinNoise pn;
+	
 public:
 	texture2():texture(){
 		pn = perlinNoise();
 	}
-	texture2(int _cr):texture(_cr){
+	texture2(double _cr):texture(_cr){
 		pn = perlinNoise();
 	}
 
-	int getR(point p, int r) override {
-		double n = pn.noise(p.x/10, p.y/10, p.z/10);
-		return floor(r * n);
+	double getR(point p, double r) override {
+		double n = pn.noise(p.x*scale, p.y*scale, p.z*scale);
+		return r * n;
 	}
-    int getG(point p, int g) override {
-		double n = pn.noise(p.x/10, p.y/10, p.z/10);
-		return floor(g * n);
+    double getG(point p, double g) override {
+		double n = pn.noise(p.x*scale, p.y*scale, p.z*scale);
+		return g * n;
 	}
-    int getB(point p, int b) override {
-		double n = pn.noise(p.x/10, p.y/10, p.z/10);
-		return floor(b * n);
+    double getB(point p, double b) override {
+		double n = pn.noise(p.x*scale, p.y*scale, p.z*scale);
+		return b * n;
 	}
 };
 
@@ -134,10 +140,10 @@ public:
         }
         delete [] Bs;
     }
-    int getR(point c, point p) override {
+    double getR(point c, point p) override {
         dir aux = c - p;
-        int x = (int)aux.x%width;
-        int y = (int)aux.y%height;
+        int x = (int)(aux.x*scale)%width;
+        int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
             x = (int)aux.x%width;
             y = (int)aux.z%height;
@@ -148,12 +154,12 @@ public:
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}
-        return Rs[y][x];
+        return Rs[y][x]/cr;
     }
-    int getG(point c, point p) override {
+    double getG(point c, point p) override {
         dir aux = c - p;
-        int x = (int)aux.x%width;
-        int y = (int)aux.y%height;
+        int x = (int)(aux.x*scale)%width;
+        int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
             x = (int)aux.x%width;
             y = (int)aux.z%height;
@@ -164,12 +170,12 @@ public:
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}
-        return Gs[y][x];
+        return Gs[y][x]/cr;
     }
-    int getB(point c, point p) override {
+    double getB(point c, point p) override {
         dir aux = c - p;
-        int x = (int)aux.x%width;
-        int y = (int)aux.y%height;
+        int x = (int)(aux.x*scale)%width;
+        int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
             x = (int)aux.x%width;
             y = (int)aux.z%height;
@@ -180,7 +186,7 @@ public:
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}
-        return Bs[y][x];
+        return Bs[y][x]/cr;
     }
 };
 #endif

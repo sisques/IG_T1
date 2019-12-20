@@ -63,7 +63,7 @@ private:
             bool colisiona = colision(p, e, i, fig, p2);
             if(colisiona && fig->isLight()){
 				double r,g,b;
-				fig->getRGB(EMISSION,r,g,b);
+				fig->getRGB(EMISSION,p2,r,g,b);
 				luz.x += r*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
 				luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
 				luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
@@ -98,7 +98,7 @@ public:
         double R_siguiente, G_siguiente, B_siguiente;
 
         if(colisiona && actualFig->isLight()){
-            actualFig->getRGB(EMISSION, R,G,B);
+            actualFig->getRGB(EMISSION,colP, R,G,B);
         }
         else if(event == DEATH){
             R = 0;
@@ -118,7 +118,7 @@ public:
 			
 			dir n = actualFig->getNormal(colP);
 			
-			if(/*!luzPuntual || luzPuntual &&*/ event != PHONG){
+			if(event != PHONG){
 				luz.x = R_siguiente * abs(dot(n,dirNewRay));
 				luz.y = G_siguiente * abs(dot(n,dirNewRay));
 				luz.z = B_siguiente * abs(dot(n,dirNewRay));
@@ -133,7 +133,7 @@ public:
 				actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
             }
             else{
-				actualFig->getRGB(event,R,G,B);
+				actualFig->getRGB(event,colP,R,G,B);
             }
 			
 			R = R*luz.x/p;
@@ -141,7 +141,7 @@ public:
 			B = B*luz.z/p;
         }
         else{
-            actualFig->getRGB(REFLEXION,R,G,B);
+            actualFig->getRGB(REFLEXION,colP,R,G,B);
         }
     }
 };
