@@ -86,6 +86,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/victor/gitRepos/IG_T1/CMakeLists.txt">
+			<Option target="IG_T1"/>
+		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/IG_T3/main.cpp">
 			<Option target="IG_T1"/>
 		</Unit>
@@ -95,10 +98,10 @@
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/camara.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/color.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h">
 			<Option target="IG_T1"/>
 		</Unit>
-		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/figuras.h">
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/globals.h">
 			<Option target="IG_T1"/>
 		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h">
@@ -126,6 +129,9 @@
 			<Option target="IG_T1"/>
 		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/russian_roulette.h">
+			<Option target="IG_T1"/>
+		</Unit>
+		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/scenes.h">
 			<Option target="IG_T1"/>
 		</Unit>
 		<Unit filename="/home/victor/gitRepos/IG_T1/bibliotecas/textures.h">

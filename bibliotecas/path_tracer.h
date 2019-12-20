@@ -13,10 +13,17 @@
 
 using namespace std;
 
-class pathTracer
-{
+class pathTracer{
 private:
-
+    /***
+     *
+     * @param c origen del rayo
+     * @param e lista de elementos
+     * @param rayo direccion de entrada
+     * @param fig devuelve la figura que colisionas con el rayo
+     * @param col devuelve el punto en el que colisiona el rayo con la figura
+     * @return devuelve cierto si colisiona con algo, sino devuelve falso
+     */
     bool colision(const point &c, const list<shared_ptr<figura>> &e, const dir &rayo, shared_ptr<figura> &fig, point &col){
         double t = 0;
         double distMin = numeric_limits<double>::max()-1;
@@ -43,6 +50,14 @@ private:
         return yes;
     }
 
+    /***
+     *
+     * @param e Lista de elementos que componen la escena
+     * @param luces Lista de puntos de luz de la escena
+     * @param n vector normal al punto
+     * @param p punto en el que se calcula la luz
+     * @return Devuelve la luz que recibe el punto p
+     */
     dir luzDirecta(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, dir n, point p){
         dir luz = newDir(0.0,0.0,0.0);
         list<point> puntosLuces;
@@ -80,6 +95,18 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
+    /***
+     * Deuvelve el color correspondiente al rayo de entrada
+     * @param c punto de origen del rayo
+     * @param e lista de figuras que componen la escena
+     * @param luces lista de luces puntuales
+     * @param rayo rayo de entrada
+     * @param R color R a devolver
+     * @param G color G a devolver
+     * @param B color B a devolver
+     * @param dist distancia viajada por el rayo
+     * @param luzPuntual indica si se usan luces puntuales o no
+     */
     void getRGB(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
                 const dir &rayo, double& R, double& G, double& B, double &dist, const bool &luzPuntual){
         shared_ptr<figura> actualFig = nullptr;

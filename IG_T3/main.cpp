@@ -75,7 +75,7 @@ int main(){
     */
     h = 128;
     w = 128;
-    rpp = 8;
+    rpp = 128;
     int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;

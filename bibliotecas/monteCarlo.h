@@ -104,16 +104,18 @@ public:
         Gt = pow(Gt / rays,0.25);
         Bt = pow(Bt / rays,0.25);
 
+
         R = Rt * CR;
         G = Gt * CR;
         B = Bt * CR;
-
         if (R < 0) { R = 0; }
-        else if (R > MAX) { R = MAX; }
+        else if (R > CR) { R = CR; }
         if (G < 0) { G = 0; }
-        else if (G > MAX) { G = MAX; }
+        else if (G > CR) { G = CR; }
         if (B < 0) { B = 0; }
-        else if (B > MAX) { B = MAX; }
+        else if (B > CR) { B = CR; }
+
+
     }
 };
 

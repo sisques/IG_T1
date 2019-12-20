@@ -10,6 +10,7 @@ include_directories(bibliotecas)
 add_executable(IG_T1
         bibliotecas/camara.h
         bibliotecas/figuras.h
+        bibliotecas/globals.h
         bibliotecas/materialProperties.h
         bibliotecas/matrix.h
         bibliotecas/monteCarlo.h
@@ -19,6 +20,8 @@ add_executable(IG_T1
         bibliotecas/ppm_reader.h
         bibliotecas/punto_direccion.h
         bibliotecas/russian_roulette.h
+        bibliotecas/scenes.h
         bibliotecas/textures.h
         bibliotecas/ToneMapping.h
-        IG_T3/main.cpp bibliotecas/color.h)
+        IG_T3/main.cpp
+        CMakeLists.txt)

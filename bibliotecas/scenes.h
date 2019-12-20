@@ -282,46 +282,46 @@ list <shared_ptr<figura>> scene_4(){
     materialProperties mp = materialProperties(false, eventos, wall);
     mp.setAlfa(0);
     materialProperties light = materialProperties(true, eventos, wall,1);
-    light.setKs(255,255,255);
+    light.setKs(1.0,1.0,1.0);
     materialProperties reflexion = materialProperties(false, eventos, reflection,1.33);
     //reflexion.setKd(0,0,0);
-    reflexion.setKs(255,255,255);
-    reflexion.setKdPhong(255,255,255);
-    reflexion.setKsPhong(255,255,255);
+    reflexion.setKs(1.0,1.0,1.0);
+    reflexion.setKdPhong(1.0,1.0,1.0);
+    reflexion.setKsPhong(1.0,1.0,1.0);
     reflexion.setAlfa(10);
     materialProperties refraccion = materialProperties(false, eventos, refraction,WATER);
-    refraccion.setKd(255,255,255);
-    refraccion.setKs(0,0,0);
-    refraccion.setKdPhong(0,0,0);
-    refraccion.setKsPhong(0,0,0);
+    refraccion.setKd(1.0,1.0,1.0);
+    refraccion.setKs(0.0,0.0,0.0);
+    refraccion.setKdPhong(0.0,0.0,0.0);
+    refraccion.setKsPhong(0.0,0.0,0.0);
 
 
     list<shared_ptr<figura>> elementos;
     shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0.49,0.5), light));
     //mp.setKd(120, 120, 120);
     //mp.setKs(120, 120, 120);
-    mp.setKdPhong(120, 120, 120);
-    mp.setKsPhong(120, 120, 120);
+    mp.setKdPhong(0.5, 0.5, 0.5);
+    mp.setKsPhong(0.5, 0.5, 0.5);
     shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
     shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
     shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),light));
     //mp.setKd(255,0,0);
     //mp.setKs(255,0,0);
-    mp.setKdPhong(255,0,0);
-    mp.setKsPhong(255,0,0);
+    mp.setKdPhong(1.0,0.0,0.0);
+    mp.setKsPhong(1.0,0.0,0.0);
     shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),mp));
     //mp.setKd(0,255,0);
     //mp.setKs(0,255,0);
-    mp.setKdPhong(0,255,0);
-    mp.setKsPhong(0,255,0);
+    mp.setKdPhong(0.0,1.0,0.0);
+    mp.setKsPhong(0.0,1.0,0.0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
     shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,0.0,0.5), 0.15, refraccion);
     shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
     shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
     shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
     shared_ptr<figura> ESFERAreflexion4 = make_shared<esfera>(newPoint(-0.3,-0.3,0.7), 0.2, reflexion);
-    mp.setKdPhong(0,0,255);
-    mp.setKsPhong(0,0,120);
+    mp.setKdPhong(0.0,0.0,1.0);
+    mp.setKsPhong(0.0,0.0,1.0);
     mp.setAlfa(4);
     shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.4,0.8), 0.1, mp);
     shared_ptr<figura> ESFERAphong2 = make_shared<esfera>(newPoint(0.3,0.2,0.9), 0.1, mp);
@@ -377,20 +377,20 @@ list<shared_ptr<figura>> scene_5 (){
     phong.setAlfa(1);
 
     materialProperties luz = materialProperties(true, eventos, wall,VACUUM);
-    luz.setKs(255,255,255);
+    luz.setKs(1,1,1);
 
     luz.setAlfa(10);
 
     materialProperties refraccion = materialProperties(false, eventos, refraction,GLASS);
 
-    refraccion.setKd(255,255,255);
-    refraccion.setKs(10,10,10);
-    refraccion.setKdPhong(255,255,255);
-    refraccion.setKsPhong(255,255,255);
+    refraccion.setKd(1,1,1);
+    refraccion.setKs(0.1,0.1,0.1);
+    refraccion.setKdPhong(1,1,1);
+    refraccion.setKsPhong(1,1,1);
 
     materialProperties reflexion = materialProperties(false, eventos, reflection,WATER);
 
-    reflexion.setKs(255,255,255);
+    reflexion.setKs(1,1,1);
 
 
 
@@ -401,8 +401,8 @@ list<shared_ptr<figura>> scene_5 (){
     shared_ptr<figura> puntoLuz_1 = make_shared<punto>(punto(newPoint(0,1,3), luz));
     shared_ptr<figura> puntoLuz_2 = make_shared<punto>(punto(newPoint(-2,-1,5), luz));
     shared_ptr<figura> puntoLuz_3 = make_shared<punto>(punto(newPoint(5,2,7), luz));
-    phong.setKdPhong(0,0,255);
-    phong.setKsPhong(0,0,255);
+    phong.setKdPhong(0,0,1);
+    phong.setKsPhong(0,0,1);
     shared_ptr<figura> TIERRA = make_shared<esfera>(newPoint(0,10,0), 2, luz);
 
 
