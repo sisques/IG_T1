@@ -47,7 +47,7 @@ private:
 		dir luz = newDir(0.0,0.0,0.0);
         list<point> puntosLuces;
         for(shared_ptr<figura> i:luces){
-			if(i->isPoint()){
+			if(i->IsPoint()){
 				for(point x:i->getLightPoints()){
 					puntosLuces.push_back(x);
 				}
@@ -118,7 +118,7 @@ public:
 			
 			dir n = actualFig->getNormal(colP);
 			
-			if(/!luzPuntual || luzPuntual &&*/ event != PHONG){
+			if(/*!luzPuntual || luzPuntual &&*/ event != PHONG){
 				luz.x = R_siguiente * abs(dot(n,dirNewRay));
 				luz.y = G_siguiente * abs(dot(n,dirNewRay));
 				luz.z = B_siguiente * abs(dot(n,dirNewRay));

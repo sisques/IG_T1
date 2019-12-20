@@ -21,9 +21,9 @@ protected:
     texture *texturizador;
     materialProperties mp;
     list<point> lightPoints;
+	bool isPoint = false;
 
 public:
-	bool isPoint = false;
     figura(materialProperties _mp){
         this -> mp = _mp;
         this->text = NO_TEXTURE;
@@ -66,6 +66,10 @@ public:
     bool isLight(){
         return mp.isLightSource();
     }
+	
+	bool IsPoint(){
+		return this->isPoint;
+	}
 
     double probEvent(event_enum e){
         return mp.probEvent(e);
@@ -244,7 +248,6 @@ public:
 				&& (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
     }
 	
-	bool isPoint(){return this->isPoint;}
 };
 
 class esfera : public figura {
