@@ -23,6 +23,7 @@ protected:
     list<point> lightPoints;
 
 public:
+	bool isPoint = false;
     figura(materialProperties _mp){
         this -> mp = _mp;
         this->text = NO_TEXTURE;
@@ -227,6 +228,7 @@ private:
     point c;
 public:
 	punto(point _c, materialProperties _mp): figura(_mp){
+		this->isPoint = true;
 		c = _c;
 		if(mp.isLightSource()){
             this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
@@ -241,6 +243,8 @@ public:
 				&& (d.y+EPSILON > rd.y &&  d.y-EPSILON < rd.y)
 				&& (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
     }
+	
+	bool isPoint(){return this->isPoint;}
 };
 
 class esfera : public figura {
