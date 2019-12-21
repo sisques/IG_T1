@@ -28,7 +28,7 @@ public:
         this -> mp = _mp;
         this->text = NO_TEXTURE;
         texturizador = nullptr;//new texture();
-        srand(0);
+        srand (time(NULL));
     }
 
     figura(texture_enum t, materialProperties _mp){
