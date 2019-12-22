@@ -329,12 +329,12 @@ public:
         this -> n = _n;
         if(mp.isLightSource()){
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
+            /*this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
             this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));*/
         }
     }
 

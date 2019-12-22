@@ -17,91 +17,61 @@ using namespace std;
 
 class photonMapper : public Renderer
 {
+private:
+
+	void generatePhotons(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
+				photonMap &pm, const dir &rayo,const double &R,const double &G,const double &B, const bool &luzPuntual){
+        shared_ptr<figura> actualFig = nullptr;
+        point colP = newPoint(0,0,0);
+        bool colisiona = colision(c,e,rayo,actualFig,colP);
+		event_enum event;
+        if(colisiona &&  (event = actualFig->evento()) != DEATH){
+			dir n = actualFig->getNormal(colP);
+			dir dirNewRay;
+			dirNewRay = actualFig->nextRay(event, rayo, colP);
+			
+			double R_act, G_act, B_act;
+			if(event == PHONG){
+				actualFig->phongColor(rayo,dirNewRay,colP,R_act,G_act,B_act);
+			}
+			else{
+				actualFig->getRGB(event,colP,R_act,G_act,B_act);
+			}
+			
+			R_act = R_act * R * abs(dot(n,dirNewRay));
+			G_act = G_act * G * abs(dot(n,dirNewRay));
+			B_act = B_act * B * abs(dot(n,dirNewRay));
+			
+			pm.addPhoton(colP,R_act,G_act,B_act);
+			
+			generatePhotons(colP,  e, luces, pm, dirNewRay, R_act, G_act, B_act, luzPuntual);
+        }
+    }
+
 public:
     photonMapper(){}
     ~photonMapper(){};
 
-	void generatePhotons(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
-				photonMap &pm, const dir &rayo, double& R, double& G, double& B, const bool &luzPuntual){
-        shared_ptr<figura> actualFig = nullptr;
-        point colP;
-        bool colisiona = colision(c,e,rayo,actualFig,colP);
-        event_enum event;
-        if(!colisiona){
-            event = DEATH;
-        }
-        else{
-            event = actualFig->evento();
-        }
-        double R_siguiente, G_siguiente, B_siguiente;
-
-        if(colisiona && actualFig->isLight()){
-            actualFig->getRGB(EMISSION,colP, R,G,B);
-			pm.addPhoton(colP,R,G,B);
-        }
-        else if(event == DEATH){
-            R = 0;
-            G = 0;
-            B = 0;
-        }
-        else if(event == REFRACTION || event == REFLEXION || event == PHONG){
-			dir luz = newDir(0.0,0.0,0.0);
-			if(luzPuntual){
-				luz =  luzDirecta(e, luces,actualFig->getNormal(colP),colP);
-			}
-            dir dirNewRay;
-            double p = 0.0;
-			dirNewRay = actualFig->nextRay(event, rayo, colP);
-			p = actualFig->probEvent(event);
-            generatePhotons(colP,  e, luces, pm, dirNewRay, R_siguiente, G_siguiente, B_siguiente, luzPuntual);
-			
-			dir n = actualFig->getNormal(colP);
-			
-			if(event != PHONG){
-				luz.x = R_siguiente * abs(dot(n,dirNewRay));
-				luz.y = G_siguiente * abs(dot(n,dirNewRay));
-				luz.z = B_siguiente * abs(dot(n,dirNewRay));
-			}
-			else{
-				luz.x = (luz.x + R_siguiente * abs(dot(n,dirNewRay)));
-				luz.y = (luz.y + G_siguiente * abs(dot(n,dirNewRay)));
-				luz.z = (luz.z + B_siguiente * abs(dot(n,dirNewRay)));
-			}
-			
-            if(event == PHONG){
-				actualFig->phongColor(rayo,dirNewRay,colP,R,G,B);
-            }
-            else{
-				actualFig->getRGB(event,colP,R,G,B);
-            }
-			
-			R = R*luz.x/p;
-			G = G*luz.y/p;
-			B = B*luz.z/p;
-			pm.addPhoton(colP,R,G,B);
-        }
-        else{
-            actualFig->getRGB(REFLEXION,colP,R,G,B);
-			pm.addPhoton(colP,R,G,B);
-        }
-    }
-
 	photonMap generatePhotonMap(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
 								const bool &luzPuntual){
 		photonMap pm;
-		list<point> puntosLuces;
+		double r,g,b;
+		list<pair<point,point>> puntosLuces;
 		for(shared_ptr<figura> i:luces){
 			for(point x:i->getLightPoints()){
-				puntosLuces.push_back(x);
+				i->getRGB(EMISSION,x,r,g,b);
+				puntosLuces.push_back(pair<point,point>(x,newPoint(r,g,b)));
 			}
 		}
-		int nRayos = 100000/puntosLuces.size();
+		int nRayos = 10/puntosLuces.size();
 		srand (time(NULL));
-		for(point pl:puntosLuces){
+		for(pair<point,point> pl:puntosLuces){
 			for(int i = 0; i < nRayos;++i){
-				double R,G,B;
-				dir rayo = newDir((double)rand() / RAND_MAX,(double)rand() / RAND_MAX,(double)rand() / RAND_MAX);
-				generatePhotons(pl, e, luces, pm, rayo, R, G, B, luzPuntual);
+				double rx = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+				double ry = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+				double rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+				dir rayo = newDir(rx,ry,rz);
+				generatePhotons(pl.first, e, luces, pm, rayo, pl.second.x, pl.second.y, pl.second.z, luzPuntual);
 			}
         }
 		return pm;
@@ -113,7 +83,6 @@ public:
 		shared_ptr<figura> actualFig = nullptr;
 		point colP;
 		bool colisiona = colision(c,e,rayo,actualFig,colP);
-		event_enum event;
 		if(!colisiona){
 			R = 0;
 			G = 0;

@@ -8,6 +8,8 @@
 #include <memory>
 #include <limits>
 #include "path_tracer.h"
+#include "photonMap.h"
+#include "photonMapper.h"
 
 using namespace std;
 
@@ -18,6 +20,9 @@ private:
     int height, wide, rays;
 	double gamma;
     pathTracer pT;
+	photonMap photonM;
+	bool photon = false;
+	photonMapper pM;
 
     double cFunc(const double v, const double min, const double max){
         return (max-min)*v + min;
@@ -25,32 +30,8 @@ private:
 
 public:
     monteCarlo(camara c, int h, int w, int r, double g):cam(c),height(h),wide(w),rays(r),gamma(g){}
+	monteCarlo(camara c, int h, int w, int r, double g, photonMap p):cam(c),height(h),wide(w),rays(r),gamma(g),photonM(p),photon(true){}
     ~monteCarlo(){};
-
-
-    void getRGB(point c, const list<shared_ptr<figura>> &e,  dir rayo, double& R, double& G, double& B){
-        double t = 0;
-        double distMin = numeric_limits<double>::max();
-        double distActual = 0;
-        bool colision;
-        shared_ptr<figura> nearest;
-        point colP;
-        for( auto it = e.begin(); it != e.end(); ++it){
-            shared_ptr<figura> f = *it;
-            colision = f->intersection(rayo, c, t);
-            if (colision) {
-                point p = c + rayo * t;
-                distActual = mod(c - p);
-                if (distActual < distMin ) {
-                    nearest = f;
-                    distMin = distActual;
-                    colP = p;
-                }
-            }
-
-        }
-        nearest->getRGB(REFLEXION,colP,R,G,B);
-    }
 
 	list<shared_ptr<figura>> getLuces(const list<shared_ptr<figura>> &e){
         list<shared_ptr<figura>> luces;
@@ -63,7 +44,7 @@ public:
     }
 
     void rtx(const list<shared_ptr<figura>> &e, const int &x, const int &y, int& R, int& G, int& B,
-			const bool &luzPuntual, const bool &basic){
+			const bool &luzPuntual){
 		list<shared_ptr<figura>> luces = getLuces(e);
         int cX = y - (height/2);
         int cY = (wide/2) - x;
@@ -90,10 +71,10 @@ public:
         for(int i = 0; i < rays; ++i){
             dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 
-            if (!basic) {
+            if (!photon) {
 				pT.getRGB(cam.o, e, luces, rayo, r, g, b, luzPuntual);
             } else {
-                this->getRGB(cam.o, e, rayo, r, g, b);
+                pM.getRGB(cam.o, e, photonM,rayo, r, g, b);
             }
             Rt += r;
             Gt += g;
