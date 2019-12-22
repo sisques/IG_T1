@@ -91,8 +91,7 @@ public:
             dir rayo = normalize(newDir(Xs[i],Ys[i],1));
 
             if (!basic) {
-				double dist = 0.0;
-                pT.getRGB(cam.o, e, luces, rayo, r, g, b, dist, luzPuntual);
+				pT.getRGB(cam.o, e, luces, rayo, r, g, b, luzPuntual);
             } else {
                 this->getRGB(cam.o, e, rayo, r, g, b);
             }
