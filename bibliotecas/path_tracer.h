@@ -13,10 +13,17 @@
 
 using namespace std;
 
-class pathTracer
-{
+class pathTracer{
 private:
-
+    /***
+     *
+     * @param c origen del rayo
+     * @param e lista de elementos
+     * @param rayo direccion de entrada
+     * @param fig devuelve la figura que colisionas con el rayo
+     * @param col devuelve el punto en el que colisiona el rayo con la figura
+     * @return devuelve cierto si colisiona con algo, sino devuelve falso
+     */
     bool colision(const point &c, const list<shared_ptr<figura>> &e, const dir &rayo, shared_ptr<figura> &fig, point &col){
         double t = 0;
         double distMin = numeric_limits<double>::max()-1;
@@ -43,6 +50,14 @@ private:
         return yes;
     }
 
+    /***
+     *
+     * @param e Lista de elementos que componen la escena
+     * @param luces Lista de puntos de luz de la escena
+     * @param n vector normal al punto
+     * @param p punto en el que se calcula la luz
+     * @return Devuelve la luz que recibe el punto p
+     */
     dir luzDirecta(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, dir n, point p){
         dir luz = newDir(0.0,0.0,0.0);
         list<point> puntosLuces;
@@ -55,7 +70,6 @@ private:
         for(point d:puntosLuces){
             rayos.push_back(d-p);
         }
-        int l = 0;
         for(dir i:rayos){
             shared_ptr<figura> fig;
             point p2;
@@ -66,12 +80,14 @@ private:
                 luz.x += r*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
                 luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
                 luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*2,2.0);
-                ++l;
             }
         }
         luz.x /= rayos.size();
         luz.y /= rayos.size();
         luz.z /= rayos.size();
+        if (luz.x > 1) { luz.x = 1; }
+        if (luz.y > 1) { luz.y = 1; }
+        if (luz.z > 1) { luz.z = 1; }
         return luz;
     }
 
@@ -79,6 +95,18 @@ public:
     pathTracer(){}
     ~pathTracer(){};
 
+    /***
+     * Deuvelve el color correspondiente al rayo de entrada
+     * @param c punto de origen del rayo
+     * @param e lista de figuras que componen la escena
+     * @param luces lista de luces puntuales
+     * @param rayo rayo de entrada
+     * @param R color R a devolver
+     * @param G color G a devolver
+     * @param B color B a devolver
+     * @param dist distancia viajada por el rayo
+     * @param luzPuntual indica si se usan luces puntuales o no
+     */
     void getRGB(const point &c, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
                 const dir &rayo, double& R, double& G, double& B, double &dist, const bool &luzPuntual){
         shared_ptr<figura> actualFig = nullptr;
@@ -108,7 +136,6 @@ public:
                 luz =  luzDirecta(e, luces,actualFig->getNormal(colP),colP);
             }
             dir dirNewRay;
-            point nextPoint;
             double p = 0.0;
             dirNewRay = actualFig->nextRay(event, rayo, colP);
             p = actualFig->probEvent(event);
@@ -116,7 +143,7 @@ public:
 
             dir n = actualFig->getNormal(colP);
 
-            if(luz.x == 0 && luz.y == 0 && luz.z == 0 || event != PHONG){
+            if((luz.x == 0 && luz.y == 0 && luz.z == 0) || event != PHONG){
                 luz.x = R_siguiente * abs(dot(n,dirNewRay));
                 luz.y = G_siguiente * abs(dot(n,dirNewRay));
                 luz.z = B_siguiente * abs(dot(n,dirNewRay));

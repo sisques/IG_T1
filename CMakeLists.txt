@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 project(IG_T1)
 
 #set(CMAKE_CXX_FLAGS_DEBUG  "-O1 -std=c++11 -pthread")
-set(CMAKE_CXX_FLAGS_RELEASE  "-O1 -std=c++11 -pthread")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+#set(CMAKE_CXX_FLAGS_RELEASE  "-O1 -std=c++11 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
 include_directories(bibliotecas)
 
 add_executable(IG_T1
         bibliotecas/camara.h
         bibliotecas/figuras.h
+        bibliotecas/globals.h
         bibliotecas/materialProperties.h
         bibliotecas/matrix.h
         bibliotecas/monteCarlo.h
@@ -19,6 +20,8 @@ add_executable(IG_T1
         bibliotecas/ppm_reader.h
         bibliotecas/punto_direccion.h
         bibliotecas/russian_roulette.h
+        bibliotecas/scenes.h
         bibliotecas/textures.h
         bibliotecas/ToneMapping.h
-        IG_T3/main.cpp)
+        IG_T3/main.cpp
+        CMakeLists.txt)

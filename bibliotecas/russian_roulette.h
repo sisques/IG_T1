@@ -20,24 +20,25 @@ private:
     double probs[4];
 
 public:
-    russianRoulette(){};
+    russianRoulette() = default;
+    ~russianRoulette() = default;
     russianRoulette(event_enum _eventos[], double _probs[]){
         srand(static_cast<unsigned int>(clock()));
         double totalP = 0.0;
-        for(int i = 0; i < nE; ++i){
-            eventos[i] = _eventos[i];
-            probs[i] = _probs[i];
+        for(int i = 0; i < this->nE; ++i){
+            this->eventos[i] = _eventos[i];
+            this->probs[i] = _probs[i];
             totalP += _probs[i];
         }
-        for(int i = 0; i < nE; ++i){
-            probs[i] = 0.9*probs[i]/totalP;
+        for(int i = 0; i < this->nE; ++i){
+            this->probs[i] = 0.9*probs[i]/totalP;
         }
-        probs[nE] = 0.1;
-        eventos[nE] = DEATH;
+
+        this->probs[nE-1] = 0.1;
+        this->eventos[nE-1] = DEATH;
     }
 
 
-    ~russianRoulette(){}
 
     event_enum event(){
         double k = (double)rand() / RAND_MAX;
