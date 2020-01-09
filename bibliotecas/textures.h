@@ -145,12 +145,12 @@ public:
         int x = (int)(aux.x*scale)%width;
         int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
-            x = (int)aux.x%width;
-            y = (int)aux.z%height;
+            x = (int)(aux.x*scale)%width;
+            y = (int)(aux.z*scale)%height;
         }
         else if(n.y == 0 && n.z == 0){
-            x = (int)aux.z%width;
-            y = (int)aux.y%height;
+            x = (int)(aux.z*scale)%width;
+            y = (int)(aux.y*scale)%height;
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}
@@ -161,12 +161,12 @@ public:
         int x = (int)(aux.x*scale)%width;
         int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
-            x = (int)aux.x%width;
-            y = (int)aux.z%height;
+            x = (int)(aux.x*scale)%width;
+            y = (int)(aux.z*scale)%height;
         }
         else if(n.y == 0 && n.z == 0){
-            x = (int)aux.z%width;
-            y = (int)aux.y%height;
+            x = (int)(aux.z*scale)%width;
+            y = (int)(aux.y*scale)%height;
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}
@@ -177,12 +177,12 @@ public:
         int x = (int)(aux.x*scale)%width;
         int y = (int)(aux.y*scale)%height;
         if(n.x == 0 && n.z == 0){
-            x = (int)aux.x%width;
-            y = (int)aux.z%height;
+            x = (int)(aux.x*scale)%width;
+            y = (int)(aux.z*scale)%height;
         }
         else if(n.y == 0 && n.z == 0){
-            x = (int)aux.z%width;
-            y = (int)aux.y%height;
+            x = (int)(aux.z*scale)%width;
+            y = (int)(aux.y*scale)%height;
         }
         if(x < 0){x = width + x;}
         if(y < 0){y = height + y;}

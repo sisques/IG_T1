@@ -20,7 +20,7 @@ private:
     int height, wide, rays;
 	double gamma;
     pathTracer pT;
-	photonMap photonM;
+	photonMap photonM, photonMC;
 	bool photon = false;
 	photonMapper pM;
 
@@ -30,7 +30,7 @@ private:
 
 public:
     monteCarlo(camara c, int h, int w, int r, double g):cam(c),height(h),wide(w),rays(r),gamma(g){}
-	monteCarlo(camara c, int h, int w, int r, double g, photonMap p):cam(c),height(h),wide(w),rays(r),gamma(g),photonM(p),photon(true){}
+	monteCarlo(camara c, int h, int w, int r, double g, photonMap p, photonMap pc):cam(c),height(h),wide(w),rays(r),gamma(g),photonM(p), photonMC(pc),photon(true){}
     ~monteCarlo(){};
 
 	list<shared_ptr<figura>> getLuces(const list<shared_ptr<figura>> &e){
@@ -74,7 +74,7 @@ public:
             if (!photon) {
 				pT.getRGB(cam.o, e, luces, rayo, r, g, b, luzPuntual);
             } else {
-                pM.getRGB(cam.o, e, photonM,rayo, r, g, b);
+                pM.getRGB(cam.o, e, photonM, photonMC, rayo, r, g, b);
             }
             Rt += r;
             Gt += g;

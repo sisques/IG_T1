@@ -24,6 +24,7 @@ public:
         shared_ptr<figura> actualFig = nullptr;
         point colP;
         bool colisiona = colision(c,e,rayo,actualFig,colP);
+		
         event_enum event;
         if(!colisiona){
             event = DEATH;

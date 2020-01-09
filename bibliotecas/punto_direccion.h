@@ -19,6 +19,16 @@ struct dir {
 		double w;
 };
 
+
+    point newPoint(double _x, double _y, double _z, double _w) {
+        point p;
+        p.x = _x;
+        p.y = _y;
+        p.z = _z;
+        p.w = _w;
+        return p;
+    }
+
 	point newPoint(double _x, double _y, double _z) {
 		point p;
 		p.x = _x;
@@ -43,20 +53,24 @@ struct dir {
 	}   
 	 
 	dir operator -(point p, point q)         {     
-		return newDir(p.x - q.x, p.y - q.y, p.z - q.z);   
+		return newDir(p.x - q.x, p.y - q.y, p.z - q.z);
 	} 
 
 	point operator +(point p, dir q)         {     
-		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);     
+		return newPoint(p.x + q.x, p.y + q.y, p.z + q.z);
 	}
 
     point operator -(point p, dir q)         {
 	    return newPoint(p.x - q.x, p.y - q.y, p.z - q.z);
     }
 
+    bool operator ==(point p, point q)         {
+        return p.x == q.x && p.y == q.y && p.z == q.z;
+    }
 
 
-	dir operator +(dir p, dir q)         {     
+
+    dir operator +(dir p, dir q)         {
 		return newDir(p.x + q.x, p.y + q.y, p.z + q.z);     
 	}   
 
@@ -74,7 +88,7 @@ struct dir {
 
     dir operator *( dir p, double q)         {
     return newDir(q*p.x, q*p.y, q*p.z);
-}
+    }
 
     dir operator /(dir p, double q)         {
 		return newDir(p.x/q, p.y/q, p.z/q);     

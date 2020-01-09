@@ -32,8 +32,8 @@ public:
 		for(int i = 0; i < nE; ++i){
             probs[i] = 0.9*probs[i]/totalP;
         }
-        probs[nE] = 0.1;
-        eventos[nE] = DEATH;
+        probs[nE-1] = 0.1;
+        eventos[nE-1] = DEATH;
     }
 
 

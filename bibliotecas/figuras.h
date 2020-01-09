@@ -28,7 +28,7 @@ public:
         this -> mp = _mp;
         this->text = NO_TEXTURE;
         texturizador = nullptr;//new texture();
-        srand (time(NULL));
+        srand(static_cast<unsigned int>(clock()));
     }
 
     figura(texture_enum t, materialProperties _mp){
@@ -44,7 +44,7 @@ public:
         else{//textures.flatColor
             texturizador = new texture();
         }
-		srand (time(NULL));
+		srand(static_cast<unsigned int>(clock()));
     }
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
@@ -56,7 +56,7 @@ public:
         else {
             texturizador = new texture();
         }
-		srand (time(NULL));
+		srand(static_cast<unsigned int>(clock()));
     }
 
     event_enum evento(){
@@ -161,9 +161,9 @@ public:
         }
     }
 	
-	dir phongDir(dir outdir, dir n, double specexp) {
+	dir phongDir(dir indir, dir n, double reflect) {
 		Matrix mat;
-		dir ldir = normalize(outdir);
+		dir ldir = normalize(indir);
 
 		dir ref = reflexion(ldir, n, newPoint(0,0,0));
 
@@ -172,7 +172,6 @@ public:
 		if(1.0 - ndotl > EPSILON) {
 			dir ivec, kvec, jvec;
 
-			// build orthonormal basis
 			if(fabs(ndotl) < EPSILON) {
 				kvec = -normalize(ldir);
 				jvec = n;
@@ -189,13 +188,14 @@ public:
 		double rnd1 = (double)rand() / RAND_MAX;
 		double rnd2 = (double)rand() / RAND_MAX;
 
-		double phi = acos(pow(rnd1, 1.0 / (specexp + 1.0)));
+		double phi = acos(pow(rnd1, 1.0 / (reflect + 1.0)));
 		double theta = 2.0 * M_PI * rnd2;
 		
 		dir v;
 		v.x = cos(theta) * sin(phi);
 		v.y = cos(phi);
 		v.z = sin(theta) * sin(phi);
+		
 		v = mat*v;
 
 		return v;
@@ -218,6 +218,8 @@ public:
             return normal;
         }
     }
+	
+	virtual void getLightRay(point &p, dir &d) {}
 };
 
 class punto : public figura {
@@ -241,6 +243,17 @@ public:
 				&& (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
     }
 	
+	void getLightRay(point &p, dir &d) override{
+		double rx,ry,rz;
+		do{
+			rx = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			ry = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+		}while(rx*rx + ry*ry+ rz*rz > 1.0);
+		dir rayo = newDir(rx,ry,rz);
+		d = rayo;
+		p = c;
+	}
 };
 
 class esfera : public figura {
@@ -275,6 +288,7 @@ public:
             this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
         }
     }
+	
 	
     point getCenter(){ return this->c;}
     double getRadius(){ return this->r;}
@@ -317,6 +331,20 @@ public:
     dir getNormal(point p) override {
         return normalize(p - this -> getCenter());
     }
+	
+	void getLightRay(point &p, dir &d) override{
+		double rx,ry,rz;
+		do{
+			rx = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			ry = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+		}while(rx*rx + ry*ry+ rz*rz > 1.0);
+		dir rayo = newDir(rx,ry,rz);
+		d = rayo;
+		double t;
+		intersection(d, c, t);
+		p = c + rayo * (t+0.0001);
+	}
 };
 
 class plano : public figura {
@@ -420,6 +448,17 @@ public:
 		else{
 			figura::getRGB(e,p,r,g,b);
 		}
+	}
+	
+	void getLightRay(point &pl, dir &d) override{
+		double rx,ry,rz;
+		rx = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		ry = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		rz = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		pl.x *= rx; pl.y *= ry; pl.z *= rz;
+		double u = (double)rand() / (double)RAND_MAX;
+		double v = (double)rand() / (double)RAND_MAX;
+		d = newDir(2.0f*cos(v)*sqrt(u)-1,2.0f*sin(v)*sqrt(u)-1, 2.0f*sqrt(1-u)-1);
 	}
 };
 
