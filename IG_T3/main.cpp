@@ -56,25 +56,29 @@ list<shared_ptr<figura>> setUpScene(){
 	//mp.setKs(120, 120, 120);
 	mp.setKdPhong(170, 170, 170);
 	mp.setKsPhong(120, 120, 120);
-    //shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm", mp));
-	shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
-	//fondo->setScale(400);
-    //shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm",mp));
-	shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
-	//suelo->setScale(400);
+    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm", mp));
+	//shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), mp));
+	fondo->setScale(400);
+    shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm",mp));
+	//shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
+	suelo->setScale(400);
     shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),mp));
     //mp.setKd(255,0,0);
 	//mp.setKs(255,0,0);
 	mp.setKdPhong(255,0,0);
 	mp.setKsPhong(120,0,0);
-    shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0), mp));
+	shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm", mp));
+	izquierda->setScale(400);
+    //shared_ptr<figura> izquierda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0), mp));
     //mp.setKd(0,255,0);
 	//mp.setKs(0,255,0);
 	mp.setKdPhong(0,255,0);
 	mp.setKsPhong(0,120,0);
-    shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
+	shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm", mp));
+	derecha->setScale(400);
+    //shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
 	//derecha->setScale(2.5);
-    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,-0.3,0.5), 0.15, refraccion);
+    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0.0,-0.3,0.75), 0.15, refraccion);
     shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
@@ -103,8 +107,8 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
     //elementos.push_back(ESFERArefraccion);
-    /*elementos.push_back(ESFERAreflexion);
-	elementos.push_back(ESFERAreflexion2);
+    elementos.push_back(ESFERAreflexion);
+	/*elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
 	elementos.push_back(ESFERAreflexion4);
 	elementos.push_back(ESFERAphong);
@@ -121,6 +125,8 @@ list<shared_ptr<figura>> setUpScene(){
 	//limit.setKs(0,0,0);
 	limit.setKdPhong(0,0,0);
 	limit.setKsPhong(0,0,0);
+	mp.setKdPhong(1,1,1);
+	mp.setKsPhong(1,1,1);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,1), mp));
 
 	elementos.push_back(limite);
@@ -181,15 +187,15 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-	bool luzPuntual = false;
-	bool photon = true;
-	photonMap pm;
+	bool luzPuntual = true;
+	bool photOn = true;
+	photonMap pm, pmC;
 	
 	double gamma = 0.25;
-    h = 100;
-    w = 100;
-    rpp = 1;
-    int threads = 1;
+    h = 350;
+    w = 350;
+    rpp = 5;
+    int threads = 10;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -201,14 +207,20 @@ int main(){
 	
 	thread th[threads];
 	int hMin = 0, hMax = - 1 + h/threads;
+	
+	monteCarlo mc(c,h,w,rpp, gamma);
+	photonMapper aux;
+	if(photOn){
+		aux.generatePhotonMap(pm, pmC, e,mc.getLuces(e),luzPuntual);
+		//pm.generateTree();
+		cout << "Se ha generado el photon map";
+	}
+	
 	for(int i = 0; i < threads;++i){
 		camara c2 = c;
-		monteCarlo mc(c2,h,w,rpp, gamma);
-		if(photon){
-			photonMapper aux;
-			pm = aux.generatePhotonMap(e,mc.getLuces(e),luzPuntual);
-			pm.imprimir();
-			mc = monteCarlo(c2,h,w,rpp, gamma, pm);
+		mc = monteCarlo(c2,h,w,rpp, gamma);
+		if(photOn){
+			mc = monteCarlo(c2,h,w,rpp, gamma, pm, pmC);
 		}
 		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w, h, luzPuntual);
