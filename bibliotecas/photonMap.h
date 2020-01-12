@@ -27,6 +27,8 @@ public:
 	
 	void generateTree(){
 		tree = new kdtree(photonList);
+		photones.clear();
+		photonList.clear();
 	}
 	
 	void getColorAt2(const point &p, double &r, double &g, double &b){
@@ -72,49 +74,52 @@ public:
 		b /= maximos.size();
 	}
 	
+	double gaussianFilter(double d, double r){
+		double denAux = pow(2.7182818,-1.953);
+		double exp = -1.953*d*d/(2*r*r);
+		double numAux = pow(7182818,exp);
+		return 0.918*(1-((1-numAux)/(1-denAux)));
+	}
+	
 	void getColorAt(const point &p, double &r, double &g, double &b){
 		double dist1 = 99999999,dist2 = 99999999,dist3 = 99999999,dist4 = 99999999,dist5 = 99999999;
-		double r1 = 0, g1 = 0, b1 = 0;
-		double r2 = 0, g2 = 0, b2 = 0;
-		double r3 = 0, g3 = 0, b3 = 0;
-		double r4 = 0, g4 = 0, b4 = 0;
-		double r5 = 0, g5 = 0, b5 = 0;
+		photon p1,p2,p3,p4,p5;
 		for(pair<point,photon> i:photones){
 			if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist1 && dist2 != 99999999 && dist3 != 99999999 && dist4 != 99999999 && dist5 != 99999999){
-				r1 = i.second.R;
-				g1 = i.second.G;
-				b1 = i.second.B;
+				p1 = i.second;
 				dist1 = mod(p-i.first);
 			}
 			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist2 && dist3 != 99999999 && dist4 != 99999999 && dist5 != 99999999){
-				r2 = i.second.R;
-				g2 = i.second.G;
-				b2 = i.second.B;
+				p2 = i.second;
 				dist2 = mod(p-i.first);
 			}
 			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist3 && dist4 != 99999999 && dist5 != 99999999){
-				r3 = i.second.R;
-				g3 = i.second.G;
-				b3 = i.second.B;
+				p3 = i.second;
 				dist3 = mod(p-i.first);
 			}
 			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist4 && dist5 != 99999999){
-				r4 = i.second.R;
-				g4 = i.second.G;
-				b4 = i.second.B;
+				p4 = i.second;
 				dist4 = mod(p-i.first);
 			}
 			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist5){
-				r5 = i.second.R;
-				g5 = i.second.G;
-				b5 = i.second.B;
+				p5 = i.second;
 				dist5 = mod(p-i.first);
 			}
 		}
 		double maxD = max(max(max(max(dist1,dist2),dist3),dist4),dist5);
-		r = (r1/(dist1/maxD) + r2/(dist2/maxD) + r3/(dist3/maxD) + r4/(dist4/maxD) + r5/(dist5/maxD))/5;
-		g = (g1/(dist1/maxD) + g2/(dist2/maxD) + g3/(dist3/maxD) + g4/(dist4/maxD) + g5/(dist5/maxD))/5;
-		b = (b1/(dist1/maxD) + b2/(dist2/maxD) + b3/(dist3/maxD) + b4/(dist4/maxD) + b5/(dist5/maxD))/5;
+		r = (p1.flow*p1.R*(1-dist1/maxD) + p2.flow*p2.R*(1-dist2/maxD) + p3.flow*p3.R*(1-dist3/maxD) + p4.flow*p4.R*(1-dist4/maxD) + p5.flow*p5.R*(1-dist5/maxD));
+		g = (p1.flow*p1.G*(1-dist1/maxD) + p2.flow*p2.G*(1-dist2/maxD) + p3.flow*p3.G*(1-dist3/maxD) + p4.flow*p4.G*(1-dist4/maxD) + p5.flow*p5.G*(1-dist5/maxD));
+		b = (p1.flow*p1.B*(1-dist1/maxD) + p2.flow*p2.B*(1-dist2/maxD) + p3.flow*p3.B*(1-dist3/maxD) + p4.flow*p4.B*(1-dist4/maxD) + p5.flow*p5.B*(1-dist5/maxD));
+		
+		//r = (p1.flow*p1.R*gaussianFilter(dist1,maxD) + p2.flow*p2.R*gaussianFilter(dist1,maxD) + p3.flow*p3.R*gaussianFilter(dist1,maxD) + p4.flow*p4.R*gaussianFilter(dist1,maxD) + p5.flow*p5.R*gaussianFilter(dist1,maxD));
+		//g = (p1.flow*p1.G*gaussianFilter(dist1,maxD) + p2.flow*p2.G*gaussianFilter(dist1,maxD) + p3.flow*p3.G*gaussianFilter(dist1,maxD) + p4.flow*p4.G*gaussianFilter(dist1,maxD) + p5.flow*p5.G*gaussianFilter(dist1,maxD));
+		//b = (p1.flow*p1.B*gaussianFilter(dist1,maxD) + p2.flow*p2.B*gaussianFilter(dist1,maxD) + p3.flow*p3.B*gaussianFilter(dist1,maxD) + p4.flow*p4.B*gaussianFilter(dist1,maxD) + p5.flow*p5.B*gaussianFilter(dist1,maxD));
+		
+		double A = M_PI*maxD*maxD;
+		double k = 1.0;
+		r = r/((1-2/(3*k))*A);
+		g = g/((1-2/(3*k))*A);
+		b = b/((1-2/(3*k))*A);
 		if(max(r, max(g,b)) > 1){
 			r = r/max(r, max(g,b));
 			g = g/max(r, max(g,b));

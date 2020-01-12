@@ -13,9 +13,12 @@ const int N = 512;
 
 using namespace std;
 
+// Fuente: https://github.com/sol-prog/Perlin_Noise/blob/master/PerlinNoise.cpp
+// Clase para el cálculo del ruido de perlin
 class perlinNoise{
 private:
-
+	
+	// Vector de valores permutados
     int p[N];
 
     double fade(double t){
@@ -33,6 +36,7 @@ private:
     }
 
 public:
+	// Contructor que genera el vector de permutados de forma aleatoria
     perlinNoise(){
         for(int i = 0; i < N/2; ++i) {
             p[i] = i;

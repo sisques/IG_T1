@@ -11,6 +11,9 @@
 
 using namespace std;
 
+	// Función para leer una imagen en formato ppm y transformarla
+	// en una lista de "pixeles" representado por un vector de dimensión 3
+	// El primero "pixel" contiene la altura y anchura de la imagen
 	list<int*> ppmReader(const string fileIn) {
 		list<int*> ouput;
 		fstream flujoIn;

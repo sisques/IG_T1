@@ -314,17 +314,6 @@ public:
         }
     }
 
-    /*double getR(point pp) override {
-        return figura::getR(pp);
-    }
-    double getG(point pp) override {
-        return figura::getG(pp);
-    }
-    double getB(point pp) override {
-        return figura::getB(pp);
-    }*/
-
-
     dir getNormal() override {
         return newDir(0,0,0);
     }
@@ -457,7 +446,7 @@ public:
 		rz = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
 		pl.x *= rx; pl.y *= ry; pl.z *= rz;
 		double u = (double)rand() / (double)RAND_MAX;
-		double v = (double)rand() / (double)RAND_MAX;
+		double v = 2*M_PI*(double)rand() / (double)RAND_MAX;
 		d = newDir(2.0f*cos(v)*sqrt(u)-1,2.0f*sin(v)*sqrt(u)-1, 2.0f*sqrt(1-u)-1);
 	}
 };
