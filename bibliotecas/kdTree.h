@@ -46,12 +46,11 @@ private:
         explicit node(const photon& pt) : pto(pt), left_(nullptr), right_(nullptr){}
 
         //Obtiene el valor de la dimension indicada como parametro
-        double get(int index) const{return getDimension(index,pto.p);}
+        double get(int dimension) const{return getDimension(dimension,pto.p);}
 
         //Devuelve la diustancia entre el punto de este nodo y el pasado
         //por parametro
-        double distance(const photon& pt) const{return dist(pt.p, pto.p);}
-
+        double distance(const point& pt) const{return dist(pt, pto.p);}
     };
 
     std::shared_ptr<node> raiz;
@@ -59,64 +58,171 @@ private:
     double mejorDist;
     int nodosVisitados;
     int dimensiones = 3;
-    std::vector<node> nodos;
 
     // Comparador de nodos (utilizado para la ordenacion)
     struct node_cmp{
-        int index_;
-        explicit node_cmp(int index) : index_(index){}
+        int dimension;
+        explicit node_cmp(int _dimension) : dimension(_dimension){}
         bool operator()(const node& n1, const node& n2) const{
-            return getDimension(index_,n1.pto.p) <  getDimension(index_, n2.pto.p);
+            return getDimension(dimension,n1.pto.p) <  getDimension(dimension, n2.pto.p);
         }
     };
 
-    // Crea un arbol dados 2 indices y la profundidad actual
-    std::shared_ptr<node> make_tree(int begin, int end, int index)    {
-        if (end <= begin){
-            return nullptr;
+
+
+    std::shared_ptr<node> insert(std::shared_ptr<node> nodoActual, photon p, int depth) {
+        if(nodoActual == nullptr){
+            return make_shared<node>(node(p));
         }
-        size_t n = begin + (end - begin)/2;
-        std::nth_element(&nodos[begin], &nodos[n], &nodos[end], node_cmp(index));
-        index = (index + 1) % dimensiones;
-        nodos[n].left_ = make_tree(begin, n, index);
-        nodos[n].right_ = make_tree(n + 1, end, index);
-        return std::make_shared<node> (nodos[n]);
+
+        int cd = depth % dimensiones;
+
+        double aux1 = getDimension(cd, p.p);
+        double aux2 = getDimension(cd, nodoActual->pto.p);
+
+        if( aux1 < aux2){
+            nodoActual->left_ = insert(nodoActual->left_, p, depth+1);
+        } else {
+            nodoActual->right_ = insert(nodoActual->right_, p, depth+1);
+        }
+        return nodoActual;
     }
 
-    //Calcula el punto mas cercano al pasado como parametro
-    void cercano(const std::shared_ptr<node>& root, const photon& nuevo, size_t index) {
-        if (root == nullptr) {
+    std::shared_ptr<node> insert(std::shared_ptr<node> raiz, photon p){
+        return insert(raiz, p, 0);
+    }
+
+    //Calcula el punto mas cercano al pasado como parametro mediante recursion
+    void cercano(const std::shared_ptr<node>& nodoActual, const point& nuevo, int dimension) {
+        if (nodoActual == nullptr) {
             return;
         }
         ++nodosVisitados;
-        double d = root->distance(nuevo);
+        double d = nodoActual->distance(nuevo);
         if (mejorNodo == nullptr || d < mejorDist) {
             mejorDist = d;
-            mejorNodo = root;
+            mejorNodo = nodoActual;
         }
         if (mejorDist == 0){
             return;
         }
-        double dx = root->get(index) - getDimension(index, nuevo.p);
-        index = (index + 1) % dimensiones;
-        cercano(dx > 0 ? root->left_ : root->right_, nuevo, index);
+        int cd = dimension%dimensiones;
+        double dx = nodoActual->get(cd) - getDimension(cd, nuevo);
+
+        cercano(dx > 0 ? nodoActual->left_ : nodoActual->right_, nuevo, dimension + 1);
         if (dx * dx >= mejorDist) {
             return;
         }
-        cercano(dx > 0 ? root->right_ : root->left_, nuevo, index);
+        cercano(dx > 0 ? nodoActual->right_ : nodoActual->left_, nuevo, dimension + 1);
     }
+
+    //Calcula el punto mas cercano al pasado como parametro
+    void cercano(const point& nuevo) {
+        cercano(this->raiz, nuevo, 0);
+    }
+
+
+
+
+    std::shared_ptr<node> minimo(std::shared_ptr<node> x, std::shared_ptr<node> y, std::shared_ptr<node> z, int d){
+        std::shared_ptr<node> resul = x;
+
+        if(y != nullptr && getDimension(d, y->pto.p) < getDimension(d,resul->pto.p)){
+            resul = y;
+        }
+        if(z != nullptr && getDimension(d, z->pto.p) < getDimension(d,resul->pto.p)){
+            resul = z;
+        }
+        return resul;
+    }
+
+    std::shared_ptr<node> minimo(std::shared_ptr<node> nodoActual, int d, int depth){
+        if(nodoActual == nullptr){
+            return nullptr;
+        }
+        int cd = depth%dimensiones;
+
+        if(cd == d){
+            if(nodoActual->left_ == nullptr){
+                return nodoActual;
+            }
+            return minimo(nodoActual->left_, d, depth + 1);
+        }
+
+        return minimo(nodoActual,
+                      minimo(nodoActual->left_, d, depth + 1),
+                      minimo(nodoActual->right_, d, depth + 1),
+                      d);
+
+    }
+
+    std::shared_ptr<node> minimo(std::shared_ptr<node> nodoActual, int depth){
+        return minimo(nodoActual, depth, 0);
+    }
+
+    //Devuelve la raiz del arbol modificado
+    std::shared_ptr<node> remove(const std::shared_ptr<node>& nodoActual,const photon& p, int depth){
+        if(nodoActual == nullptr){
+            return nullptr;
+        }
+        int cd = depth%dimensiones;
+
+
+
+        if( nodoActual->pto == p ){
+
+            if(nodoActual->right_ != nullptr){
+                std::shared_ptr<node> min = minimo(nodoActual->right_, cd);
+
+                nodoActual->pto = min->pto;
+
+
+
+                nodoActual->right_ = remove(nodoActual->right_, min->pto, depth + 1);
+            } else if (nodoActual->left_ != nullptr){
+                std::shared_ptr<node> min = minimo(nodoActual->left_, cd);
+
+                nodoActual->pto = min->pto;
+
+
+                nodoActual->left_ = remove(nodoActual->left_, min->pto, depth + 1);
+            } else {
+               return nullptr;
+            }
+            return nodoActual;
+        }
+
+        if(getDimension(cd, p.p) < getDimension(cd, nodoActual->pto.p)){
+            nodoActual->left_ = remove(nodoActual->left_, p, depth + 1);
+        } else {
+            nodoActual->right_ = remove(nodoActual->right_, p, depth + 1);
+        }
+
+
+        return nodoActual;
+    }
+
+
+    //Calcula el punto mas cercano al pasado como parametro
+    std::shared_ptr<node> remove(const photon& pt) {
+        return remove(this->raiz, pt, 0);
+    }
+
+
 
 public:
 
     //Constructores de la clase
-    kdtree(const kdtree&) = delete;
+    kdtree(const kdtree&) = default;
+	kdtree() = default;
+
     kdtree& operator=(const kdtree& in){
         this->raiz = in.raiz;
         this->mejorNodo = nullptr;
         this->mejorDist = 0;
         this->nodosVisitados = 0;
         this->dimensiones = 3;
-        this->nodos = in.nodos;
+
 
     }
 
@@ -124,28 +230,22 @@ public:
 
     //Crea un arbol pasada una lista de fotones
     kdtree(std::list<photon> in){
-        auto inicio = in.begin();
-        auto fin = in.end();
         dimensiones = 3;
         mejorNodo = nullptr;
         mejorDist = 0;
         nodosVisitados = 0;
-        nodos.reserve(std::distance(inicio, fin));
-        for (auto i = inicio; i != fin; ++i) {
-            nodos.emplace_back(*i);
+
+
+        for (photon p : in) {
+            raiz = insert(raiz, p);
         }
-        raiz = make_tree(0, nodos.size(), 0);
     }
 
 
 
-    //Devuelve cierto si el arbol esta vacio
-    bool esVacio() const    {
-        return nodos.empty();
-    }
 
     //Devuelve el numero de nodos visitados en la llamada a cercano
-    size_t getNodosVisitados() const    {
+    int getNodosVisitados() const    {
         return nodosVisitados;
     }
 
@@ -156,34 +256,36 @@ public:
 
 
     //Busca el punto mas cercano al punto dado
-    photon cercano(const photon& pt){
+    photon fotonCercano(const point& pt){
         if (raiz == nullptr) {
-            std::cerr << "tree is empty" << std::endl;
+            return photon();
         }
         mejorNodo = nullptr;
         nodosVisitados = 0;
         mejorDist= 0;
-        cercano(raiz, pt, 0);
+        cercano(pt);
         return mejorNodo->pto;
     }
 
     //Busca los n puntos mas cercanos al punto dado
-    std::list<photon> cercanos(const photon& pt, const std::list<photon> listaPuntos, const int nPuntos){
+    std::list<photon> fotonesCercanos(const point& pt, const int nPuntos){
+		std::list<photon> output;
         if (raiz == nullptr) {
-            std::cerr << "tree is empty" << std::endl;
+            return output;
         }
-        std::list<photon> output;
-        std::list<photon> puntosAux = listaPuntos;
-        kdtree arbolAuxiliar(puntosAux);
+        kdtree arbolAuxiliar = *this;
         for(int i = 0; i < nPuntos; i++){
+            if(arbolAuxiliar.raiz == nullptr){
+                break;
+            }
             arbolAuxiliar.mejorNodo = nullptr;
             arbolAuxiliar.nodosVisitados = 0;
             arbolAuxiliar.mejorDist= 0;
-            arbolAuxiliar.cercano(arbolAuxiliar.raiz, pt, 0);
+            arbolAuxiliar.cercano(pt);
             photon puntoResul = arbolAuxiliar.mejorNodo->pto;
             output.push_back(puntoResul);
-            puntosAux.remove(puntoResul);
-            arbolAuxiliar = kdtree(puntosAux);
+            std::shared_ptr<node> nuevaRaiz= arbolAuxiliar.remove(puntoResul);
+            arbolAuxiliar.raiz = nuevaRaiz;
         }
         return output;
     }

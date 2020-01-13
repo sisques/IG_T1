@@ -14,6 +14,17 @@ public:
     double flow;
     //dir phi, theta; // compressed incident direction
     int refr = 0;
+	short flag;
+	
+	photon& operator=(const photon& in){
+        this->p = in.p;
+        this->n = in.n;
+        this->R = in.R;
+        this->G = in.G;
+        this->B = in.B;
+        this->flow = in.flow;
+        this->flag = in.flag;
+    }
 };
 
 bool operator ==(photon p, photon q){

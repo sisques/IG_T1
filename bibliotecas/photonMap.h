@@ -7,6 +7,8 @@
 #include "punto_direccion.h"
 #include "photon.h"
 #include "kdtree.h"
+#include <mutex>
+#include <condition_variable>
 
 using namespace std;
 
@@ -14,64 +16,34 @@ class photonMap
 {
 private:
 	list<pair<point,photon>> photones;
-	
 	list<photon> photonList;
-	
-	kdtree *tree;
+	kdtree tree;
 	
 public:
+	photonMap(){}
+	
+	photonMap(kdtree t){
+		tree = t;
+	}
+
 	void addPhoton(const point &p, photon ph){
 		photones.push_back(pair<point,photon>(p,ph));
-		//photonList.push_back(ph);
+		photonList.push_back(ph);
 	}
 	
-	void generateTree(){
-		tree = new kdtree(photonList);
+	void clear(){
 		photones.clear();
 		photonList.clear();
 	}
 	
-	void getColorAt2(const point &p, double &r, double &g, double &b){
-		photon phaux;phaux.p = p;
-		list<photon> aux = tree->cercanos(phaux,photonList,5);
-		for(photon ph:aux){
-			r += ph.R;
-			g += ph.G;
-			b += ph.B;
-		}
-		r /= aux.size();
-		g /= aux.size();
-		b /= aux.size();
+	void generateTree(){
+		tree = kdtree(photonList);
+		//photones.clear();
+		photonList.clear();
 	}
 	
-	void getColorAt3(const point &p, double &r, double &g, double &b){
-		map<double,photon> maximos;
-		int nPh = 5;
-		for(pair<point,photon> i:photones){
-			if(maximos.size() < nPh){
-				maximos.insert(pair<double,photon>(mod(p-i.first),i.second));
-			}
-			else{
-				double photonToReplace = 99999999;
-				for(pair<int,photon> j:maximos){
-					if(j.first > mod(p-i.first) && j.first < photonToReplace){
-						photonToReplace = j.first;
-					}
-				}
-				if(photonToReplace != 99999999){
-					maximos.erase(photonToReplace);
-					maximos.insert(pair<double,photon>(mod(p-i.first),i.second));
-				}
-			}
-		}
-		for(pair<int,photon> i:maximos){
-			r += i.second.R;
-			g += i.second.G;
-			b += i.second.B;
-		}
-		r /= maximos.size();
-		g /= maximos.size();
-		b /= maximos.size();
+	kdtree generateTreeAux(){
+		return kdtree(photonList);
 	}
 	
 	double gaussianFilter(double d, double r){
@@ -79,6 +51,53 @@ public:
 		double exp = -1.953*d*d/(2*r*r);
 		double numAux = pow(7182818,exp);
 		return 0.918*(1-((1-numAux)/(1-denAux)));
+	}
+	
+	void getColorAt2(const point &p, double &r, double &g, double &b){
+		list<photon> aux = tree.fotonesCercanos(p,15);
+		double maxD = 0;
+		for(photon ph:aux){
+			if(mod(p-ph.p) > maxD){maxD = mod(p-ph.p);}
+		}
+		for(photon ph:aux){
+			r += ph.R/(mod(p-ph.p)/maxD);
+			g += ph.G/(mod(p-ph.p)/maxD);
+			b += ph.B/(mod(p-ph.p)/maxD);
+		}
+		if(aux.size() != 0){
+			r /= aux.size();
+			g /= aux.size();
+			b /= aux.size();
+		}
+	}
+	
+	void getColorAt3(const point &p, double &r, double &g, double &b){
+		list<photon> aux = tree.fotonesCercanos(p,100);
+		double maxD = 0;
+		if(aux.size() == 0){
+			//cout << "Ss" << endl;
+		}
+		for(photon ph:aux){
+			if(mod(p-ph.p) > maxD){maxD = mod(p-ph.p);}
+		}
+		for(photon ph:aux){
+			r += ph.R*ph.flow*(1-mod(p-ph.p)/maxD);
+			g += ph.G*ph.flow*(1-mod(p-ph.p)/maxD);
+			b += ph.B*ph.flow*(1-mod(p-ph.p)/maxD);
+		}
+		if(maxD == 0){
+			//cout << "Ss" << endl;
+		}
+		double A = M_PI*maxD*maxD;
+		double k = 1.0;
+		r = r/((1-2/(3*k))*A);
+		g = g/((1-2/(3*k))*A);
+		b = b/((1-2/(3*k))*A);
+		if(max(r, max(g,b)) > 1){
+			r = r/max(r, max(g,b));
+			g = g/max(r, max(g,b));
+			b = b/max(r, max(g,b));
+		}
 	}
 	
 	void getColorAt(const point &p, double &r, double &g, double &b){

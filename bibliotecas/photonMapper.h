@@ -92,9 +92,8 @@ public:
 	// Función que realiza la fase del trazado de fotones y genera los photon maps de la iluminación global y de las cáusticas
 	void generatePhotonMap(photonMap &base, photonMap &caustics, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
 								const bool &luzPuntual){
-		photonMap pm,pmc;
 		// Dividimos el número de rayos a lanzar entre el número de luces de la escena
-		int nRayos = 1000/luces.size();
+		int nRayos = 100000/luces.size();
 		// Para todas las luces de la escena
 		for(shared_ptr<figura> i:luces){
 			for(int j = 0; j < nRayos;++j){
@@ -111,11 +110,9 @@ public:
 				// Asignamos al photon inicial el RGB de la luz
 				i->getRGB(EMISSION,pl,ph.R,ph.G,ph.B);
 				// Generamos los photones que dicho rayo deje en la escena en su camino
-				generatePhotons(pl, e, luces, pm, pmc, dl, ph, luzPuntual);
+				generatePhotons(pl, e, luces, base, caustics, dl, ph, luzPuntual);
 			}
         }
-		base = pm;
-		caustics = pmc;
 	}
 	
 	// Obtenemos el RGB correspondiente al rayo con origen en c y dirección rayo a partir del photon map de
@@ -150,11 +147,11 @@ public:
 			// Si es phong
 			else{
 				// Halla el RGB en el photon map global
-				pm.getColorAt(colP,R,G,B);
-				double r = R,g = G,b = B;
+				pm.getColorAt2(colP,R,G,B);
+				//double r = R,g = G,b = B;
 				// Y le suma el RGB de las cáusticas
-				pmc.getColorAt(colP,R,G,B);
-				R += r; G += g; B += b;
+				//pmc.getColorAt2(colP,R,G,B);
+				//R += r; G += g; B += b;
 				// Si se pasa del límite, se reescala
 				if(max(R, max(G,B)) > 1){
 					R = R/max(R, max(G,G));

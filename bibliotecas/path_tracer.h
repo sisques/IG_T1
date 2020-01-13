@@ -60,7 +60,7 @@ public:
 			// Calculamos la luz directa por las luces puntuales de la escena
 			// si es que las hay
 			if(luzPuntual){
-				luz =  luzDirecta(e, luces,actualFig->getNormal(colP),colP);
+				luz =  luzDirecta(e, luces,rayo,actualFig->getNormal(colP),colP);
 			}
             dir dirNewRay;
             double p = 0.0;

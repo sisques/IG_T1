@@ -134,31 +134,14 @@ public:
         return R0 + (1 - R0) * c * c * c * c * c;	
     }
 	
-    // basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java	
+    // basado en https://stackoverflow.com/questions/42218704/how-to-properly-handle-refraction-in-raytracing
     virtual dir refraction(dir d, dir n, point o) {
-        dir d_Re = reflexion(d,n,o);
-        bool fuer_a_dent = dot(n,d);
-        dir nl = fuer_a_dent ? n : n;
-        double n_out = mp.getIndiceRefraccionMedio();
-        double n_in = mp.getIndiceRefraccionObjeto();
-        double r = fuer_a_dent ? n_out / n_in : n_in / n_out;
-        double cos_theta = dot(d,nl);
-        double cos2_phi = 1.0 - r * r * (1.0 - cos_theta * cos_theta);
-        //reflexion interna
-        if (cos2_phi < 0) {
-            return d_Re;
+        double r = mp.getIndiceRefraccionObjeto();
+        double cosI = dot(d,-n);
+        if (cosI < 0) {
+           r  = 1.0 / r;
         }
-        dir d_Tr = normalize(r*d - nl*(r*cos_theta + sqrt(cos2_phi)));
-        double c = 1.0 - (fuer_a_dent ? -cos_theta : dot(d_Tr,n));
-        double Re = schlickReflectance(n_out, n_in, c);	
-        double p_Re = 0.25 + 0.5 * Re;
-        double rnd = (double)rand() / RAND_MAX;
-        if (rnd < p_Re) {
-            return d_Re;
-        }
-        else  {
-            return d_Tr;
-        }
+        return (d * r - n * (-cosI + r * cosI));
     }
 	
 	dir phongDir(dir indir, dir n, double reflect) {

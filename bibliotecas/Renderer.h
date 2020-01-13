@@ -55,7 +55,7 @@ protected:
 
 	// Devuelve una dirección que contiene en sus valores x, y, z la luminancia R, G, B correspodiente a la luz
 	// directa incidente sobre un punto "p" con normal "n". Solo se cuentan las luces puntuales
-    dir luzDirecta(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, dir n, point p){
+    dir luzDirecta(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, dir rayo, dir n, point p){
 		dir luz = newDir(0.0,0.0,0.0);
         list<point> puntosLuces;
 		// Se obtiene la posición de las luces puntuales
@@ -87,6 +87,13 @@ protected:
 				luz.y += g*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
 				luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
             }
+			else if(colisiona && fig->evento() == REFRACTION){
+				dir nR = fig->nextRay(REFRACTION,rayo,p2);
+				dir aux = luzDirecta(e,luces,rayo,fig->getNormal(p2),p2);
+				luz.x += aux.x*abs(dot(n, nR));
+				luz.y += aux.y*abs(dot(n, nR));
+				luz.z += aux.z*abs(dot(n, nR));
+			}
         }
 		luz.x /= rayos.size();
 		luz.y /= rayos.size();
