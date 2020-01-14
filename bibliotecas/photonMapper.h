@@ -14,6 +14,7 @@
 #include "photon.h"
 
 
+class getRGB;
 using namespace std;
 
 // Clase hija de renderer que implementa el algoritmo de photon mapping
@@ -93,7 +94,7 @@ public:
 	void generatePhotonMap(photonMap &base, photonMap &caustics, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
 								const bool &luzPuntual){
 		// Dividimos el número de rayos a lanzar entre el número de luces de la escena
-		int nRayos = 100000/luces.size();
+		int nRayos = 10000/luces.size();
 		// Para todas las luces de la escena
 		for(shared_ptr<figura> i:luces){
 			for(int j = 0; j < nRayos;++j){
@@ -134,27 +135,33 @@ public:
 			event_enum event;
 			// Se selecciona un evento distinto de muerte aleatoriamente
 			do{event = actualFig->evento();}while(event == DEATH);
+			
+			dir dirNewRay = actualFig->nextRay(event, rayo, colP);
+			// Si es emisor devuelve su RGB directamente
+			if(actualFig->isLight()){
+				actualFig->getRGB(EMISSION,colP,R,G,B);
+			}
 			// Si es refracción o reflexión, calcula la interacción, y devuelve el RGB
 			// de dicha interacciónn
-			if(event != PHONG && event != EMISSION){
-				dir dirNewRay = actualFig->nextRay(event, rayo, colP);
+			else if(event != PHONG && event != EMISSION){
 				getRGB(colP, e, pm, pmc, dirNewRay, R,G,B);
-			}
-			// Si es emisor devuelve su RGB directamente
-			else if(actualFig->isLight()){
-				actualFig->getRGB(EMISSION,colP,R,G,B);
+				double r,g,b;
+				actualFig->getRGB(event,colP,r,g,b);
+				R *= r; G *= g; B *= b;
 			}
 			// Si es phong
 			else{
 				// Halla el RGB en el photon map global
-				pm.getColorAt2(colP,R,G,B);
-				//double r = R,g = G,b = B;
+				pm.getColorAt(colP,R,G,B);
+				double r,g,b;
 				// Y le suma el RGB de las cáusticas
-				//pmc.getColorAt2(colP,R,G,B);
-				//R += r; G += g; B += b;
+				pmc.getColorAt(colP,r,g,b);
+				R += r; G += g; B += b;
+				actualFig->phongColor(rayo,dirNewRay,colP,r,g,b);
+				R *= r; G *= g; B *= b;
 				// Si se pasa del límite, se reescala
 				if(max(R, max(G,B)) > 1){
-					R = R/max(R, max(G,G));
+					R = R/max(R, max(G,B));
 					G = G/max(R, max(G,B));
 					B = B/max(R, max(G,B));
 				}

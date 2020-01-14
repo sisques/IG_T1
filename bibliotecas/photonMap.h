@@ -17,12 +17,12 @@ class photonMap
 private:
 	list<pair<point,photon>> photones;
 	list<photon> photonList;
-	kdtree tree;
+	KDTree tree;
 	
 public:
 	photonMap(){}
 	
-	photonMap(kdtree t){
+	photonMap(KDTree t){
 		tree = t;
 	}
 
@@ -37,13 +37,13 @@ public:
 	}
 	
 	void generateTree(){
-		tree = kdtree(photonList);
+		tree = KDTree(photonList);
 		//photones.clear();
-		photonList.clear();
+		//photonList.clear();
 	}
 	
-	kdtree generateTreeAux(){
-		return kdtree(photonList);
+	KDTree generateTreeAux(){
+		return KDTree(photonList);
 	}
 	
 	double gaussianFilter(double d, double r){
@@ -54,29 +54,46 @@ public:
 	}
 	
 	void getColorAt2(const point &p, double &r, double &g, double &b){
-		list<photon> aux = tree.fotonesCercanos(p,15);
+		r = 0; g = 0; b = 0;
+		list<photon> aux = tree.fotonesCercanos(p,1);
 		double maxD = 0;
+		//cout << "Kd tree" << endl;
 		for(photon ph:aux){
-			if(mod(p-ph.p) > maxD){maxD = mod(p-ph.p);}
+			if(mod(ph.p-p) > maxD){maxD = mod(p-ph.p);}
+			//cout << ph.p.x << " " << ph.p.y << " " << ph.p.z << endl;
+			//cout <<  mod(p-ph.p) << endl;
 		}
 		for(photon ph:aux){
-			r += ph.R/(mod(p-ph.p)/maxD);
-			g += ph.G/(mod(p-ph.p)/maxD);
-			b += ph.B/(mod(p-ph.p)/maxD);
+			r += ph.flow*ph.R*(1-(mod(p-ph.p)/maxD));
+			g += ph.flow*ph.G*(1-(mod(p-ph.p)/maxD));
+			b += ph.flow*ph.B*(1-(mod(p-ph.p)/maxD));
 		}
-		if(aux.size() != 0){
-			r /= aux.size();
-			g /= aux.size();
-			b /= aux.size();
+		double A = M_PI*maxD*maxD;
+		double k = 1.0;
+		r = r/((1-2/(3*k))*A);
+		g = g/((1-2/(3*k))*A);
+		b = b/((1-2/(3*k))*A);
+		double mAux = max(r, max(g,b));
+		if(mAux > 1){
+			r = r/mAux;
+			g = g/mAux;
+			b = b/mAux;
+		}
+	}
+	
+	void getPhotonAt(const point &p, double &r, double &g, double &b){
+		list<photon> aux = tree.fotonesCercanos(p,1);
+		if(mod(p-aux.front().p) < 0.001){
+			r = 1; g = 1; b = 1;
+		}
+		else{
+			r = 0; g = 0; b = 0;
 		}
 	}
 	
 	void getColorAt3(const point &p, double &r, double &g, double &b){
-		list<photon> aux = tree.fotonesCercanos(p,100);
+		list<photon> aux = tree.fotonesCercanos(p,10);
 		double maxD = 0;
-		if(aux.size() == 0){
-			//cout << "Ss" << endl;
-		}
 		for(photon ph:aux){
 			if(mod(p-ph.p) > maxD){maxD = mod(p-ph.p);}
 		}
@@ -85,64 +102,68 @@ public:
 			g += ph.G*ph.flow*(1-mod(p-ph.p)/maxD);
 			b += ph.B*ph.flow*(1-mod(p-ph.p)/maxD);
 		}
-		if(maxD == 0){
-			//cout << "Ss" << endl;
-		}
 		double A = M_PI*maxD*maxD;
 		double k = 1.0;
 		r = r/((1-2/(3*k))*A);
 		g = g/((1-2/(3*k))*A);
 		b = b/((1-2/(3*k))*A);
-		if(max(r, max(g,b)) > 1){
-			r = r/max(r, max(g,b));
-			g = g/max(r, max(g,b));
-			b = b/max(r, max(g,b));
+		double mAux = max(r, max(g,b));
+		if(mAux > 1){
+			r = r/mAux;
+			g = g/mAux;
+			b = b/mAux;
 		}
 	}
 	
 	void getColorAt(const point &p, double &r, double &g, double &b){
-		double dist1 = 99999999,dist2 = 99999999,dist3 = 99999999,dist4 = 99999999,dist5 = 99999999;
-		photon p1,p2,p3,p4,p5;
+		r = 0; g = 0; b = 0;
+		if(photones.empty()){
+			return;
+		}
+		int N = 50, last = 0;;
+		double dist[N], maxD = 0;
+		photon lista[N];
+		for(int i = 0; i < N; ++i){dist[i] = 99999999;}
 		for(pair<point,photon> i:photones){
-			if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist1 && dist2 != 99999999 && dist3 != 99999999 && dist4 != 99999999 && dist5 != 99999999){
-				p1 = i.second;
-				dist1 = mod(p-i.first);
+			if(last < N-1){
+				lista[last] = i.second;
+				dist[last+1] = mod(p-i.first);
+				if(dist[last+1] > maxD){maxD = dist[last+1];}
+				++last;
 			}
-			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist2 && dist3 != 99999999 && dist4 != 99999999 && dist5 != 99999999){
-				p2 = i.second;
-				dist2 = mod(p-i.first);
-			}
-			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist3 && dist4 != 99999999 && dist5 != 99999999){
-				p3 = i.second;
-				dist3 = mod(p-i.first);
-			}
-			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist4 && dist5 != 99999999){
-				p4 = i.second;
-				dist4 = mod(p-i.first);
-			}
-			else if(mod(p-i.first) < 0.1 && mod(p-i.first) < dist5){
-				p5 = i.second;
-				dist5 = mod(p-i.first);
+			else{
+				photon aux = i.second;
+				double distAux = mod(p-i.first);
+				for(int j = 0; j < N; ++j){
+					if(distAux < dist[j]){
+						photon aux2 = lista[j];
+						double disAux2 = dist[j];
+						lista[j] = aux;
+						dist[j] = distAux;
+						aux = aux2;
+						distAux = disAux2;
+					}
+				}
 			}
 		}
-		double maxD = max(max(max(max(dist1,dist2),dist3),dist4),dist5);
-		r = (p1.flow*p1.R*(1-dist1/maxD) + p2.flow*p2.R*(1-dist2/maxD) + p3.flow*p3.R*(1-dist3/maxD) + p4.flow*p4.R*(1-dist4/maxD) + p5.flow*p5.R*(1-dist5/maxD));
-		g = (p1.flow*p1.G*(1-dist1/maxD) + p2.flow*p2.G*(1-dist2/maxD) + p3.flow*p3.G*(1-dist3/maxD) + p4.flow*p4.G*(1-dist4/maxD) + p5.flow*p5.G*(1-dist5/maxD));
-		b = (p1.flow*p1.B*(1-dist1/maxD) + p2.flow*p2.B*(1-dist2/maxD) + p3.flow*p3.B*(1-dist3/maxD) + p4.flow*p4.B*(1-dist4/maxD) + p5.flow*p5.B*(1-dist5/maxD));
-		
-		//r = (p1.flow*p1.R*gaussianFilter(dist1,maxD) + p2.flow*p2.R*gaussianFilter(dist1,maxD) + p3.flow*p3.R*gaussianFilter(dist1,maxD) + p4.flow*p4.R*gaussianFilter(dist1,maxD) + p5.flow*p5.R*gaussianFilter(dist1,maxD));
-		//g = (p1.flow*p1.G*gaussianFilter(dist1,maxD) + p2.flow*p2.G*gaussianFilter(dist1,maxD) + p3.flow*p3.G*gaussianFilter(dist1,maxD) + p4.flow*p4.G*gaussianFilter(dist1,maxD) + p5.flow*p5.G*gaussianFilter(dist1,maxD));
-		//b = (p1.flow*p1.B*gaussianFilter(dist1,maxD) + p2.flow*p2.B*gaussianFilter(dist1,maxD) + p3.flow*p3.B*gaussianFilter(dist1,maxD) + p4.flow*p4.B*gaussianFilter(dist1,maxD) + p5.flow*p5.B*gaussianFilter(dist1,maxD));
-		
+		//cout << "Lista" << endl;
+		for(int i = 0; i < last; ++i){
+			//cout << lista[i].p.x << " " << lista[i].p.y << " " << lista[i].p.z << endl;
+			//cout << mod(p-lista[i].p) << endl;
+			r += lista[i].R*lista[i].flow*(1-mod(p-lista[i].p)/maxD);
+			g += lista[i].G*lista[i].flow*(1-mod(p-lista[i].p)/maxD);
+			b += lista[i].B*lista[i].flow*(1-mod(p-lista[i].p)/maxD);
+		}
 		double A = M_PI*maxD*maxD;
 		double k = 1.0;
 		r = r/((1-2/(3*k))*A);
 		g = g/((1-2/(3*k))*A);
 		b = b/((1-2/(3*k))*A);
-		if(max(r, max(g,b)) > 1){
-			r = r/max(r, max(g,b));
-			g = g/max(r, max(g,b));
-			b = b/max(r, max(g,b));
+		double mAux = max(r, max(g,b));
+		if(mAux > 1){
+			r = r/mAux;
+			g = g/mAux;
+			b = b/mAux;
 		}
 	}
 	

@@ -1,298 +1,390 @@
 //
-// Created by victor on 22/12/19.
+// Created by victor on 14/1/20.
 //
 
-#ifndef _KDTREE_H
-#define _KDTREE_H
-
-#include <algorithm>
-#include <memory>
-#include <array>
-#include <vector>
-#include <cmath>
-#include <iostream>
-#include <random>
-#include "punto_direccion.h"
-#include "photon.h"
-
-// Devuelve la coordenada correspondiente a la dimension pasada como parametro
-double getDimension(int dimension, point p){
-    if (dimension % 3 == 0){
-        return p.x;
-    } else if (dimension % 3 == 1){
-        return p.y;
-    } else if (dimension % 3 == 2){
-        return p.z;
-    }
-    return 0;
-}
-
-
-
-
-
-/**
- * Implementacion de arbol K-dimensional basado en la implementacion de https://rosettacode.org/wiki/K-d_tree#C.2B.2B
+#ifndef KD_TREE_KDTREE_3_H
+#define KD_TREE_KDTREE_3_H
+/*
+ * file: KDTree.hpp
+ * author: J. Frederico Carvalho
+ *
+ * This is an adaptation of the KD-tree implementation in rosetta code
+ *  https://rosettacode.org/wiki/K-d_tree
+ * It is a reimplementation of the C code using C++.
+ * It also includes a few more queries than the original
+ *
  */
 
-class kdtree{
-private:
-    struct node{
-        photon pto;
-        std::shared_ptr<node> left_;
-        std::shared_ptr<node> right_;
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <vector>
+#include "photon.h"
 
-        //Costructor de la clase
-        explicit node(const photon& pt) : pto(pt), left_(nullptr), right_(nullptr){}
 
-        //Obtiene el valor de la dimension indicada como parametro
-        double get(int dimension) const{return getDimension(dimension,pto.p);}
+using indexArr = std::vector< size_t >;
+using pointIndex = typename std::pair< photon, size_t >;
 
-        //Devuelve la diustancia entre el punto de este nodo y el pasado
-        //por parametro
-        double distance(const point& pt) const{return dist(pt, pto.p);}
-    };
+class KDNode {
+public:
+    using KDNodePtr = std::shared_ptr< KDNode >;
+    size_t index;
+    photon x;
+    KDNodePtr left;
+    KDNodePtr right;
 
-    std::shared_ptr<node> raiz;
-    std::shared_ptr<node> mejorNodo;
-    double mejorDist;
-    int nodosVisitados;
-    int dimensiones = 3;
+    // initializer
+    KDNode() = default;
 
-    // Comparador de nodos (utilizado para la ordenacion)
-    struct node_cmp{
-        int dimension;
-        explicit node_cmp(int _dimension) : dimension(_dimension){}
-        bool operator()(const node& n1, const node& n2) const{
-            return getDimension(dimension,n1.pto.p) <  getDimension(dimension, n2.pto.p);
+    KDNode(const photon &pt, const size_t &idx_, const KDNodePtr &left_,
+           const KDNodePtr &right_){
+        x = pt;
+        index = idx_;
+        left = left_;
+        right = right_;
+    }
+
+    KDNode(const pointIndex &pi, const KDNodePtr &left_,
+           const KDNodePtr &right_) {
+        x = pi.first;
+        index = pi.second;
+        left = left_;
+        right = right_;
+    }
+
+    ~KDNode() = default;
+
+
+    // getter
+    double coord(const size_t &idx){
+        return x.at(idx);
+    }
+
+    // conversions
+    explicit operator bool(){
+        return !x.empty();
+    }
+    explicit operator photon(){
+        return x;
+    }
+    explicit operator size_t(){
+        return index;
+    }
+    explicit operator pointIndex(){
+        return pointIndex(x, index);
+    }
+};
+
+using KDNodePtr = std::shared_ptr< KDNode >;
+
+KDNodePtr NewKDNodePtr() {
+    KDNodePtr mynode = std::make_shared< KDNode >();
+    return mynode;
+}
+
+inline double dist(const KDNodePtr &a, const KDNodePtr &b) {
+    return dist(a->x, b->x);
+}
+
+// Need for sorting
+class comparer {
+public:
+    size_t idx;
+    explicit comparer(size_t idx_) : idx(idx_) {};
+    inline bool compare_idx(const pointIndex &a, const pointIndex &b ){
+        return (a.first.at(idx) < b.first.at(idx));
+    }
+};
+
+using pointIndexArr = typename std::vector< pointIndex >;
+
+inline void sort_on_idx(const pointIndexArr::iterator &begin,  //
+                        const pointIndexArr::iterator &end,  //
+                        size_t idx){
+    comparer comp(idx);
+    comp.idx = idx;
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+
+    std::sort(begin, end, std::bind(&comparer::compare_idx, comp, _1, _2));
+}
+
+using pointVec = std::vector< photon >;
+
+class KDTree {
+    KDNodePtr root;
+    KDNodePtr leaf;
+
+    KDNodePtr make_tree(const pointIndexArr::iterator &begin,  //
+                        const pointIndexArr::iterator &end,    //
+                        const size_t &length,                  //
+                        const size_t &level                    //
+    ){
+        if (begin == end) {
+            return NewKDNodePtr();  // empty tree
         }
-    };
 
+        size_t dim = begin->first.size();
 
-
-    std::shared_ptr<node> insert(std::shared_ptr<node> nodoActual, photon p, int depth) {
-        if(nodoActual == nullptr){
-            return make_shared<node>(node(p));
+        if (length > 1) {
+            sort_on_idx(begin, end, level);
         }
 
-        int cd = depth % dimensiones;
+        auto middle = begin + (length / 2);
 
-        double aux1 = getDimension(cd, p.p);
-        double aux2 = getDimension(cd, nodoActual->pto.p);
+        auto l_begin = begin;
+        auto l_end = middle;
+        auto r_begin = middle + 1;
+        auto r_end = end;
 
-        if( aux1 < aux2){
-            nodoActual->left_ = insert(nodoActual->left_, p, depth+1);
+        size_t l_len = length / 2;
+        size_t r_len = length - l_len - 1;
+
+        KDNodePtr left;
+        if (l_len > 0 && dim > 0) {
+            left = make_tree(l_begin, l_end, l_len, (level + 1) % dim);
         } else {
-            nodoActual->right_ = insert(nodoActual->right_, p, depth+1);
+            left = leaf;
         }
-        return nodoActual;
-    }
-
-    std::shared_ptr<node> insert(std::shared_ptr<node> raiz, photon p){
-        return insert(raiz, p, 0);
-    }
-
-    //Calcula el punto mas cercano al pasado como parametro mediante recursion
-    void cercano(const std::shared_ptr<node>& nodoActual, const point& nuevo, int dimension) {
-        if (nodoActual == nullptr) {
-            return;
-        }
-        ++nodosVisitados;
-        double d = nodoActual->distance(nuevo);
-        if (mejorNodo == nullptr || d < mejorDist) {
-            mejorDist = d;
-            mejorNodo = nodoActual;
-        }
-        if (mejorDist == 0){
-            return;
-        }
-        int cd = dimension%dimensiones;
-        double dx = nodoActual->get(cd) - getDimension(cd, nuevo);
-
-        cercano(dx > 0 ? nodoActual->left_ : nodoActual->right_, nuevo, dimension + 1);
-        if (dx * dx >= mejorDist) {
-            return;
-        }
-        cercano(dx > 0 ? nodoActual->right_ : nodoActual->left_, nuevo, dimension + 1);
-    }
-
-    //Calcula el punto mas cercano al pasado como parametro
-    void cercano(const point& nuevo) {
-        cercano(this->raiz, nuevo, 0);
-    }
-
-
-
-
-    std::shared_ptr<node> minimo(std::shared_ptr<node> x, std::shared_ptr<node> y, std::shared_ptr<node> z, int d){
-        std::shared_ptr<node> resul = x;
-
-        if(y != nullptr && getDimension(d, y->pto.p) < getDimension(d,resul->pto.p)){
-            resul = y;
-        }
-        if(z != nullptr && getDimension(d, z->pto.p) < getDimension(d,resul->pto.p)){
-            resul = z;
-        }
-        return resul;
-    }
-
-    std::shared_ptr<node> minimo(std::shared_ptr<node> nodoActual, int d, int depth){
-        if(nodoActual == nullptr){
-            return nullptr;
-        }
-        int cd = depth%dimensiones;
-
-        if(cd == d){
-            if(nodoActual->left_ == nullptr){
-                return nodoActual;
-            }
-            return minimo(nodoActual->left_, d, depth + 1);
-        }
-
-        return minimo(nodoActual,
-                      minimo(nodoActual->left_, d, depth + 1),
-                      minimo(nodoActual->right_, d, depth + 1),
-                      d);
-
-    }
-
-    std::shared_ptr<node> minimo(std::shared_ptr<node> nodoActual, int depth){
-        return minimo(nodoActual, depth, 0);
-    }
-
-    //Devuelve la raiz del arbol modificado
-    std::shared_ptr<node> remove(const std::shared_ptr<node>& nodoActual,const photon& p, int depth){
-        if(nodoActual == nullptr){
-            return nullptr;
-        }
-        int cd = depth%dimensiones;
-
-
-
-        if( nodoActual->pto == p ){
-
-            if(nodoActual->right_ != nullptr){
-                std::shared_ptr<node> min = minimo(nodoActual->right_, cd);
-
-                nodoActual->pto = min->pto;
-
-
-
-                nodoActual->right_ = remove(nodoActual->right_, min->pto, depth + 1);
-            } else if (nodoActual->left_ != nullptr){
-                std::shared_ptr<node> min = minimo(nodoActual->left_, cd);
-
-                nodoActual->pto = min->pto;
-
-
-                nodoActual->left_ = remove(nodoActual->left_, min->pto, depth + 1);
-            } else {
-               return nullptr;
-            }
-            return nodoActual;
-        }
-
-        if(getDimension(cd, p.p) < getDimension(cd, nodoActual->pto.p)){
-            nodoActual->left_ = remove(nodoActual->left_, p, depth + 1);
+        KDNodePtr right;
+        if (r_len > 0 && dim > 0) {
+            right = make_tree(r_begin, r_end, r_len, (level + 1) % dim);
         } else {
-            nodoActual->right_ = remove(nodoActual->right_, p, depth + 1);
+            right = leaf;
         }
 
-
-        return nodoActual;
+        // KDNode result = KDNode();
+        return std::make_shared< KDNode >(*middle, left, right);
     }
-
-
-    //Calcula el punto mas cercano al pasado como parametro
-    std::shared_ptr<node> remove(const photon& pt) {
-        return remove(this->raiz, pt, 0);
-    }
-
-
 
 public:
-
-    //Constructores de la clase
-    kdtree(const kdtree&) = default;
-	kdtree() = default;
-
-    kdtree& operator=(const kdtree& in){
-        this->raiz = in.raiz;
-        this->mejorNodo = nullptr;
-        this->mejorDist = 0;
-        this->nodosVisitados = 0;
-        this->dimensiones = 3;
-
-
-    }
-
-
-
-    //Crea un arbol pasada una lista de fotones
-    kdtree(std::list<photon> in){
-        dimensiones = 3;
-        mejorNodo = nullptr;
-        mejorDist = 0;
-        nodosVisitados = 0;
-
-
-        for (photon p : in) {
-            raiz = insert(raiz, p);
+    KDTree() = default;
+    explicit KDTree(pointVec point_array) {
+        leaf = std::make_shared< KDNode >();
+        // iterators
+        pointIndexArr arr;
+        for (size_t i = 0; i < point_array.size(); i++) {
+            arr.push_back(pointIndex(point_array.at(i), i));
         }
+
+        auto begin = arr.begin();
+        auto end = arr.end();
+
+        size_t length = arr.size();
+        size_t level = 0;  // starting
+
+        root = KDTree::make_tree(begin, end, length, level);
     }
 
+    explicit KDTree(std::list<photon> in) {
+        pointVec point_array;
 
-
-
-    //Devuelve el numero de nodos visitados en la llamada a cercano
-    int getNodosVisitados() const    {
-        return nodosVisitados;
-    }
-
-    //Devuelve la distancia entre el nuevo punto y su punto mas cercano tras llamar a cercano
-    double getMejorDist() const    {
-        return mejorDist;
-    }
-
-
-    //Busca el punto mas cercano al punto dado
-    photon fotonCercano(const point& pt){
-        if (raiz == nullptr) {
-            return photon();
+        for(photon p : in){
+            point_array.push_back(p);
         }
-        mejorNodo = nullptr;
-        nodosVisitados = 0;
-        mejorDist= 0;
-        cercano(pt);
-        return mejorNodo->pto;
-    }
 
-    //Busca los n puntos mas cercanos al punto dado
-    std::list<photon> fotonesCercanos(const point& pt, const int nPuntos){
-		std::list<photon> output;
-        if (raiz == nullptr) {
-            return output;
+
+        leaf = std::make_shared< KDNode >();
+        // iterators
+        pointIndexArr arr;
+        for (size_t i = 0; i < point_array.size(); i++) {
+            arr.push_back(pointIndex(point_array.at(i), i));
         }
-        kdtree arbolAuxiliar = *this;
-        for(int i = 0; i < nPuntos; i++){
-            if(arbolAuxiliar.raiz == nullptr){
-                break;
+
+        auto begin = arr.begin();
+        auto end = arr.end();
+
+        size_t length = arr.size();
+        size_t level = 0;  // starting
+
+        root = KDTree::make_tree(begin, end, length, level);
+    }
+private:
+    KDNodePtr nearest_(           //
+            const KDNodePtr &branch,  //
+            const photon &pt,        //
+            const size_t &level,      //
+            const KDNodePtr &best,    //
+            const double &best_dist   //
+    ){
+        double d, dx, dx2;
+
+        if (!bool(*branch)) {
+            return NewKDNodePtr();  // basically, null
+        }
+
+        photon branch_pt(*branch);
+        size_t dim = branch_pt.size();
+
+        d = dist(branch_pt, pt);
+        dx = branch_pt.at(level) - pt.at(level);
+        dx2 = dx * dx;
+
+        KDNodePtr best_l = best;
+        double best_dist_l = best_dist;
+
+        if (d < best_dist) {
+            best_dist_l = d;
+            best_l = branch;
+        }
+
+        size_t next_lv = (level + 1) % dim;
+        KDNodePtr section;
+        KDNodePtr other;
+
+        // select which branch makes sense to check
+        if (dx > 0) {
+            section = branch->left;
+            other = branch->right;
+        } else {
+            section = branch->right;
+            other = branch->left;
+        }
+
+        // keep nearest neighbor from further down the tree
+        KDNodePtr further = nearest_(section, pt, next_lv, best_l, best_dist_l);
+        if (!further->x.empty()) {
+            double dl = dist(further->x, pt);
+            if (dl < best_dist_l) {
+                best_dist_l = dl;
+                best_l = further;
             }
-            arbolAuxiliar.mejorNodo = nullptr;
-            arbolAuxiliar.nodosVisitados = 0;
-            arbolAuxiliar.mejorDist= 0;
-            arbolAuxiliar.cercano(pt);
-            photon puntoResul = arbolAuxiliar.mejorNodo->pto;
-            output.push_back(puntoResul);
-            std::shared_ptr<node> nuevaRaiz= arbolAuxiliar.remove(puntoResul);
-            arbolAuxiliar.raiz = nuevaRaiz;
         }
-        return output;
+        // only check the other branch if it makes sense to do so
+        if (dx2 < best_dist_l) {
+            further = nearest_(other, pt, next_lv, best_l, best_dist_l);
+            if (!further->x.empty()) {
+                double dl = dist(further->x, pt);
+                if (dl < best_dist_l) {
+                    best_dist_l = dl;
+                    best_l = further;
+                }
+            }
+        }
+
+        return best_l;
+    };
+
+    // default caller
+    KDNodePtr nearest_(const photon &pt){
+        size_t level = 0;
+        // KDNodePtr best = branch;
+        double branch_dist = dist(photon(*root), pt);
+        return nearest_(root,          // beginning of tree
+                        pt,            // point we are querying
+                        level,         // start from level 0
+                        root,          // best is the root
+                        branch_dist);  // best_dist = branch_dist
     }
 
+public:
+    photon nearest_point(const photon &pt) {
+        return photon(*nearest_(pt));
+    }
+    size_t nearest_index(const photon &pt){
+        return size_t(*nearest_(pt));
+    };
+    pointIndex nearest_pointIndex(const photon &pt){
+        KDNodePtr Nearest = nearest_(pt);
+        return pointIndex(photon(*Nearest), size_t(*Nearest));
+    }
 
+private:
+    pointIndexArr neighborhood_(  //
+            const KDNodePtr &branch,  //
+            const photon &pt,        //
+            const double &rad,        //
+            const size_t &level       //
+    ){
+        double d, dx, dx2;
+
+        if ( branch == NULL || !bool(*branch)) {
+            // branch has no point, means it is a leaf,
+            // no points to add
+            return pointIndexArr();
+        }
+
+        size_t dim = pt.size();
+
+        double r2 = rad * rad;
+
+        d = dist(photon(*branch), pt);
+        dx = photon(*branch).at(level) - pt.at(level);
+        dx2 = dx * dx;
+
+        pointIndexArr nbh, nbh_s, nbh_o;
+        if (d <= r2) {
+            nbh.push_back(pointIndex(*branch));
+        }
+
+        //
+        KDNodePtr section;
+        KDNodePtr other;
+        if (dx > 0) {
+            section = branch->left;
+            other = branch->right;
+        } else {
+            section = branch->right;
+            other = branch->left;
+        }
+
+        nbh_s = neighborhood_(section, pt, rad, (level + 1) % dim);
+        nbh.insert(nbh.end(), nbh_s.begin(), nbh_s.end());
+        if (dx2 < r2) {
+            nbh_o = neighborhood_(other, pt, rad, (level + 1) % dim);
+            nbh.insert(nbh.end(), nbh_o.begin(), nbh_o.end());
+        }
+
+        return nbh;
+    }
+
+public:
+    pointIndexArr neighborhood(  //
+            const photon &pt,       //
+            const double &rad) {
+        size_t level = 0;
+        return neighborhood_(root, pt, rad, level);
+    }
+
+    pointVec neighborhood_points(  //
+            const photon &pt,         //
+            const double &rad) {
+        size_t level = 0;
+        pointIndexArr nbh = neighborhood_(root, pt, rad, level);
+        pointVec nbhp;
+        nbhp.resize(nbh.size());
+        std::transform(nbh.begin(), nbh.end(), nbhp.begin(),
+                       [](pointIndex x) { return x.first; });
+        return nbhp;
+    }
+
+    std::list<photon> fotonesCercanos( photon p, const double &dist){
+        pointVec aux = neighborhood_points(p, dist);
+        std::list<photon> out;
+        for(photon pto : aux){
+            if(!pto.vacio()){
+                out.push_back(photon(pto));
+            }
+        }
+        return out;
+    }
+
+    indexArr neighborhood_indices(  //
+            const photon &pt,          //
+            const double &rad) {
+        size_t level = 0;
+        pointIndexArr nbh = neighborhood_(root, pt, rad, level);
+        indexArr nbhi;
+        nbhi.resize(nbh.size());
+        std::transform(nbh.begin(), nbh.end(), nbhi.begin(),
+                       [](pointIndex x) { return x.second; });
+        return nbhi;
+    }
 };
 
 
-
-#endif //_KDTREE_H
+#endif //KD_TREE_KDTREE_3_H

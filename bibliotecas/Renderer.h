@@ -88,11 +88,13 @@ protected:
 				luz.z += b*abs(dot(n,i))/pow(mod(p2-p)*3,2.0);
             }
 			else if(colisiona && fig->evento() == REFRACTION){
+				double r,g,b;
+				fig->getRGB(REFRACTION,p2,r,g,b);
 				dir nR = fig->nextRay(REFRACTION,rayo,p2);
-				dir aux = luzDirecta(e,luces,rayo,fig->getNormal(p2),p2);
-				luz.x += aux.x*abs(dot(n, nR));
-				luz.y += aux.y*abs(dot(n, nR));
-				luz.z += aux.z*abs(dot(n, nR));
+				dir aux = luzDirecta(e,luces,nR,fig->getNormal(p2),p2);
+				luz.x += r*aux.x*abs(dot(n, nR));
+				luz.y += g*aux.y*abs(dot(n, nR));
+				luz.z += b*aux.z*abs(dot(n, nR));
 			}
         }
 		luz.x /= rayos.size();
