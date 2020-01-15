@@ -15,11 +15,11 @@ public:
     double flow;
     //dir phi, theta; // compressed incident direction
     bool inicializado = false;
-    int refr = 0;
+    int refr;
 
 
     photon(const point &p) : p(p) {}
-
+    photon(const double &x) : p(newPoint(x,x,x)) {}
     photon() = default;
     ~photon() = default;
 
@@ -47,36 +47,6 @@ public:
         }
     }
 
-    bool empty(){
-        return inicializado;
-    }
-
-    bool vacio(){
-        bool a = this->p.x == 0;
-        bool b = this->p.y == 0;
-        bool c = this->p.z == 0;
-        bool d = this->p.w == 0;
-        bool e = this->n.x == 0;
-        bool f = this->n.y == 0;
-        bool g = this->n.z == 0;
-        bool h = this->n.w == 0;
-        bool i = this->R == 0;
-        bool j = this->G == 0;
-        bool k = this->B == 0;
-        bool l = this->flow == 0;
-        //this->dir = in.dir;
-        //this->theta = in.theta;
-        bool m = this->inicializado == false;
-        bool n = this->refr == 0;
-        bool resul =  a && b && c && d && e && f && g && h && i && j && k && l && m && n;
-        return resul;
-    }
-
-
-
-    int size() const {
-        return 3;
-    }
 
 
 

@@ -50,9 +50,9 @@ private:
 			}
 			
 			// Se calcula su RGB usando la luz entrante del camino
-			R_act = R_act * R * abs(dot(n,rayo));
-			G_act = G_act * G * abs(dot(n,rayo));
-			B_act = B_act * B * abs(dot(n,rayo));
+			R_act = R_act * R * abs(dot(n,dirNewRay));
+			G_act = G_act * G * abs(dot(n,dirNewRay));
+			B_act = B_act * B * abs(dot(n,dirNewRay));
 			
 			// Se define un nuevo fotón
 			newPhoton.R = R_act;
@@ -94,7 +94,7 @@ public:
 	void generatePhotonMap(photonMap &base, photonMap &caustics, const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces,
 								const bool &luzPuntual){
 		// Dividimos el número de rayos a lanzar entre el número de luces de la escena
-		int nRayos = 10000/luces.size();
+		int nRayos = 100/luces.size();
 		// Para todas las luces de la escena
 		for(shared_ptr<figura> i:luces){
 			for(int j = 0; j < nRayos;++j){
@@ -152,10 +152,10 @@ public:
 			// Si es phong
 			else{
 				// Halla el RGB en el photon map global
-				pm.getColorAt(colP,R,G,B);
+				pm.getColorAt2(colP,R,G,B);
 				double r,g,b;
 				// Y le suma el RGB de las cáusticas
-				pmc.getColorAt(colP,r,g,b);
+				pmc.getColorAt2(colP,r,g,b);
 				R += r; G += g; B += b;
 				actualFig->phongColor(rayo,dirNewRay,colP,r,g,b);
 				R *= r; G *= g; B *= b;

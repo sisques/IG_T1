@@ -17,12 +17,12 @@ class photonMap
 private:
 	list<pair<point,photon>> photones;
 	list<photon> photonList;
-	KDTree tree;
+	kdTree tree;
 	
 public:
 	photonMap(){}
 	
-	photonMap(KDTree t){
+	photonMap(kdTree t){
 		tree = t;
 	}
 
@@ -37,13 +37,13 @@ public:
 	}
 	
 	void generateTree(){
-		tree = KDTree(photonList);
+		tree = kdTree(photonList);
 		//photones.clear();
 		//photonList.clear();
 	}
 	
-	KDTree generateTreeAux(){
-		return KDTree(photonList);
+	kdTree generateTreeAux(){
+		return kdTree(photonList);
 	}
 	
 	double gaussianFilter(double d, double r){
@@ -55,13 +55,10 @@ public:
 	
 	void getColorAt2(const point &p, double &r, double &g, double &b){
 		r = 0; g = 0; b = 0;
-		list<photon> aux = tree.fotonesCercanos(p,1);
+		list<photon> aux = tree.fotonesCercanos(p,50);
 		double maxD = 0;
-		//cout << "Kd tree" << endl;
 		for(photon ph:aux){
 			if(mod(ph.p-p) > maxD){maxD = mod(p-ph.p);}
-			//cout << ph.p.x << " " << ph.p.y << " " << ph.p.z << endl;
-			//cout <<  mod(p-ph.p) << endl;
 		}
 		for(photon ph:aux){
 			r += ph.flow*ph.R*(1-(mod(p-ph.p)/maxD));
@@ -88,30 +85,6 @@ public:
 		}
 		else{
 			r = 0; g = 0; b = 0;
-		}
-	}
-	
-	void getColorAt3(const point &p, double &r, double &g, double &b){
-		list<photon> aux = tree.fotonesCercanos(p,10);
-		double maxD = 0;
-		for(photon ph:aux){
-			if(mod(p-ph.p) > maxD){maxD = mod(p-ph.p);}
-		}
-		for(photon ph:aux){
-			r += ph.R*ph.flow*(1-mod(p-ph.p)/maxD);
-			g += ph.G*ph.flow*(1-mod(p-ph.p)/maxD);
-			b += ph.B*ph.flow*(1-mod(p-ph.p)/maxD);
-		}
-		double A = M_PI*maxD*maxD;
-		double k = 1.0;
-		r = r/((1-2/(3*k))*A);
-		g = g/((1-2/(3*k))*A);
-		b = b/((1-2/(3*k))*A);
-		double mAux = max(r, max(g,b));
-		if(mAux > 1){
-			r = r/mAux;
-			g = g/mAux;
-			b = b/mAux;
 		}
 	}
 	

@@ -234,6 +234,7 @@ public:
 			rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
 		}while(rx*rx + ry*ry+ rz*rz > 1.0);
 		dir rayo = newDir(rx,ry,rz);
+		rayo = normalize(rayo);
 		d = rayo;
 		p = c;
 	}
