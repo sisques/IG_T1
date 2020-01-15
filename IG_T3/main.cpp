@@ -50,7 +50,7 @@ list<shared_ptr<figura>> setUpScene(){
 
 
     list<shared_ptr<figura>> elementos;
-	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0,0.5), light));
+	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0,0.9), light));
 	shared_ptr<figura> puntoLuz2 = make_shared<punto>(punto(newPoint(0,-0.4,0.5), light));
 	//mp.setKd(120, 120, 120);
 	//mp.setKs(120, 120, 120);
@@ -88,7 +88,7 @@ list<shared_ptr<figura>> setUpScene(){
 	PR.setKdPhong(0,255,255);
 	PR.setKsPhong(0,255,255);
 	PR.setAlfa(0);
-	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.35,0.7), 0.1, PR);
+	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.35,0.6), 0.1, PR);
 	mp.setKdPhong(0,0,255);
 	mp.setKsPhong(0,0,120);
 	mp.setAlfa(4);
@@ -195,7 +195,7 @@ int main(){
     h = 100;
     w = 100;
     rpp = 10;
-    int threads = 4;
+    int threads = 1;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -212,8 +212,8 @@ int main(){
 	photonMapper aux;
 	if(photOn){
 		aux.generatePhotonMap(pm, pmC, e,mc.getLuces(e),luzPuntual);
-		//pm.generateTree();
-		//pmC.generateTree();
+		pm.generateTree();
+		pmC.generateTree();
 		cout << "Se ha generao"<< endl;
 		//pm.imprimir();
 	}
@@ -222,7 +222,7 @@ int main(){
 		camara c2 = c;
 		mc = monteCarlo(c2,h,w,rpp, gamma);
 		if(photOn){
-			mc = monteCarlo(c2,h,w,rpp, gamma, pm/*photonMap(pm.generateTreeAux())*/, pmC/*photonMap(pmC.generateTreeAux())*/);
+			mc = monteCarlo(c2,h,w,rpp, gamma, photonMap(pm.generateTreeAux()), photonMap(pmC.generateTreeAux()));
 		}
 		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w, h, luzPuntual);
