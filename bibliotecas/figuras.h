@@ -21,13 +21,14 @@ protected:
     texture *texturizador;
     materialProperties mp;
     list<point> lightPoints;
+	bool isPoint = false;
 
 public:
     figura(materialProperties _mp){
         this -> mp = _mp;
         this->text = NO_TEXTURE;
         texturizador = nullptr;//new texture();
-        srand(0);
+        srand(static_cast<unsigned int>(clock()));
     }
 
     figura(texture_enum t, materialProperties _mp){
@@ -43,7 +44,7 @@ public:
         else{//textures.flatColor
             texturizador = new texture();
         }
-        srand (time(NULL));
+		srand(static_cast<unsigned int>(clock()));
     }
 
     figura(texture_enum t, string im, dir d, materialProperties _mp){
@@ -55,7 +56,7 @@ public:
         else {
             texturizador = new texture();
         }
-        srand (time(NULL));
+		srand(static_cast<unsigned int>(clock()));
     }
 
     event_enum evento(){
@@ -65,6 +66,10 @@ public:
     bool isLight(){
         return mp.isLightSource();
     }
+	
+	bool IsPoint(){
+		return this->isPoint;
+	}
 
     double probEvent(event_enum e){
         return mp.probEvent(e);
@@ -73,46 +78,39 @@ public:
     virtual list<point> getLightPoints(){
         return this->lightPoints;
     }
+	
+	void setScale(double p){texturizador->setScale(p);}
 
-    void getRGB(event_enum e, double &r, double &g, double &b){
-        if ( e == REFLEXION || e == EMISSION) {
+    virtual void getRGB(event_enum e, point p, double &r, double &g, double &b){
+		if ( e == REFLEXION || e == EMISSION) {
             r = mp.getKsR();
-            g = mp.getKsG();
-            b = mp.getKsB();
+			g = mp.getKsG();
+			b = mp.getKsB();
         } else if (e == REFRACTION) {
             r = mp.getKdR();
-            g = mp.getKdG();
-            b = mp.getKdB();
+			g = mp.getKdG();
+			b = mp.getKdB();
         }
-    }
-
-    void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
-        dir refindir = reflexion(indir, getNormal(p),p);
-        double cos = dot(refindir, outdir);
-        double aux = pow(cos, mp.getAlfa());
-        r = (mp.getKdPhongR()/M_PI) + (mp.getKsPhongR()*(mp.getAlfa()+2)/(2*M_PI))*aux;
-        g = (mp.getKdPhongG()/M_PI) + (mp.getKsPhongG()*(mp.getAlfa()+2)/(2*M_PI))*aux;
-        b = (mp.getKdPhongB()/M_PI) + (mp.getKsPhongB()*(mp.getAlfa()+2)/(2*M_PI))*aux;
-    }
-
-    /*virtual double getR(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getR(p,this->R);
+		if(this->text == WOOD|| this->text == PERLIN_NOISE){
+            r = texturizador->getR(p,r);
+			g = texturizador->getG(p,g);
+			b = texturizador->getB(p,b);
         }
-        return this->R;
-    }
-    virtual double getG(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getG(p,this->G);
+	}
+	
+	virtual void phongColor(const dir indir, const dir outdir, point p, double &r, double &g, double &b) {
+		dir refindir = reflexion(indir, getNormal(p),p);
+		double cos = dot(refindir, outdir);
+		double aux = pow(cos, mp.getAlfa());
+		r = (mp.getKdPhongR()/M_PI) + (mp.getKsPhongR()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+		g = (mp.getKdPhongG()/M_PI) + (mp.getKsPhongG()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+		b = (mp.getKdPhongB()/M_PI) + (mp.getKsPhongB()*(mp.getAlfa()+2)/(2*M_PI))*aux;
+		if(this->text == WOOD|| this->text == PERLIN_NOISE){
+            r = texturizador->getR(p,r);
+			g = texturizador->getG(p,g);
+			b = texturizador->getB(p,b);
         }
-        return this->G;
-    }
-    virtual double getB(point p){
-        if(this->text == WOOD|| this->text == PERLIN_NOISE){
-            return texturizador->getB(p,this->B);
-        }
-        return this->B;
-    }*/
+	}
 
     virtual bool intersection(dir rd, point ro, double &t){
         return false;
@@ -125,7 +123,17 @@ public:
         dir output = 2.0*dot(normal, inputRay)*normal -inputRay;
         return -normalize(output);
     }
-
+	
+	double reflectance0(double n1, double n2) {	
+        double sqrt_R0 = (n1 - n2) / (n1 + n2);	
+        return sqrt_R0 * sqrt_R0;	
+    }
+	
+	double schlickReflectance(double n1, double n2, double c) {	
+        double R0 = reflectance0(n1, n2);	
+        return R0 + (1 - R0) * c * c * c * c * c;	
+    }
+	
     // basado en https://stackoverflow.com/questions/42218704/how-to-properly-handle-refraction-in-raytracing
     virtual dir refraction(dir d, dir n, point o) {
         double r = mp.getIndiceRefraccionObjeto();
@@ -135,48 +143,46 @@ public:
         }
         return (d * r - n * (-cosI + r * cosI));
     }
+	
+	dir phongDir(dir indir, dir n, double reflect) {
+		Matrix mat;
+		dir ldir = normalize(indir);
 
+		dir ref = reflexion(ldir, n, newPoint(0,0,0));
 
+		double ndotl = dot(ldir, n);
 
-    dir phongDir(dir outdir, dir n, double specexp) {
-        Matrix mat;
-        dir ldir = normalize(outdir);
+		if(1.0 - ndotl > EPSILON) {
+			dir ivec, kvec, jvec;
 
-        dir ref = reflexion(ldir, n, newPoint(0,0,0));
+			if(fabs(ndotl) < EPSILON) {
+				kvec = -normalize(ldir);
+				jvec = n;
+				ivec = cross(jvec, kvec);
+			} else {
+				ivec = normalize(cross(ldir, ref));
+				jvec = ref;
+				kvec = cross(ref, ivec);
+			}
 
-        double ndotl = dot(ldir, n);
+			mat = originalBase(ivec, jvec, kvec, newPoint(0,0,0));
+		}
 
-        if(1.0 - ndotl > EPSILON) {
-            dir ivec, kvec, jvec;
+		double rnd1 = (double)rand() / RAND_MAX;
+		double rnd2 = (double)rand() / RAND_MAX;
 
-            // build orthonormal basis
-            if(fabs(ndotl) < EPSILON) {
-                kvec = -normalize(ldir);
-                jvec = n;
-                ivec = cross(jvec, kvec);
-            } else {
-                ivec = normalize(cross(ldir, ref));
-                jvec = ref;
-                kvec = cross(ref, ivec);
-            }
+		double phi = acos(pow(rnd1, 1.0 / (reflect + 1.0)));
+		double theta = 2.0 * M_PI * rnd2;
+		
+		dir v;
+		v.x = cos(theta) * sin(phi);
+		v.y = cos(phi);
+		v.z = sin(theta) * sin(phi);
+		
+		v = mat*v;
 
-            mat = originalBase(ivec, jvec, kvec, newPoint(0,0,0));
-        }
-
-        double rnd1 = (double)rand() / RAND_MAX;
-        double rnd2 = (double)rand() / RAND_MAX;
-
-        double phi = acos(pow(rnd1, 1.0 / (specexp + 1.0)));
-        double theta = 2.0 * M_PI * rnd2;
-
-        dir v;
-        v.x = cos(theta) * sin(phi);
-        v.y = cos(phi);
-        v.z = sin(theta) * sin(phi);
-        v = mat*v;
-
-        return v;
-    }
+		return v;
+	}
 
     virtual dir getNormal() {return newDir(0,0,0);}
     virtual dir getNormal(point p) {return newDir(0,0,0);}
@@ -195,27 +201,42 @@ public:
             return normal;
         }
     }
+	
+	virtual void getLightRay(point &p, dir &d) {}
 };
 
 class punto : public figura {
 private:
     point c;
 public:
-    punto(point _c, materialProperties _mp): figura(_mp){
-        c = _c;
-        if(mp.isLightSource()){
+	punto(point _c, materialProperties _mp): figura(_mp){
+		this->isPoint = true;
+		c = _c;
+		if(mp.isLightSource()){
             this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
         }
-    }
-
-    bool intersection(dir rd, point ro, double &t) override {
+	}
+	
+	bool intersection(dir rd, point ro, double &t) override {
         dir d = normalize(c - ro);
-        rd = normalize(rd);
-        t = mod(d)/mod(rd);
-        return (d.x+EPSILON > rd.x &&  d.x-EPSILON < rd.x)
-               && (d.y+EPSILON > rd.y &&  d.y-EPSILON < rd.y)
-               && (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
+		rd = normalize(rd);
+		t = mod(d)/mod(rd);
+		return (d.x+EPSILON > rd.x &&  d.x-EPSILON < rd.x) 
+				&& (d.y+EPSILON > rd.y &&  d.y-EPSILON < rd.y)
+				&& (d.z+EPSILON > rd.z &&  d.z-EPSILON < rd.z);
     }
+	
+	void getLightRay(point &p, dir &d) override{
+		double rx,ry,rz;
+		do{
+			rx = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			ry = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+		}while(rx*rx + ry*ry+ rz*rz > 1.0);
+		dir rayo = newDir(rx,ry,rz);
+		d = rayo;
+		p = c;
+	}
 };
 
 class esfera : public figura {
@@ -250,7 +271,8 @@ public:
             this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
         }
     }
-
+	
+	
     point getCenter(){ return this->c;}
     double getRadius(){ return this->r;}
 
@@ -259,32 +281,21 @@ public:
         double aux  = dot(this->c - ro, rd);
         if (aux < 0){
             //corta detras del punto de origen
-            t = aux;
+			t = aux;
             return false;
         }
         point p = ro + rd*aux;
         double y = mod(this->c - p);
         if ( y <= r) {
-            t = aux - sqrt(this->r * this->r - y * y);
-            if(t == 0){
-                t = aux + sqrt(this->r * this->r - y * y);
-            }
+			t = aux - sqrt(this->r * this->r - y * y);
+			if(t == 0){
+				t = aux + sqrt(this->r * this->r - y * y);
+			}
             return true;
         } else {
             return false;
         }
     }
-
-    /*double getR(point pp) override {
-        return figura::getR(pp);
-    }
-    double getG(point pp) override {
-        return figura::getG(pp);
-    }
-    double getB(point pp) override {
-        return figura::getB(pp);
-    }*/
-
 
     dir getNormal() override {
         return newDir(0,0,0);
@@ -292,6 +303,20 @@ public:
     dir getNormal(point p) override {
         return normalize(p - this -> getCenter());
     }
+	
+	void getLightRay(point &p, dir &d) override{
+		double rx,ry,rz;
+		do{
+			rx = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			ry = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+			rz = 2.0f * ((double)rand() / (double)RAND_MAX) - 1.0f;
+		}while(rx*rx + ry*ry+ rz*rz > 1.0);
+		dir rayo = newDir(rx,ry,rz);
+		d = rayo;
+		double t;
+		intersection(d, c, t);
+		p = c + rayo * (t+0.0001);
+	}
 };
 
 class plano : public figura {
@@ -304,12 +329,12 @@ public:
         this -> n = _n;
         if(mp.isLightSource()){
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
+            /*this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
             this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
+            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));*/
         }
     }
 
@@ -338,12 +363,31 @@ public:
             this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
             this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
-        }
-    }
+		}
+	}
 
     point getPoint(){ return this->p;}
+	
     dir getNormal() override { return normalize(this->n);}
+	
     dir getNormal(point p) override {return this->getNormal();}
+	
+	void phongColor(const dir indir, const dir outdir, point pp, double &r, double &g, double &b) override {
+		if(this->text == IMAGE){
+			dir refindir = reflexion(indir, getNormal(p),p);
+			double cos = dot(refindir, outdir);
+			double aux = pow(cos, mp.getAlfa());
+            r = texturizador->getR(p,pp);
+			g = texturizador->getG(p,pp);
+			b = texturizador->getB(p,pp);
+			r = (r/M_PI) + (r*(mp.getAlfa()+2)/(2*M_PI))*aux;
+			g = (g/M_PI) + (g*(mp.getAlfa()+2)/(2*M_PI))*aux;
+			b = (b/M_PI) + (b*(mp.getAlfa()+2)/(2*M_PI))*aux;
+        }
+		else{
+			figura::phongColor(indir,outdir,pp,r,g,b);
+		}
+	}
 
     bool intersection(dir rd, point ro, double &t) override {
         dir diff = this->p - ro;
@@ -367,24 +411,27 @@ public:
 
     }
 
-    /*double getR(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getR(this->p, pp);
-        }
-        return figura::getR(pp);
-    }
-    double getG(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getG(this->p, pp);
-        }
-        return figura::getG(pp);
-    }
-    double getB(point pp) override {
-        if(this->text == IMAGE){
-            return texturizador->getB(this->p, pp);
-        }
-        return figura::getB(pp);
-    }*/
+	void getRGB(event_enum e, point pp, double &r, double &g, double &b) override{
+		if(this->text == IMAGE){
+			r = texturizador->getR(this->p, pp);
+			g = texturizador->getG(this->p, pp);
+			b = texturizador->getB(this->p, pp);
+		}
+		else{
+			figura::getRGB(e,p,r,g,b);
+		}
+	}
+	
+	void getLightRay(point &pl, dir &d) override{
+		double rx,ry,rz;
+		rx = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		ry = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		rz = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
+		pl.x *= rx; pl.y *= ry; pl.z *= rz;
+		double u = (double)rand() / (double)RAND_MAX;
+		double v = 2*M_PI*(double)rand() / (double)RAND_MAX;
+		d = newDir(2.0f*cos(v)*sqrt(u)-1,2.0f*sin(v)*sqrt(u)-1, 2.0f*sqrt(1-u)-1);
+	}
 };
 
 class triangulo : public figura {
@@ -480,10 +527,5 @@ public:
     }
 
 };
-
-
-
-
-
 
 #endif

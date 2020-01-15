@@ -19,70 +19,51 @@ protected:
     double ksR, ksG, ksB;
     double PkdR, PkdG, PkdB;
     double PksR, PksG, PksB;
-    double indiceRefraccionObjeto;
+    double indiceRefraccionObjeto, indiceRefraccionMedio;
     double alfa;
     russianRoulette rR;
 
 public:
     ~materialProperties(){}
     materialProperties(){}
-    materialProperties(bool is_light_source, event_enum events[], double probs[], double r_obj = GLASS){
+    materialProperties(bool is_light_source, event_enum events[], double probs[], double r_obj = GLASS, double r_mdo = VACUUM ){
         this -> light_source = is_light_source;
-        this -> rR = russianRoulette(events, probs);
         this -> setKd(0,0,0);
         this -> setKs(0,0,0);
         this -> setKdPhong(0,0,0);
         this -> setKsPhong(0,0,0);
         this -> setIndiceRefraccionObjeto(r_obj);
+        this -> setIndiceRefraccionMedio(r_mdo);
 
+        this -> rR = russianRoulette(events, probs);
     }
+
     void setKd(int _R,int _G,int _B){
-        this -> kdR = (double)_R/CR;
-        this -> kdG = (double)_G/CR;
-        this -> kdB = (double)_B/CR;
+        double d = (double)MAX;
+        this -> kdR = _R/d;
+        this -> kdG = _G/d;
+        this -> kdB = _B/d;
     }
 
     void setKs(int _R,int _G,int _B){
-        this -> ksR = (double)_R/CR;
-        this -> ksG = (double)_G/CR;
-        this -> ksB = (double)_B/CR;
+        double d = (double)MAX;
+        this -> ksR = _R/d;
+        this -> ksG = _G/d;
+        this -> ksB = _B/d;
     }
 
     void setKdPhong(int _R,int _G,int _B){
-        this -> PkdR = (double)_R/CR;
-        this -> PkdG = (double)_G/CR;
-        this -> PkdB = (double)_B/CR;
+        double d = (double)MAX;
+        this -> PkdR = _R/d;
+        this -> PkdG = _G/d;
+        this -> PkdB = _B/d;
     }
 
     void setKsPhong(int _R,int _G,int _B){
-        this -> PksR = (double)_R/CR;
-        this -> PksG = (double)_G/CR;
-        this -> PksB = (double)_B/CR;
-    }
-
-
-    void setKd(double _R,double _G,double _B){
-        this -> kdR = _R;
-        this -> kdG = _G;
-        this -> kdB = _B;
-    }
-
-    void setKs(double _R,double _G,double _B){
-        this -> ksR = _R;
-        this -> ksG = _G;
-        this -> ksB = _B;
-    }
-
-    void setKdPhong(double _R,double _G,double _B){
-        this -> PkdR = _R;
-        this -> PkdG = _G;
-        this -> PkdB = _B;
-    }
-
-    void setKsPhong(double _R,double _G,double _B){
-        this -> PksR = _R;
-        this -> PksG = _G;
-        this -> PksB = _B;
+        double d = (double)MAX;
+        this -> PksR = _R/d;
+        this -> PksG = _G/d;
+        this -> PksB = _B/d;
     }
 
     double getKdR(){ return this->kdR;}
@@ -101,7 +82,6 @@ public:
     double getKsPhongG(){ return this->PksG;}
     double getKsPhongB(){ return this->PksB;}
 
-
     void setAlfa(double a){this->alfa = a;}
 
     double getAlfa(){return this->alfa;}
@@ -110,6 +90,9 @@ public:
 
     double getIndiceRefraccionObjeto(){return this->indiceRefraccionObjeto;}
 
+    void setIndiceRefraccionMedio(double r){this->indiceRefraccionMedio = r;}
+
+    double getIndiceRefraccionMedio(){return this->indiceRefraccionMedio;}
 
     bool isLightSource(){
         return this->light_source;
@@ -124,8 +107,5 @@ public:
     }
 
 };
-
-
-
 
 #endif

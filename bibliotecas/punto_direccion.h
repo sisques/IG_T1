@@ -64,9 +64,13 @@ struct dir {
 	    return newPoint(p.x - q.x, p.y - q.y, p.z - q.z);
     }
 
+    bool operator ==(point p, point q)         {
+        return p.x == q.x && p.y == q.y && p.z == q.z;
+    }
 
 
-	dir operator +(dir p, dir q)         {     
+
+    dir operator +(dir p, dir q)         {
 		return newDir(p.x + q.x, p.y + q.y, p.z + q.z);     
 	}   
 
@@ -84,7 +88,7 @@ struct dir {
 
     dir operator *( dir p, double q)         {
     return newDir(q*p.x, q*p.y, q*p.z);
-}
+    }
 
     dir operator /(dir p, double q)         {
 		return newDir(p.x/q, p.y/q, p.z/q);     
