@@ -17,16 +17,16 @@ public:
     kdNode() = default;
     kdNode(photon _p):data(_p), izda(nullptr), dcha(nullptr){}
     kdNode(photon _p, kdNode* _izda, kdNode* _dcha):
-    data(_p), izda(_izda), dcha(_dcha) {}
+            data(_p), izda(_izda), dcha(_dcha) {}
 
 };
 
-    kdNode* newNode(photon p){
-        kdNode* temp = new kdNode;
-        temp->data = p;
-        temp->izda = nullptr;
-        temp->dcha = nullptr;
-        return temp;
+kdNode* newNode(photon p){
+    kdNode* temp = new kdNode;
+    temp->data = p;
+    temp->izda = nullptr;
+    temp->dcha = nullptr;
+    return temp;
 }
 
 //https://www.cs.cmu.edu/~ckingsf/bioinfo-lectures/kdtrees.pdf
@@ -106,9 +106,9 @@ private:
         //Si el subarbol actual es diferente, el minimo puede
         //estar en cualquier otro lado
         return minNode(root,
-                   findMinRec(root->izda, d, depth + 1),
-                   findMinRec(root->dcha, d, depth + 1),
-                   d);
+                       findMinRec(root->izda, d, depth + 1),
+                       findMinRec(root->dcha, d, depth + 1),
+                       d);
     }
 
     kdNode* deleteNodeRec(kdNode* root, photon p, unsigned  depth){
@@ -203,10 +203,10 @@ public:
     int DIM;
     double mejorDist;
     kdNode* mejorNodo;
-    std::list<photon> elementos;
-
+    int numElem;
 
     kdNode* insert(photon p){
+        numElem++;
         return insertRec(this->raiz,p,0);
     }
 
@@ -225,14 +225,16 @@ public:
 
     // Elimina el photon p y devuelve la raiz del arbol
     kdNode* deleteNode( photon p){
+        numElem--;
         return deleteNodeRec(this->raiz,p, 0);
     }
     // Elimina el photon p y devuelve la raiz del arbol
     void nearest(photon p){
-         nearestRec(this->raiz,p, 0);
+        nearestRec(this->raiz,p, 0);
     }
 
     kdTree() = default;
+
 
 
     kdTree(std::list<photon> lista){
@@ -240,7 +242,6 @@ public:
         raiz = nullptr;
         mejorDist = std::numeric_limits<double>::max();
         mejorNodo = nullptr;
-        elementos = lista;
         for( photon p : lista){
             raiz = insert(p);
         }
@@ -252,7 +253,6 @@ public:
         raiz = nullptr;
         mejorDist = std::numeric_limits<double>::max();
         mejorNodo = nullptr;
-        elementos = lista;
         for( photon p : lista){
             raiz = insert(p);
         }
@@ -263,21 +263,29 @@ public:
     std::list<photon> fotonesCercanos(const photon& pt, const int nPuntos){
 
         std::list<photon> output;
-        kdTree aux(this->elementos, this->DIM);
+
         for(int i = 0; i < nPuntos; i++){
-            aux.mejorNodo = nullptr;
-            aux.mejorDist = std::numeric_limits<double>::max();
 
-            aux.nearest(pt);
-            photon puntoResul = aux.mejorNodo->data;
-            output.push_back(puntoResul);
-
-            aux.raiz = aux.deleteNode(puntoResul);
-
-            if(aux.raiz == nullptr){
+            if(this->raiz == nullptr){
                 break;
             }
+            this->mejorNodo = nullptr;
+            this->mejorDist = std::numeric_limits<double>::max();
+
+            this->nearest(pt);
+            photon puntoResul = this->mejorNodo->data;
+            output.push_back(puntoResul);
+
+            this->raiz = this->deleteNode(puntoResul);
+
+
+
         }
+        for(photon p : output){
+            this->raiz = insert(p);
+        }
+
+
         return output;
     }
 

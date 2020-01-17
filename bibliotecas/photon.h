@@ -7,24 +7,33 @@
 
 using namespace std;
 
+// Clase que representa un photón generado por un rayo de luz
 class photon{
 public:
-    point p; // position
+	// Posición del fotón
+    point p;
+	// Normal de la superficie en la que impactóo
     dir n;
-    double R,G,B;; // power packed as 4 chars
+	// RGB del fotón
+    double R,G,B;
+	// Flujo del fotón
     double flow;
-    //dir phi, theta; // compressed incident direction
     bool inicializado = false;
-    int refr;
-
-
+	// Entero para controlar a que photon map debe ir
+	// Si es 0 al global, si es 1 ha entrado en refracción,
+	// si es 2 debe ir al de cáusticas, y si es 3, proviene
+	// de reflexión, y debe ir al de cáusticas
+    int state;
+	
+	// Constructores
     photon(const point &p) : p(p) {}
     photon(const double &x) : p(newPoint(x,x,x)) {}
     photon() = default;
+	// Destructor
     ~photon() = default;
 
 
-
+	// Operador de igualdad
     photon& operator=(const photon& in){
         this->p = in.p;
         this->n = in.n;
@@ -36,7 +45,8 @@ public:
         //this->theta = in.theta;
         this->inicializado = in.inicializado;
     }
-
+	
+	// Para obtener la información de la posición
     double at(int cd) const{
         if(cd % 3 == 0){
             return p.x;

@@ -78,7 +78,7 @@ protected:
             shared_ptr<figura> fig;
             point p2;
             bool colisiona = colision(p, e, i, fig, p2);
-            if(colisiona && fig->isLight()){
+            if(colisiona && (fig->isLight())){
 				double r,g,b;
 				fig->getRGB(EMISSION,p2,r,g,b);
 				// Se divide por la distancia al cuadrado

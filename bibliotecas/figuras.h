@@ -248,29 +248,11 @@ public:
     esfera(point _c, double _r,  materialProperties _mp): figura(_mp){
         this -> c = _c;
         this -> r = _r;
-        if(mp.isLightSource()){
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x+r, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y+r, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z+r));
-            this->lightPoints.push_back(newPoint(c.x-r, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y-r, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
-        }
     }
 
     esfera(point _c, double _r, texture_enum t,  materialProperties _mp): figura(t,_mp){
         this -> c = _c;
         this -> r = _r;
-        if(mp.isLightSource()){
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x+r, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y+r, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z+r));
-            this->lightPoints.push_back(newPoint(c.x-r, c.y, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y-r, c.z));
-            this->lightPoints.push_back(newPoint(c.x, c.y, c.z-r));
-        }
     }
 	
 	
@@ -328,43 +310,16 @@ public:
     plano( point _p, dir _n, materialProperties _mp): figura(_mp){
         this -> p = _p;
         this -> n = _n;
-        if(mp.isLightSource()){
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
-            /*this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
-            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));*/
-        }
     }
 
     plano( point _p, dir _n,texture_enum t, materialProperties _mp): figura( t,_mp){
         this -> p = _p;
         this -> n = _n;
-        if(mp.isLightSource()){
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
-            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
-        }
     }
 
     plano( point _p, dir _n, texture_enum t, string _im,  materialProperties _mp): figura(t, _im, _n, _mp){
         this -> p = _p;
         this -> n = _n;
-        if(mp.isLightSource()){
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x+2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y+2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z+2));
-            this->lightPoints.push_back(newPoint(p.x-2, p.y, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y-2, p.z));
-            this->lightPoints.push_back(newPoint(p.x, p.y, p.z-2));
-		}
 	}
 
     point getPoint(){ return this->p;}
@@ -424,14 +379,31 @@ public:
 	}
 	
 	void getLightRay(point &pl, dir &d) override{
-		double rx,ry,rz;
-		rx = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
-		ry = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
-		rz = 4.0f * ((double)rand() / (double)RAND_MAX) - 2.0f;
-		pl.x *= rx; pl.y *= ry; pl.z *= rz;
+		pl.x = ((double)rand() / (double)RAND_MAX);
+		pl.z = ((double)rand() / (double)RAND_MAX); 
+		pl.y = 0;
+		
 		double u = (double)rand() / (double)RAND_MAX;
 		double v = 2*M_PI*(double)rand() / (double)RAND_MAX;
 		d = newDir(2.0f*cos(v)*sqrt(u)-1,2.0f*sin(v)*sqrt(u)-1, 2.0f*sqrt(1-u)-1);
+		if(d.y < 0){d.y = -d.y;}
+		
+		Matrix mat;
+		dir ldir = newDir(1,0,1);
+		if(ldir.x ==  1 && ldir.y ==  1 && ldir.z ==  1){
+			ldir = newDir(1,1,1);
+		}
+		dir ivec, kvec, jvec;
+		kvec = -normalize(cross(n,ldir));
+		jvec = n;
+		ivec = cross(jvec, kvec);
+		mat = originalBase(ivec, jvec, kvec, newPoint(p.x,p.y,p.z));
+		d = mat*d;
+		pl = mat*pl;
+		if(pl.x > 0.5){pl.x -= 0.5;}
+		if(pl.y > 0.5){pl.y -= 0.5;}
+		if(pl.z > 0.5){pl.z -= 0.5;}
+		d = normalize(d);
 	}
 };
 

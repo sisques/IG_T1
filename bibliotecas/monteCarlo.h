@@ -31,6 +31,8 @@ private:
 	bool photon = false;
 	// Photon mapping con el que se puede obtener el RGB de cada rayo
 	photonMapper pM;
+	// Número máximo de rayos lanzados en photon mapping, máximo de fotones
+	// de iluminación global y máximo de fotones de cáusticas
 
 	// Devuelve un valor entre máximo y mínimo en base a v
     double cFunc(const double v, const double min, const double max){
@@ -43,8 +45,11 @@ public:
     monteCarlo(camara c, int h, int w, int r, double g):cam(c),height(h),wide(w),rays(r),gamma(g){}
 	// Constructor que pide la cámara, altura y anchura, el número de rayos por pixel, el gamma 
 	// y los photon maps global y de cáusticas
-	monteCarlo(camara c, int h, int w, int r, double g, const photonMap &p, const photonMap &pc)
-	:cam(c),height(h),wide(w),rays(r),gamma(g),photonM(p), photonMC(pc),photon(true){}
+	monteCarlo(camara c, int h, int w, int r, double g, const photonMap &p, const photonMap &pc, int ppr)
+	:cam(c),height(h),wide(w),rays(r),gamma(g),photonM(p), photonMC(pc),photon(true){
+		photonM.setPhotonsPerRay(ppr);
+		photonMC.setPhotonsPerRay(ppr);
+	}
 	
 	// Destructor
     ~monteCarlo(){};
@@ -97,7 +102,7 @@ public:
             } 
 			// Sino se usa el path tracer
 			else {
-                pM.getRGB(cam.o, e, photonM, photonMC, rayo, r, g, b);
+                pM.getRGB(cam.o, e, luces, photonM, photonMC, rayo, r, g, b, luzPuntual);
             }
 			// Se va acumulando los valores obtenidos
             Rt += r;
