@@ -50,7 +50,7 @@ list<shared_ptr<figura>> setUpScene(){
 
 
     list<shared_ptr<figura>> elementos;
-	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0,0.9), light));
+	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0,0.95), light));
 	shared_ptr<figura> puntoLuz2 = make_shared<punto>(punto(newPoint(0,-0.4,0.5), light));
 	//mp.setKd(120, 120, 120);
 	//mp.setKs(120, 120, 120);
@@ -88,7 +88,7 @@ list<shared_ptr<figura>> setUpScene(){
 	PR.setKdPhong(0,255,255);
 	PR.setKsPhong(0,255,255);
 	PR.setAlfa(0);
-	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.35,0.6), 0.1, PR);
+	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.3,0.8), 0.2, refraccion);
 	mp.setKdPhong(0,0,255);
 	mp.setKsPhong(0,0,120);
 	mp.setAlfa(4);
@@ -107,16 +107,16 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
     //elementos.push_back(ESFERArefraccion);
-    elementos.push_back(ESFERAreflexion);
+	elementos.push_back(ESFERAreflexion);
 	elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
 	elementos.push_back(ESFERAreflexion4);
 	elementos.push_back(ESFERAphong);
-	//elementos.push_back(ESFERAphong2);
-	//elementos.push_back(ESFERAphong3);
-	//elementos.push_back(ESFERAphong4);
-	//elementos.push_back(ESFERAphong5);
-	//elementos.push_back(ESFERAphong6);
+	elementos.push_back(ESFERAphong2);
+	elementos.push_back(ESFERAphong3);
+	elementos.push_back(ESFERAphong4);
+	elementos.push_back(ESFERAphong5);
+	elementos.push_back(ESFERAphong6);
 
 
     double brdfValues2[] = {0.9,0.0,0.0};
@@ -172,6 +172,7 @@ int main(){
 
 	c =  newCamara(origenCamara, alturaPlano, anchuraPlano, distanciaPlano);
     double rpp = 0, w = 0, h = 0;
+	int maxRays, maxPhotonsGlobal, maxPhotonsCaustics, photonsPerRay;
     string fOut = "";
 
     /*cout << "Introduce la altura de la imagen deseada:" << endl;
@@ -191,11 +192,15 @@ int main(){
 	bool photOn = true;
 	photonMap pm, pmC;
 	
-	double gamma = 0.05;
-    h = 100;
-    w = 100;
+	double gamma = 0.10;
+	maxRays = 100000;
+	maxPhotonsGlobal = 1000000;
+	maxPhotonsCaustics = 1000000;
+	photonsPerRay =  100;
+    h = 300;
+    w = 300;
     rpp = 10;
-    int threads = 1;
+    int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
         exit(5);
@@ -209,20 +214,20 @@ int main(){
 	int hMin = 0, hMax = - 1 + h/threads;
 	
 	monteCarlo mc(c,h,w,rpp, gamma);
-	photonMapper aux;
+	photonMapper aux(maxRays, maxPhotonsGlobal, maxPhotonsCaustics);
 	if(photOn){
-		aux.generatePhotonMap(pm, pmC, e,mc.getLuces(e),luzPuntual);
-		pm.generateTree();
-		pmC.generateTree();
-		cout << "Se ha generao"<< endl;
-		//pm.imprimir();
+		aux.generatePhotonMap(pm, pmC, e,mc.getLuces(e));
+		cout << "Se ha generado el photon map"<< endl;
+		cout << "Photones de iluminacion global: " << pm.size() << endl;
+		cout << "Photones de cáusticas: " << pmC.size() << endl;
 	}
 	
 	for(int i = 0; i < threads;++i){
 		camara c2 = c;
 		mc = monteCarlo(c2,h,w,rpp, gamma);
 		if(photOn){
-			mc = monteCarlo(c2,h,w,rpp, gamma, photonMap(pm.generateTreeAux()), photonMap(pmC.generateTreeAux()));
+			mc = monteCarlo(c2,h,w,rpp, gamma, photonMap(pm.generateTreeAux()), 
+					photonMap(pmC.generateTreeAux()), photonsPerRay);
 		}
 		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w, h, luzPuntual);
@@ -231,7 +236,7 @@ int main(){
 		cout << "Se ha creado el thread " << i << endl;
 	}
 	pm.clear();
-	
+	pmC.clear();
 	for(int i = 0; i < threads;++i){th[i].join();}
 	
 	fOut = fOut + ".ppm";
