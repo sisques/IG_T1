@@ -97,9 +97,11 @@ protected:
 				luz.z += b*aux.z*abs(dot(n, nR));
 			}
         }
+		// Hace la media de la luz entre el número de rayos
 		luz.x /= rayos.size();
 		luz.y /= rayos.size();
 		luz.z /= rayos.size();
+		// Se capa en caso de exceso
 		if (luz.x > 1) { luz.x = 1; }
 		if (luz.y > 1) { luz.y = 1; }
 		if (luz.z > 1) { luz.z = 1; }

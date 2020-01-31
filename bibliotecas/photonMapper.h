@@ -183,6 +183,7 @@ public:
 				// Y le suma el RGB de las cáusticas
 				pmc.getColorAt(colP,r,g,b);
 				R += r; G += g; B += b;
+				// Si hay luces puntuales se calcula la luz directa
 				if(luzPuntual){
 					luzDirecta(e,luces,dirNewRay,actualFig->getNormal(colP),colP);
 					R += r; G += g; B += b;
