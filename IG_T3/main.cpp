@@ -42,7 +42,7 @@ list<shared_ptr<figura>> setUpScene(){
 	reflexion.setKdPhong(255,255,255);
 	reflexion.setKsPhong(255,255,255);
 	reflexion.setAlfa(10);
-    materialProperties refraccion = materialProperties(false, eventos, refraction,1.33);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,2);
 	refraccion.setKd(0,255,255);
 	refraccion.setKs(0,255,255);
 	refraccion.setKdPhong(0,255,255);
@@ -62,7 +62,7 @@ list<shared_ptr<figura>> setUpScene(){
     //shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),IMAGE,"C:\\Users\\BlueSac\\Desktop\\Tools\\WorspaceCodelite\\Practica3IG\\aragon.ppm",mp));
 	shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),mp));
 	//suelo->setScale(400);
-    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),mp));
+    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),light));
     //mp.setKd(255,0,0);
 	//mp.setKs(255,0,0);
 	mp.setKdPhong(255,0,0);
@@ -88,7 +88,7 @@ list<shared_ptr<figura>> setUpScene(){
 	PR.setKdPhong(0,255,255);
 	PR.setKsPhong(0,255,255);
 	PR.setAlfa(0);
-	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.3,0.8), 0.2, refraccion);
+	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.35,0.7), 0.15, refraccion);
 	mp.setKdPhong(0,0,255);
 	mp.setKsPhong(0,0,120);
 	mp.setAlfa(4);
@@ -99,7 +99,7 @@ list<shared_ptr<figura>> setUpScene(){
 	shared_ptr<figura> ESFERAphong6 = make_shared<esfera>(newPoint(0.15,0.275,0.85), 0.1, mp);
 
 
-    elementos.push_back(puntoLuz);
+    //elementos.push_back(puntoLuz);
 	//elementos.push_back(puntoLuz2);
 	elementos.push_back(fondo);
     elementos.push_back(suelo);
@@ -107,16 +107,16 @@ list<shared_ptr<figura>> setUpScene(){
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
     //elementos.push_back(ESFERArefraccion);
-	elementos.push_back(ESFERAreflexion);
+	/*elementos.push_back(ESFERAreflexion);
 	elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
-	elementos.push_back(ESFERAreflexion4);
+	elementos.push_back(ESFERAreflexion4);*/
 	elementos.push_back(ESFERAphong);
-	elementos.push_back(ESFERAphong2);
+	/*elementos.push_back(ESFERAphong2);
 	elementos.push_back(ESFERAphong3);
 	elementos.push_back(ESFERAphong4);
 	elementos.push_back(ESFERAphong5);
-	elementos.push_back(ESFERAphong6);
+	elementos.push_back(ESFERAphong6);*/
 
 
     double brdfValues2[] = {0.9,0.0,0.0};
@@ -188,18 +188,18 @@ int main(){
     cout << "Introduce el nombre del fichero de salida:" << endl;
     cin >> fOut;
     */
-	bool luzPuntual = true;
-	bool photOn = true;
+	bool luzPuntual = false;
+	bool photOn = false;
 	photonMap pm, pmC;
 	
 	double gamma = 0.10;
 	maxRays = 100000;
-	maxPhotonsGlobal = 1000000;
-	maxPhotonsCaustics = 1000000;
-	photonsPerRay =  100;
-    h = 300;
-    w = 300;
-    rpp = 10;
+	maxPhotonsGlobal = 1000;
+	maxPhotonsCaustics = 1000;
+	photonsPerRay =  30;
+    h = 100;
+    w = 100;
+    rpp = 50;
     int threads = 4;
     if (threads > h || threads > w){
         cerr << "Numero de threads incompatible con la resolucion de la imagen" << endl;
