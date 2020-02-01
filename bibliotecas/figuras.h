@@ -158,15 +158,60 @@ public:
         return -normalize(output);
     }
 	
+	 dir reflexion(dir _in, dir _n, point o){
+
+        dir inputRay = normalize(_in);
+        dir normal = normalize(_n);
+        dir output = 2.0*dot(normal, inputRay)*normal -inputRay;
+        return -normalize(output);
+    }
+	
     // basado en https://stackoverflow.com/questions/42218704/how-to-properly-handle-refraction-in-raytracing
 	// Devuelve el rayo de refracción en base a el rayo de entrada y la normal
-    virtual dir refraction(dir d, dir n) {
+    /*virtual dir refraction(dir d, dir n) {
         double r = mp.getIndiceRefraccionObjeto();
         double cosI = dot(d,-n);
         if (cosI < 0) {
            r  = 1.0 / r;
         }
         return (d * r - n * (-cosI + r * cosI));
+    }*/
+	
+	double reflectance0(double n1, double n2) {
+        double sqrt_R0 = (n1 - n2) / (n1 + n2);
+        return sqrt_R0 * sqrt_R0;
+    }
+
+    double schlickReflectance(double n1, double n2, double c) {
+        double R0 = reflectance0(n1, n2);
+        return R0 + (1 - R0) * c * c * c * c * c;
+    }
+
+    // basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java
+    virtual dir refraction(dir d, dir n, point o) {
+        dir d_Re = -reflexion(d,n,o);
+        bool fuer_a_dent = dot(n,d);
+        dir nl = fuer_a_dent ? n : n;
+        double n_out = mp.getIndiceRefraccionMedio();
+        double n_in = mp.getIndiceRefraccionObjeto();
+        double r = fuer_a_dent ? n_out / n_in : n_in / n_out;
+        double cos_theta = dot(d,nl);
+        double cos2_phi = 1.0 - r * r * (1.0 - cos_theta * cos_theta);
+        //reflexion interna
+        if (cos2_phi < 0) {
+            return d_Re;
+        }
+        dir d_Tr = normalize(r*d - nl*(r*cos_theta + sqrt(cos2_phi)));
+        double c = 1.0 - (fuer_a_dent ? -cos_theta : dot(d_Tr,n));
+        double Re = schlickReflectance(n_out, n_in, c);
+        double p_Re = 0.25 + 0.5 * Re;
+        double rnd = (double)rand() / RAND_MAX;
+        if (rnd < p_Re) {
+            return d_Re;
+        }
+        else  {
+            return newDir(-d_Tr.x, d_Tr.y, -d_Tr.z);
+        }
     }
 	
 	// Basado en https://www.scratchapixel.com/lessons/3d-basic-rendering/phong-shader-BRDF?url=3d-basic-rendering/phong-shader-BRDF
@@ -223,7 +268,7 @@ public:
             return reflexion(inputRay, normal);
 		// Si el evento es refracción
         } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal);
+            return refraction(inputRay, normal, inputPoint);
         }
 		// Si el evento es phong
         else if (evento == PHONG){

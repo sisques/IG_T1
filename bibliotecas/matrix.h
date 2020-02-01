@@ -8,11 +8,10 @@
 
 
 // Basado en ->http://www.speqmath.com/tutorials/matrix/matrix.html
-
+// Clase que representa una matriz de 4x4
 class Matrix{
 public:
     double p[4][4];     // puntero a matriz de doubles
-
 
     // constructor
     Matrix(){
@@ -22,18 +21,14 @@ public:
             }
         }
     }
-
-
+	
+	// Define una matriz vacía
     Matrix empty(){
         Matrix m;
         return m;
     }
 
-    bool isEmpty(){
-        return this->p == nullptr;
-    }
-
-    // operador de asignacion
+    // Operador de asignacion
     Matrix& operator= (const Matrix& a){
         for (int f = 0; f < 4; f++) {
             for (int c = 0; c < 4; c++){
@@ -48,6 +43,7 @@ public:
 
 };
 
+// Función de multiplicación auxiliar
 void mulAux(const Matrix& m, double& x, double& y, double& z, double& w){
     double a, b, c, d;
     a = m.p[0][0]*x + m.p[0][1]*y + m.p[0][2]*z + m.p[0][3]*w;
@@ -57,7 +53,7 @@ void mulAux(const Matrix& m, double& x, double& y, double& z, double& w){
     x = a; y = b; z = c; w = d;
 }
 
-// operador de suma
+// Operador de suma
 Matrix operator+ (const Matrix& a, const Matrix& b)    {
     Matrix res = Matrix();
     for (int f = 0; f < 4; f++){
@@ -70,7 +66,7 @@ Matrix operator+ (const Matrix& a, const Matrix& b)    {
 
 
 
-// operador de multiplicacion
+// Operador de multiplicacion
 Matrix operator* (const Matrix& a, const Matrix& b)    {
     Matrix res = Matrix();
     for (int f = 0; f < 4; f++){
@@ -83,7 +79,7 @@ Matrix operator* (const Matrix& a, const Matrix& b)    {
     return res;
 }
 
-// operador de division entre real
+// Operador de division entre real
 Matrix operator/ (const Matrix& a, const double& b)    {
     Matrix res = Matrix();
     for (int f = 0; f < 4; f++){
@@ -95,7 +91,7 @@ Matrix operator/ (const Matrix& a, const double& b)    {
 }
 
 
-// operador de multiplicacion por punto
+// Operador de multiplicacion por punto
 point operator* (const Matrix& m, const point p)    {
     double a,b,c,d;
     a = p.x; b = p.y; c = p.z; d = p.w;
@@ -103,7 +99,7 @@ point operator* (const Matrix& m, const point p)    {
     return newPoint(a, b, c);
 }
 
-// operador de multiplicacion por direccion
+// Operador de multiplicacion por direccion
 dir operator* (const Matrix& m, const dir& p)    {
     double a,b,c,d;
     a = p.x; b = p.y; c = p.z; d = p.w;
@@ -111,7 +107,7 @@ dir operator* (const Matrix& m, const dir& p)    {
     return newDir(a, b, c);
 }
 
-// operador de multiplicacion por punto
+// Operador de multiplicacion por punto
 point operator* (const point p, const Matrix& m)    {
     double a,b,c,d;
     a = p.x; b = p.y; c = p.z; d = p.w;
@@ -119,7 +115,7 @@ point operator* (const point p, const Matrix& m)    {
     return newPoint(a, b, c);
 }
 
-// operador de multiplicacion por direccion
+// Operador de multiplicacion por direccion
 dir operator* (const dir& p, const Matrix& m)    {
     double a,b,c,d;
     a = p.x; b = p.y; c = p.z; d = p.w;
@@ -127,6 +123,7 @@ dir operator* (const dir& p, const Matrix& m)    {
     return newDir(a, b, c);
 }
 
+// Devuelve el determinante de una matriz 3x3 según la ley de sarrus
 double det3x3(const double m[3][3]){
     return  m[0][0]*m[1][1]*m[2][2] +
             m[0][1]*m[1][2]*m[2][0] +
@@ -136,6 +133,7 @@ double det3x3(const double m[3][3]){
             m[1][0]*m[0][1]*m[2][2];
 }
 
+// Devuelve el determinante de una matriz
 double det(const Matrix& m){
     double det = 0;
     if(m.p[0][0] != 0){
@@ -170,6 +168,7 @@ double det(const Matrix& m){
     return det;
 }
 
+// Devuelve la matriz adjunta de a
 Matrix adj(const Matrix& a){
     Matrix res = Matrix();
     for(int f = 0; f < 4; f++){
@@ -193,7 +192,7 @@ Matrix adj(const Matrix& a){
     return res;
 }
 
-
+// Devuelve la matriz traspuesta de a
 Matrix transp(const Matrix& a){
     Matrix res = Matrix();
     for(int f = 0; f < 4; f++){
@@ -204,7 +203,7 @@ Matrix transp(const Matrix& a){
     return res;
 }
 
-
+// Devuelve la matriz inversa de a
 Matrix inverse(const Matrix& a){
     Matrix adjM = adj(a);
     Matrix trasnpM = transp(adjM);
@@ -212,7 +211,7 @@ Matrix inverse(const Matrix& a){
     return trasnpM / d;
 }
 
-
+// Devuelve una matriz para escalar en base a x_s, y_s y z_s
 Matrix scale(const double x_s, const double y_s, const double z_s){
     // x_s  0   0   0
     // 0    y_s 0   0
@@ -226,6 +225,7 @@ Matrix scale(const double x_s, const double y_s, const double z_s){
     return res;
 }
 
+// Devuelve una matriz de traslacción en base a x_s, y_s y z_s
 Matrix translate(const double x_t, const double y_t, const double z_t){
     // 1    0   0   x_t
     // 0    1   0   y_t
@@ -242,7 +242,7 @@ Matrix translate(const double x_t, const double y_t, const double z_t){
     return res;
 }
 
-
+// Devuelve una matriz para rotar en el eje x en base a i
 Matrix rotateX(const double i){
     //1      0       0       0
     //0      cos(i)  -sin(i) 0
@@ -259,7 +259,7 @@ Matrix rotateX(const double i){
     return res;
 }
 
-
+// Devuelve una matriz para rotar en el eje y en base a i
 Matrix rotateY(const double i){
     //cos(i)    0       sin(i)  0
     //0         1       0       0
@@ -277,6 +277,7 @@ Matrix rotateY(const double i){
     return res;
 }
 
+// Devuelve una matriz para rotar en el eje z en base a i
 Matrix rotateZ(const double i){
     //cos(i)    -sin(i)     0       0
     //sin(i)    cos(i)      0       0
@@ -293,10 +294,7 @@ Matrix rotateZ(const double i){
     return res;
 }
 
-
-
-
-
+// Crea una matriz para la base representada por u,v, w y o
 Matrix originalBase(const dir u, const dir v, const dir w, const point o){
     //u.x       v.x         w.x       o.x
     //u.y       v.y         w.y       o.y
@@ -330,7 +328,7 @@ Matrix originalBase(const dir u, const dir v, const dir w, const point o){
 
 }
 
-
+// Crea una matriz para pasar a la nueva base representada por u,v, w y o
 Matrix newBase(const dir u, const dir v, const dir w, const point o){
     Matrix res = inverse(originalBase(u,v,w,o));
 

@@ -2,12 +2,13 @@
 // Created by victor on 14/1/20.
 //
 
-#ifndef KD_TREE_KDTREE_2_H
-#define KD_TREE_KDTREE_2_H
+#ifndef KD_TREE_KDTREE_H
+#define KD_TREE_KDTREE_H
 
 #include <algorithm>
 
-
+// Clase que modela un nodo del árbol k-dimensional
+// Cada nodo almacena punteros a sus hijos y un Photon
 class kdNode{
 public:
     photon data;
@@ -21,6 +22,8 @@ public:
 
 };
 
+// Función que devuelve un nuevo nodo sin hijos y
+// con el Photon pasado como parametro 
 kdNode* newNode(photon p){
     kdNode* temp = new kdNode;
     temp->data = p;
@@ -29,12 +32,14 @@ kdNode* newNode(photon p){
     return temp;
 }
 
+// Para implementar el árbol k-dimensional se han utilizado las siguientes fuentes
 //https://www.cs.cmu.edu/~ckingsf/bioinfo-lectures/kdtrees.pdf
-
+//https://www.geeksforgeeks.org/k-dimensional-tree-set-3-delete/
 class kdTree{
-
-
 private:
+
+    // Implementación recursiva de la inserción de un nuevo nodo al árbol con
+    // la raiz pasada como parametro.
     kdNode* insertRec(kdNode* root, photon p, unsigned depth){
         //Si el arbol esta vacio
         if ( root == NULL ){
@@ -54,6 +59,8 @@ private:
         return root;
     }
 
+    // Implementación recursiva de la busqueda de aquel nodo que almacene un
+    // Photon concreto
     bool searchRec(kdNode* root, photon p, unsigned depth){
         //Casos base
         if( root == nullptr ){
@@ -74,6 +81,7 @@ private:
     }
 
 
+    // Función que devuelve el nodo con valor mínimo
     kdNode* minNode(kdNode *x, kdNode *y, kdNode *z, int d){
         kdNode *resultado = x;
         if(y != nullptr && y->data.at(d) < resultado->data.at(d)){
@@ -85,6 +93,7 @@ private:
         return resultado;
     }
 
+    // Función recursiva que busca el hijo con valor mínimo de un nodo dado
     kdNode* findMinRec(kdNode* root, int d, unsigned depth){
         //Casos base
         if(root == nullptr){
@@ -111,6 +120,8 @@ private:
                        d);
     }
 
+
+    // Función recursiva que se encarga de eliminar un nodo
     kdNode* deleteNodeRec(kdNode* root, photon p, unsigned  depth){
         //El punto pasado como parametro no esta en el arbol
         if(root == nullptr){
@@ -147,9 +158,6 @@ private:
         return root;
     }
 
-
-
-
     void printRec(kdNode* root, int depth, int pos){
         if(root == nullptr){
             std::cout << "" << std::endl;
@@ -174,7 +182,6 @@ private:
             printRec(root->dcha, depth+1,2);
         }
     }
-
 
     //Calcula el punto mas cercano al pasado como parametro mediante recursion
     void nearestRec(kdNode* root, const photon& nuevo, int dimension) {
@@ -228,14 +235,13 @@ public:
         numElem--;
         return deleteNodeRec(this->raiz,p, 0);
     }
+	
     // Elimina el photon p y devuelve la raiz del arbol
     void nearest(photon p){
         nearestRec(this->raiz,p, 0);
     }
 
     kdTree() = default;
-
-
 
     kdTree(std::list<photon> lista){
         DIM = 3;
@@ -247,7 +253,6 @@ public:
         }
     }
 
-
     kdTree(std::list<photon> lista, int d){
         DIM = d;
         raiz = nullptr;
@@ -258,9 +263,8 @@ public:
         }
     }
 
-
     //Busca los n puntos mas cercanos al punto dado
-    std::list<photon> fotonesCercanos(const photon& pt, const int nPuntos){
+    std::list<photon> fotonesCercanos(const photon pt, const int nPuntos){
 
         std::list<photon> output;
 
@@ -297,5 +301,4 @@ public:
 
 };
 
-
-#endif //KD_TREE_KDTREE_2_H
+#endif //KD_TREE_KDTREE_H
