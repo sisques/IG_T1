@@ -204,7 +204,7 @@ list<shared_ptr<figura>> scene_3(){
 
     luz.setAlfa(10);
 
-    materialProperties refraccion = materialProperties(false, eventos, refraction,GLASS);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,2);
 
     refraccion.setKd(255,255,255);
     refraccion.setKs(10,10,10);
@@ -429,6 +429,87 @@ list<shared_ptr<figura>> scene_5 (){
     elementos.push_back(TIERRA);
 */
 
+
+
+
+
+    return elementos;
+}
+
+
+
+list<shared_ptr<figura>> cornell_box(){
+
+
+
+    double reflection[] = {0,0,0.90};
+    double refraction[] = {0,0.70,0.20};
+    double wall[] = {0.90,0,0};
+
+
+    event_enum eventos[] = {PHONG, REFRACTION, REFLEXION };
+    materialProperties phong = materialProperties(false, eventos, wall,VACUUM);
+    phong.setAlfa(1);
+
+    materialProperties luz = materialProperties(true, eventos, wall,VACUUM);
+    luz.setKs(255,255,255);
+
+    luz.setAlfa(10);
+
+    materialProperties refraccion_reflexion = materialProperties(false, eventos, refraction,2);
+
+    refraccion_reflexion.setKd(255,255,255);
+    refraccion_reflexion.setKs(255,255,255);
+
+
+    materialProperties reflexion = materialProperties(false, eventos, reflection,WATER);
+
+    reflexion.setKs(255,255,255);
+
+
+
+
+
+
+
+    phong.setKdPhong(100, 100, 100);
+    phong.setKsPhong(100, 100, 100);
+
+    shared_ptr<figura> techo = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0), luz));
+    shared_ptr<figura> suelo = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0), phong));
+    shared_ptr<figura> fondo = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1), phong));
+
+
+
+    phong.setKdPhong(255, 0, 0);
+    phong.setKsPhong(255, 0, 0);
+    shared_ptr<figura> izda = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0), phong));
+    phong.setKdPhong(0, 255, 0);
+    phong.setKsPhong(0, 255, 0);
+
+    shared_ptr<figura> dcha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0), phong));
+
+
+
+    phong.setKdPhong(0, 0, 255);
+    phong.setKsPhong(0, 0, 255);
+    shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0.3,-0.3,0.8), 0.2, phong);
+
+    shared_ptr<figura> ESFERArefrac_reflex = make_shared<esfera>(newPoint(-0.3,-0.3,0.8), 0.2, refraccion_reflexion);
+
+
+
+    list<shared_ptr<figura>> elementos;
+
+    shared_ptr<figura> puntoLuz_1 = make_shared<punto>(punto(newPoint(0,0.5,0.5), luz));
+    elementos.push_back(puntoLuz_1);
+    elementos.push_back(fondo);
+    elementos.push_back(suelo);
+    elementos.push_back(techo);
+    elementos.push_back(izda);
+    elementos.push_back(dcha);
+    elementos.push_back(ESFERArefrac_reflex);
+    elementos.push_back(ESFERAphong);
 
 
 

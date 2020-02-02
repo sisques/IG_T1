@@ -7,24 +7,32 @@
 
 using namespace std;
 
+// Clase que representa un photón generado por un rayo de luz
 class photon{
 public:
-    point p; // position
+    // Posición del fotón
+    point p;
+    // Normal de la superficie en la que impactóo
     dir n;
-    double R,G,B;; // power packed as 4 chars
+    // RGB del fotón
+    double R,G,B;
+    // Flujo del fotón
     double flow;
-    //dir phi, theta; // compressed incident direction
-    bool inicializado = false;
-    int refr = 0;
+    // Entero para controlar a que photon map debe ir
+    // Si es 0 al global, si es 1 ha entrado en refracción,
+    // si es 2 debe ir al de cáusticas, y si es 3, proviene
+    // de reflexión, y debe ir al de cáusticas
+    int state;
 
-
+    // Constructores
     photon(const point &p) : p(p) {}
-
+    photon(const double &x) : p(newPoint(x,x,x)) {}
     photon() = default;
+    // Destructor
     ~photon() = default;
 
 
-
+    // Operador de igualdad
     photon& operator=(const photon& in){
         this->p = in.p;
         this->n = in.n;
@@ -32,11 +40,9 @@ public:
         this->G = in.G;
         this->B = in.B;
         this->flow = in.flow;
-        //this->dir = in.dir;
-        //this->theta = in.theta;
-        this->inicializado = in.inicializado;
     }
 
+    // Para obtener la información de la posición
     double at(int cd) const{
         if(cd % 3 == 0){
             return p.x;
@@ -47,36 +53,6 @@ public:
         }
     }
 
-    bool empty(){
-        return inicializado;
-    }
-
-    bool vacio(){
-        bool a = this->p.x == 0;
-        bool b = this->p.y == 0;
-        bool c = this->p.z == 0;
-        bool d = this->p.w == 0;
-        bool e = this->n.x == 0;
-        bool f = this->n.y == 0;
-        bool g = this->n.z == 0;
-        bool h = this->n.w == 0;
-        bool i = this->R == 0;
-        bool j = this->G == 0;
-        bool k = this->B == 0;
-        bool l = this->flow == 0;
-        //this->dir = in.dir;
-        //this->theta = in.theta;
-        bool m = this->inicializado == false;
-        bool n = this->refr == 0;
-        bool resul =  a && b && c && d && e && f && g && h && i && j && k && l && m && n;
-        return resul;
-    }
-
-
-
-    int size() const {
-        return 3;
-    }
 
 
 

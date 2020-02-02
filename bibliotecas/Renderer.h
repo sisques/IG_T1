@@ -53,6 +53,8 @@ protected:
         return yes;
     }
 
+
+
 	// Devuelve una dirección que contiene en sus valores x, y, z la luminancia R, G, B correspodiente a la luz
 	// directa incidente sobre un punto "p" con normal "n". Solo se cuentan las luces puntuales
     dir luzDirecta(const list<shared_ptr<figura>> &e, const list<shared_ptr<figura>> &luces, dir rayo, dir n, point p){

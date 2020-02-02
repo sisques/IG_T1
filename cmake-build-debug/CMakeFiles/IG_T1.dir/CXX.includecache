@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+../bibliotecas/scenes.h
+../bibliotecas/punto_direccion.h
+../bibliotecas/punto_direccion.h
+../bibliotecas/figuras.h
+../bibliotecas/figuras.h
+../bibliotecas/ply_reader.h
+../bibliotecas/ply_reader.h
+
 /home/victor/gitRepos/IG_T1/IG_T3/main.cpp
 ../bibliotecas/punto_direccion.h
 /home/victor/gitRepos/IG_T1/bibliotecas/punto_direccion.h
@@ -42,6 +50,8 @@ time.h
 stdio.h
 -
 iomanip
+-
+scenes.h
 -
 
 /home/victor/gitRepos/IG_T1/bibliotecas/Renderer.h
@@ -93,22 +103,22 @@ list
 /home/victor/gitRepos/IG_T1/bibliotecas/globals.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/kdTree.h
+kdTree_smallPM.h
+/home/victor/gitRepos/IG_T1/bibliotecas/kdTree_smallPM.h
+
+/home/victor/gitRepos/IG_T1/bibliotecas/kdTree_smallPM.h
+vector
+-
+list
+-
+iostream
+-
+math.h
+-
 algorithm
--
-cmath
--
-functional
--
-iterator
 -
 limits
 -
-memory
--
-vector
--
-photon.h
-/home/victor/gitRepos/IG_T1/bibliotecas/photon.h
 
 /home/victor/gitRepos/IG_T1/bibliotecas/materialProperties.h
 iostream
