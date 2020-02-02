@@ -46,7 +46,8 @@ private:
 		// Si colisiona y el evento no es muerte
         if(colisiona && !actualFig->isLight() && (event = actualFig->evento()) != DEATH){
 			dir n = actualFig->getNormal(colP);
-			dir dirNewRay = actualFig->nextRay(event, rayo, colP);
+			bool refInt = false;
+			dir dirNewRay = actualFig->nextRay(event, rayo, colP, refInt);
 			
 			double R_act, G_act, B_act;
 			// Se obtiene el RGB de la figura colisionada
@@ -87,7 +88,7 @@ private:
 			// se guarde el fotón en el photon map de cáusticas
 			else if(event == REFRACTION){
 				if(phAnt.state == 0){newPhoton.state = 1;}
-				else if(phAnt.state == 1){newPhoton.state = 2;}
+				else if(phAnt.state == 1 && !refInt){newPhoton.state = 2;}
 			}
 			else if(event == REFLEXION && phAnt.state == 0){
 				newPhoton.state = 3;
@@ -148,6 +149,7 @@ public:
 				double& R, double& G, double& B, const bool &luzPuntual){
 		shared_ptr<figura> actualFig = nullptr;
 		point colP;
+		static int aux = 0;
 		// Comprobamos si colisiona
 		bool colisiona = colision(c,e,rayo,actualFig,colP);
 		// Si no colisiona
@@ -161,8 +163,8 @@ public:
 			event_enum event;
 			// Se selecciona un evento distinto de muerte aleatoriamente
 			do{event = actualFig->evento();}while(event == DEATH);
-			
-			dir dirNewRay = actualFig->nextRay(event, rayo, colP);
+			bool trash;
+			dir dirNewRay = actualFig->nextRay(event, rayo, colP, trash);
 			// Si es emisor devuelve su RGB directamente
 			if(actualFig->isLight()){
 				actualFig->getRGB(EMISSION,colP,R,G,B);
@@ -170,13 +172,20 @@ public:
 			// Si es refracción o reflexión, calcula la interacción, y devuelve el RGB
 			// de dicha interacciónn
 			else if(event != PHONG && event != EMISSION){
-				getRGB(colP, e,luces, pm, pmc, dirNewRay, R,G,B, luzPuntual);
+				++aux;
 				double r,g,b;
+				if(aux > 50){
+					colP.x /= 0.99;
+					colP.y /= 0.99;
+					colP.z /= 0.99;
+				}
+				getRGB(colP, e,luces, pm, pmc, dirNewRay, R,G,B, luzPuntual);
 				actualFig->getRGB(event,colP,r,g,b);
 				R *= r; G *= g; B *= b;
 			}
 			// Si es phong
 			else{
+				aux = 0;
 				// Halla el RGB en el photon map global
 				pm.getColorAt(colP,R,G,B);
 				double r,g,b;

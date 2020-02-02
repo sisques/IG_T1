@@ -168,7 +168,7 @@ public:
 	
     // basado en https://stackoverflow.com/questions/42218704/how-to-properly-handle-refraction-in-raytracing
 	// Devuelve el rayo de refracción en base a el rayo de entrada y la normal
-    /*virtual dir refraction(dir d, dir n) {
+    /*virtual dir refraction(dir d, dir n, point o) {
         double r = mp.getIndiceRefraccionObjeto();
         double cosI = dot(d,-n);
         if (cosI < 0) {
@@ -188,21 +188,23 @@ public:
     }
 
     // basado en https://github.com/matt77hias/java-smallpt/blob/master/src/core/Specular.java
-    virtual dir refraction(dir d, dir n, point o) {
+    virtual dir refraction(dir d, dir n, point o, bool &reflexionInterna) {
+        reflexionInterna = false;
         dir d_Re = -reflexion(d,n,o);
-        bool fuer_a_dent = dot(n,d);
-        dir nl = fuer_a_dent ? n : n;
+        bool out_to_in = dot(n,d) < 0;
+        dir nl = out_to_in ? -n : n;
         double n_out = mp.getIndiceRefraccionMedio();
         double n_in = mp.getIndiceRefraccionObjeto();
-        double r = fuer_a_dent ? n_out / n_in : n_in / n_out;
+        double r = out_to_in ? n_out / n_in : n_in / n_out;
         double cos_theta = dot(d,nl);
         double cos2_phi = 1.0 - r * r * (1.0 - cos_theta * cos_theta);
         //reflexion interna
         if (cos2_phi < 0) {
+            reflexionInterna = true;
             return d_Re;
         }
         dir d_Tr = normalize(r*d - nl*(r*cos_theta + sqrt(cos2_phi)));
-        double c = 1.0 - (fuer_a_dent ? -cos_theta : dot(d_Tr,n));
+        double c = 1.0 - (out_to_in ? -cos_theta : dot(d_Tr,n));
         double Re = schlickReflectance(n_out, n_in, c);
         double p_Re = 0.25 + 0.5 * Re;
         double rnd = (double)rand() / RAND_MAX;
@@ -210,7 +212,7 @@ public:
             return d_Re;
         }
         else  {
-            return newDir(-d_Tr.x, d_Tr.y, -d_Tr.z);
+            return normalize(d_Tr);
         }
     }
 	
@@ -261,20 +263,21 @@ public:
 
 	// Devuelve una dirección en base al tipo de evento, el rayo de entrada
 	// y un punto
-    dir nextRay(event_enum evento, dir inputRay, point inputPoint) {
+    dir nextRay(event_enum evento, dir inputRay, point inputPoint, bool &reflexionInterna) {
         dir normal = this -> getNormal(inputPoint);
-		// Si el evento es reflexión
+        reflexionInterna = false;
+        // Si el evento es reflexión
         if ( evento == REFLEXION) {
             return reflexion(inputRay, normal);
-		// Si el evento es refracción
+            // Si el evento es refracción
         } else if (evento == REFRACTION) {
-            return refraction(inputRay, normal, inputPoint);
+            return refraction(inputRay, normal, inputPoint, reflexionInterna);
         }
-		// Si el evento es phong
+            // Si el evento es phong
         else if (evento == PHONG){
             return phongDir(inputRay, normal, mp.getAlfa());
         }
-		// Por defecto
+            // Por defecto
         else{
             return normal;
         }

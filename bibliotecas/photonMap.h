@@ -25,14 +25,20 @@ private:
 	// Número de fotones a coger entorno a un punto
 	int photonsPerRay = 50;
 	
+	bool vacio = false;
+	
 public:
 	// Costructor por defecto
 	photonMap(){}
 	// Constructor a partir de un árbol
-	photonMap(kdTree t){
-		tree = t;
+	photonMap(kdTree t, int size){
+		if(size > 0){
+			tree = t;
+		}
+		else{
+			vacio = true;
+		}
 	}
-	
 	// Configurar el número de fotones por rayo
 	void setPhotonsPerRay(int ppr){ photonsPerRay = ppr;}
 	
@@ -58,7 +64,12 @@ public:
 	
 	// Devuelve un árbol generado a partir de la lista auxiliar
 	kdTree generateTreeAux(){
-		return kdTree(photonList);
+		if(photonList.size() > 0){
+			return kdTree(photonList);
+		}
+		else{
+			return kdTree();
+		}
 	}
 	
 	// Filtro gaussiano para los fotones capturados
@@ -73,6 +84,7 @@ public:
 	// de los photonsPerRay fotones más cercanos al punto p
 	void getColorAt(const point &p, double &r, double &g, double &b){
 		r = 0; g = 0; b = 0;
+		if(vacio){return;}
 		// Obtiene los photonsPerRay fotones más cercanos
 		list<photon> aux = tree.fotonesCercanos(p,photonsPerRay);
 		double maxD = 0;
@@ -82,9 +94,16 @@ public:
 		}
 		// Estima la radiandia aplicando el filtrado cónico
 		for(photon ph:aux){
-			r += ph.flow*ph.R*(1-(mod(p-ph.p)/maxD));
-			g += ph.flow*ph.G*(1-(mod(p-ph.p)/maxD));
-			b += ph.flow*ph.B*(1-(mod(p-ph.p)/maxD));
+			if(aux.size() > 1){
+				r += ph.flow*ph.R*(1-(mod(p-ph.p)/maxD));
+				g += ph.flow*ph.G*(1-(mod(p-ph.p)/maxD));
+				b += ph.flow*ph.B*(1-(mod(p-ph.p)/maxD));
+			}
+			else{
+				r += ph.flow*ph.R;
+				g += ph.flow*ph.G;
+				b += ph.flow*ph.B;
+			}
 		}
 		// Haya el área
 		double A = M_PI*maxD*maxD;

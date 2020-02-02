@@ -64,8 +64,9 @@ public:
 			}
             dir dirNewRay;
             double p = 0.0;
+			bool trash;
 			// Calculamos el nuevo rayo según el evento con la figura colisionada
-			dirNewRay = actualFig->nextRay(event, rayo, colP);
+			dirNewRay = actualFig->nextRay(event, rayo, colP, trash);
 			p = actualFig->probEvent(event);
 			// Obtenemos el RGB del resto del camino
             getRGB(colP,  e, luces, dirNewRay, R_siguiente, G_siguiente, B_siguiente, luzPuntual);

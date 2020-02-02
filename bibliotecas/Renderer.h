@@ -90,7 +90,8 @@ protected:
 			else if(colisiona && fig->evento() == REFRACTION){
 				double r,g,b;
 				fig->getRGB(REFRACTION,p2,r,g,b);
-				dir nR = fig->nextRay(REFRACTION,rayo,p2);
+				bool trash;
+				dir nR = fig->nextRay(REFRACTION,rayo,p2,trash);
 				dir aux = luzDirecta(e,luces,nR,fig->getNormal(p2),p2);
 				luz.x += r*aux.x*abs(dot(n, nR));
 				luz.y += g*aux.y*abs(dot(n, nR));
