@@ -46,18 +46,25 @@ list<shared_ptr<figura>> set_room(){
     luz.setAlfa(0);
 	
     shared_ptr<figura> floor_ = make_shared<plano>(plano(newPoint(0,0,1), newDir(0,0,-1),floor));
-    shared_ptr<figura> ceil_ = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),luz));
+    shared_ptr<figura> ceil_ = make_shared<plano>(plano(newPoint(0,0.5,0), newDir(0,-1,0),floor));
     shared_ptr<figura> back_ = make_shared<plano>(plano(newPoint(0,-0.5,0), newDir(0,1,0),floor));
     shared_ptr<figura> left_ = make_shared<plano>(plano(newPoint(-0.5,0,0), newDir(1,0,0),left));
     shared_ptr<figura> right_ = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),right));
 
     shared_ptr<figura> puntoLuz_1 = make_shared<punto>(punto(newPoint(0,0.49,0.5), luz));
-    //elementos.push_back(puntoLuz_1);
+    elementos.push_back(puntoLuz_1);
     elementos.push_back(floor_);
     elementos.push_back(ceil_);
     elementos.push_back(back_);
     elementos.push_back(left_);
     elementos.push_back(right_);
+	
+	double brdfValues2[] = {0.9,0.0,0.0};
+    materialProperties limit = materialProperties(false, eventos, brdfValues2,0);
+	limit.setKdPhong(0,0,0);
+	limit.setKsPhong(0,0,0);
+    shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,1), limit));
+	elementos.push_back(limite);
 
     return elementos;
 }
@@ -74,15 +81,15 @@ list<shared_ptr<figura>> setUpSceneCool(){
     materialProperties mp = materialProperties(false, eventos, wall);
 	materialProperties PR = materialProperties(false, eventos,wall);
 	mp.setAlfa(0);
-    materialProperties light = materialProperties(true, eventos2, l,1);
+    materialProperties light = materialProperties(true, eventos2, l);
 	light.setKs(255,255,255);
-    materialProperties reflexion = materialProperties(false, eventos, reflection,1.33);
+    materialProperties reflexion = materialProperties(false, eventos, reflection);
 	//reflexion.setKd(0,0,0);
 	reflexion.setKs(255,255,255);
 	reflexion.setKdPhong(255,255,255);
 	reflexion.setKsPhong(255,255,255);
 	reflexion.setAlfa(10);
-    materialProperties refraccion = materialProperties(false, eventos, refraction,2);
+    materialProperties refraccion = materialProperties(false, eventos, refraction,1.3);
 	refraccion.setKd(0,255,255);
 	refraccion.setKs(0,255,255);
 	refraccion.setKdPhong(0,255,255);
@@ -90,7 +97,7 @@ list<shared_ptr<figura>> setUpSceneCool(){
 
 	// Definición de geometrías
     list<shared_ptr<figura>> elementos;
-	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0,0.95), light));
+	shared_ptr<figura> puntoLuz = make_shared<punto>(punto(newPoint(0,0.49,0.5), light));
 	//mp.setKd(120, 120, 120);
 	//mp.setKs(120, 120, 120);
 	mp.setKdPhong(170, 170, 170);
@@ -108,7 +115,6 @@ list<shared_ptr<figura>> setUpSceneCool(){
 	mp.setKdPhong(0,255,0);
 	mp.setKsPhong(0,120,0);
     shared_ptr<figura> derecha = make_shared<plano>(plano(newPoint(0.5,0,0), newDir(-1,0,0),mp));
-    shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0,0.35,0.5), 0.15, refraccion);
     shared_ptr<figura> ESFERAreflexion = make_shared<esfera>(newPoint(0.3,-0.3,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion2 = make_shared<esfera>(newPoint(0.3,-0.1,0.9), 0.2, reflexion);
 	shared_ptr<figura> ESFERAreflexion3 = make_shared<esfera>(newPoint(-0.3,-0.15,0.7), 0.2, reflexion);
@@ -118,7 +124,7 @@ list<shared_ptr<figura>> setUpSceneCool(){
 	PR.setKdPhong(0,255,255);
 	PR.setKsPhong(0,255,255);
 	PR.setAlfa(0);
-	shared_ptr<figura> ESFERAphong = make_shared<esfera>(newPoint(0,-0.4,0.7), 0.1, refraccion);
+	shared_ptr<figura> ESFERArefraccion = make_shared<esfera>(newPoint(0,-0.1,0.7), 0.2, refraccion);
 	mp.setKdPhong(0,0,255);
 	mp.setKsPhong(0,0,120);
 	mp.setAlfa(4);
@@ -134,12 +140,12 @@ list<shared_ptr<figura>> setUpSceneCool(){
     elementos.push_back(techo);
     elementos.push_back(izquierda);
     elementos.push_back(derecha);
-    //elementos.push_back(ESFERArefraccion);
+    elementos.push_back(ESFERArefraccion);
 	elementos.push_back(ESFERAreflexion);
 	elementos.push_back(ESFERAreflexion2);
 	elementos.push_back(ESFERAreflexion3);
 	elementos.push_back(ESFERAreflexion4);
-	elementos.push_back(ESFERAphong);
+	elementos.push_back(ESFERArefraccion);
 	elementos.push_back(ESFERAphong2);
 	elementos.push_back(ESFERAphong3);
 	elementos.push_back(ESFERAphong4);
@@ -148,15 +154,13 @@ list<shared_ptr<figura>> setUpSceneCool(){
 
     double brdfValues2[] = {0.9,0.0,0.0};
     materialProperties limit = materialProperties(false, eventos, brdfValues2,0);
-	//limit.setKd(0,0,0);
-	//limit.setKs(0,0,0);
 	limit.setKdPhong(0,0,0);
 	limit.setKsPhong(0,0,0);
 	mp.setKdPhong(0,0,0);
 	mp.setKsPhong(0,0,0);
     shared_ptr<figura> limite = make_shared<plano>(plano(newPoint(0,0,0), newDir(0,0,1), mp));
-
 	elementos.push_back(limite);
+	
     return elementos;
 }
 
@@ -184,6 +188,34 @@ list<shared_ptr<figura>> scene_1(){
     return elementos;
 }
 
+list<shared_ptr<figura>> scene_2(){
+
+    double reflection[] =   {0,0.0,0.90};
+    double refraction[] =   {0,0.90,0.0};
+    double phong[] =        {0.90,0.0,0.0};
+    event_enum eventos[] =  {PHONG, REFRACTION, REFLEXION };
+
+    materialProperties red = materialProperties(false, eventos, phong);
+    red.setKdPhong(216,21,21);
+    red.setKsPhong(216,21,21);
+	
+	materialProperties white = materialProperties(false, eventos, phong);
+    white.setKdPhong(216,216,216);
+    white.setKsPhong(216,216,216);
+
+    list<shared_ptr<figura>> elementos = set_room();
+
+    shared_ptr<figura> sphere1 = make_shared<esfera>(newPoint(0,-0.35, 0.85), 0.15, white);
+    shared_ptr<figura> sphere2 = make_shared<esfera>(newPoint(-0.25,-0.35, 0.5), 0.15, red);
+	shared_ptr<figura> sphere3 = make_shared<esfera>(newPoint(0.25,-0.35, 0.7), 0.15, white);
+
+    elementos.push_back(sphere1);
+    elementos.push_back(sphere2);
+	elementos.push_back(sphere3);
+
+    return elementos;
+}
+
 list<shared_ptr<figura>> scene_4(){
 
     double reflection[] =   {0,0.0,0.90};
@@ -192,18 +224,16 @@ list<shared_ptr<figura>> scene_4(){
     event_enum eventos[] =  {PHONG, REFRACTION, REFLEXION };
 
     materialProperties orange = materialProperties(false, eventos, phong);
-    orange.setKdPhong(216,21,21);
-    orange.setKsPhong(216,21,21);
+    orange.setKdPhong(216,153,5);
+    orange.setKsPhong(216,153,5);
 
     list<shared_ptr<figura>> elementos = set_room();
 
-    materialProperties mirror = materialProperties(false, eventos, reflection);
     materialProperties glass = materialProperties(false, eventos, refraction, 1.5);
-    glass.setKd(255,255,255);
-    mirror.setKs(255,255,255);
+    glass.setKd(216,216,216);
 
-    shared_ptr<figura> sphere1 = make_shared<esfera>(newPoint(0,-0.1, 0.7), 0.3, glass);
-    shared_ptr<figura> sphere2 = make_shared<esfera>(newPoint(0,-0.1, 0.7), 0.15, orange);
+    shared_ptr<figura> sphere1 = make_shared<esfera>(newPoint(0,-0.2, 0.7), 0.3, glass);
+    shared_ptr<figura> sphere2 = make_shared<esfera>(newPoint(0,-0.2, 0.7), 0.15, orange);
 
     elementos.push_back(sphere1);
     elementos.push_back(sphere2);
@@ -216,7 +246,10 @@ list<shared_ptr<figura>> setUpScene(int id){
 	if(id  == 1){
 		return scene_1();
 	}
-	if(id == 4){
+	else if(id == 2){
+		return scene_2();
+	}
+	else if(id == 4){
 		return scene_4();
 	}
 	else{
@@ -230,6 +263,7 @@ int completadas = 0;
 void generateScene( monteCarlo mc, const list<shared_ptr<figura>> &e,
 					const string &fOut, const int &hMin, const int &hMax,
 					const int &w, const int &h, const int &luzPuntual){
+						
 	int R,G,B;
 	fstream flujoOut;
 	flujoOut.open((fOut).c_str(), ios::out);
@@ -253,9 +287,9 @@ int main(int argc, char *argv[]){
 		return 0;
 	}
 	// Si se usa el algoritmo de photon mapping o path tracer
-	bool photOn = false;
+	bool photOn = true;
 	// Identificador de la escena, de 1 a 5
-	int nScene = 4;
+	int nScene = 5;
 	
 	/*
      * camara       x   y   z
@@ -279,18 +313,18 @@ int main(int argc, char *argv[]){
 	int maxRays, maxPhotonsGlobal, maxPhotonsCaustics, photonsPerRay;
 
 	// Si la escena contiene luces puntuales
-	bool luzPuntual = false;
+	bool luzPuntual = true;
 	
 	// Photon maps para iluminación global y cáusticas
 	photonMap pm, pmC;
 	
-	double gamma = 0.3;
+	double gamma = 0.2;
 	
 	// Parámetros para el photon map
 	maxRays = 1000000;
-	maxPhotonsGlobal = 50000;
-	maxPhotonsCaustics = 50000;
-	photonsPerRay =  25;
+	maxPhotonsGlobal = 1000000;
+	maxPhotonsCaustics = 1000000;
+	photonsPerRay =  500;
 
     int threads = 4;
     if (threads > h || threads > w){
@@ -323,14 +357,14 @@ int main(int argc, char *argv[]){
 		mc = monteCarlo(c2,h,w,rpp, gamma);
 		// Si es photon mapping
 		if(photOn){
-			mc = monteCarlo(c2,h,w,rpp, gamma, photonMap(pm.generateTreeAux()), 
-					photonMap(pmC.generateTreeAux()), photonsPerRay);
+			mc = monteCarlo(c2,h,w,rpp, gamma, photonMap(pm.generateTreeAux(),pm.size()), 
+					photonMap(pmC.generateTreeAux(),pmC.size()), photonsPerRay);
 		}
 		if(i == threads-1){hMax = h - 1;}
 		th[i] = thread(&generateScene, mc, e, ruta+to_string(i), hMin, hMax, w, h, luzPuntual);
 		hMin += h/threads;
 		hMax += h/threads;
-		cout << "Se ha creado el thread " << i << endl;
+		cout << "Se ha creado el thread " << i+1 << endl;
 	}
 	// Vaciamos los photon maps auxiliares
 	pm.clear();
