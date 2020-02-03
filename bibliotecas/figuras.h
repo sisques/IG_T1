@@ -168,10 +168,12 @@ public:
 	
     // basado en https://stackoverflow.com/questions/42218704/how-to-properly-handle-refraction-in-raytracing
 	// Devuelve el rayo de refracción en base a el rayo de entrada y la normal
-    /*virtual dir refraction(dir d, dir n, point o) {
+    /*virtual dir refraction(dir d, dir n, point o, bool &ri) {
+		ri = false;
         double r = mp.getIndiceRefraccionObjeto();
         double cosI = dot(d,-n);
         if (cosI < 0) {
+			ri = true;
            r  = 1.0 / r;
         }
         return (d * r - n * (-cosI + r * cosI));

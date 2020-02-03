@@ -87,10 +87,10 @@ private:
 			// Si el evento es refracción se gestiona, para que cuando salga de esta
 			// se guarde el fotón en el photon map de cáusticas
 			else if(event == REFRACTION){
-				if(phAnt.state == 0){newPhoton.state = 1;}
+				if(phAnt.state == 0 || phAnt.state == 3){newPhoton.state = 1;}
 				else if(phAnt.state == 1 && !refInt){newPhoton.state = 2;}
 			}
-			else if(event == REFLEXION && phAnt.state == 0){
+			else if(event == REFLEXION && phAnt.state != 3){
 				newPhoton.state = 3;
 			}
 			else{
@@ -194,8 +194,8 @@ public:
 				R += r; G += g; B += b;
 				// Si hay luces puntuales se calcula la luz directa
 				if(luzPuntual){
-					luzDirecta(e,luces,dirNewRay,actualFig->getNormal(colP),colP);
-					R += r; G += g; B += b;
+					dir daux = luzDirecta(e,luces,dirNewRay,actualFig->getNormal(colP),colP);
+					R += daux.x; G += daux.y; B += daux.z;
 				}
 				actualFig->phongColor(rayo,dirNewRay,colP,r,g,b);
 				R *= r; G *= g; B *= b;
